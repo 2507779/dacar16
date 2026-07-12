@@ -28,7 +28,7 @@ export default function Home() {
     setActiveCarId(id);
   };
 
-  // Рекомендованные авто (первые 3)
+  // Популярные авто (первые 3)
   const hotCars = cars.slice(0, 3);
 
   return (
@@ -44,7 +44,7 @@ export default function Home() {
           <div className="flex justify-between items-start z-10">
             <div>
               <span className="bg-amber-400 text-black text-[9px] font-black uppercase px-2.5 py-0.5 rounded-md tracking-wider shadow-sm">
-                Премиум Импорт
+                Консьерж-сервис по заказу автомобилей
               </span>
               <h2 className="font-display text-2xl font-bold mt-3 tracking-tight leading-tight">
                 Автомобили из Азии <br />
