@@ -15,7 +15,7 @@ import VehicleDetails from './pages/VehicleDetails';
 import VehicleStories from './components/VehicleStories';
 import { AnimatePresence, motion } from 'motion/react';
 // @ts-ignore
-import dacarLogo from './assets/images/dacar_logo_1783874158928.jpg';
+import dacarLogo from './assets/images/logo.png';
 
 export default function App() {
   const { currentTab, activeCarId } = useStore();
