@@ -44,7 +44,7 @@ export default function Home() {
           <div className="flex justify-between items-start z-10">
             <div>
               <span className="bg-amber-400 text-black text-[9px] font-black uppercase px-2.5 py-0.5 rounded-md tracking-wider shadow-sm">
-                Консьерж-сервис по заказу автомобилей
+                Консьерж-сервис по заказу и покупке автомобилей
               </span>
               <h2 className="font-display text-2xl font-bold mt-3 tracking-tight leading-tight">
                 Автомобили из Азии <br />
