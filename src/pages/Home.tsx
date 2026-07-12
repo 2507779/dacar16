@@ -1,12 +1,7 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import { useStore } from '../store/useStore';
 import { formatCurrency, calculateFullCarPrice } from '../data/cars';
 import { triggerHaptic } from '../utils/haptics';
-import { ShieldCheck, Truck, Percent, Coins, MessageSquare, ArrowRight, Zap, Flame, Award } from 'lucide-react';
+import { ShieldCheck, Truck, Percent, Coins, MessageSquare, ArrowRight, Zap, Flame, Award, Sparkles } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export default function Home() {
@@ -23,7 +18,6 @@ export default function Home() {
     if (key === 'engineType') {
       setFilters({ fuel: value });
     } else if (key === 'bodyType') {
-      // Ищем по кузову
       setFilters({ brand: null, country: null, condition: null, fuel: null });
     }
     setCurrentTab('catalog');
@@ -38,42 +32,44 @@ export default function Home() {
   const hotCars = cars.slice(0, 3);
 
   return (
-    <div className="flex flex-col text-neutral-900 pb-10">
+    <div className="flex flex-col text-white pb-10 select-none">
       
       {/* 1. Премиум Баннер-Слайдер */}
       <div className="relative px-4 pt-4 select-none">
-        <div className="h-56 bg-gradient-to-r from-neutral-950 via-neutral-900 to-neutral-800 rounded-3xl p-6 flex flex-col justify-between text-white overflow-hidden relative shadow-lg">
+        <div className="h-60 bg-gradient-to-br from-[#121215] via-[#16161c] to-[#0c0c0e] rounded-3xl p-6 flex flex-col justify-between text-white overflow-hidden relative border border-white/[0.04] shadow-2xl">
           {/* Декоративная подсветка */}
-          <div className="absolute top-[-50%] right-[-10%] w-72 h-72 bg-amber-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-[-30%] left-[-10%] w-48 h-48 bg-amber-500/20 rounded-full blur-2xl"></div>
+          <div className="absolute -top-12 -right-12 w-64 h-64 bg-amber-500/10 rounded-full blur-[80px]"></div>
+          <div className="absolute -bottom-16 -left-16 w-48 h-48 bg-amber-500/15 rounded-full blur-[60px]"></div>
 
           <div className="flex justify-between items-start z-10">
             <div>
-              <span className="bg-amber-400 text-black text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-widest">
+              <span className="bg-amber-400 text-black text-[9px] font-black uppercase px-2.5 py-0.5 rounded-md tracking-wider shadow-sm">
                 Премиум Импорт
               </span>
-              <h2 className="font-display text-2xl font-bold mt-2.5 tracking-tight leading-tight">
+              <h2 className="font-display text-2xl font-bold mt-3 tracking-tight leading-tight">
                 Автомобили из Азии <br />
-                <span className="text-amber-400">под ключ в РФ</span>
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500">под ключ в РФ</span>
               </h2>
             </div>
-            <Award className="w-8 h-8 text-amber-400 shrink-0" />
+            <div className="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-amber-400 shadow-inner">
+              <Award className="w-5 h-5" />
+            </div>
           </div>
 
-          <div className="flex justify-between items-end z-10 border-t border-white/10 pt-4 mt-3">
+          <div className="flex justify-between items-end z-10 border-t border-white/[0.04] pt-4 mt-3">
             <div>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wider">Главный офис</p>
-              <p className="text-sm font-semibold text-white">г. Казань, ул. Серова, д. 48, к. 2</p>
+              <p className="text-[9px] text-gray-500 uppercase tracking-widest font-mono">Главный офис</p>
+              <p className="text-xs font-semibold text-gray-200 mt-0.5">г. Казань, ул. Серова, 48</p>
             </div>
             <button
               onClick={() => {
                 triggerHaptic('medium');
                 setCurrentTab('catalog');
               }}
-              className="bg-white hover:bg-amber-400 hover:text-neutral-950 transition-colors duration-200 text-black px-4 py-2 rounded-xl text-xs font-bold flex items-center space-x-1 cursor-pointer active:scale-95"
+              className="bg-amber-400 hover:bg-amber-500 text-black px-4.5 py-2.5 rounded-xl text-xs font-bold flex items-center space-x-1.5 cursor-pointer active:scale-95 transition-bezier shadow-md shadow-amber-400/10"
             >
               <span>В каталог</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3.5 h-3.5 text-black" />
             </button>
           </div>
         </div>
@@ -81,8 +77,9 @@ export default function Home() {
 
       {/* 2. Выбор стран происхождения */}
       <div className="px-4 mt-6">
-        <h3 className="font-display text-sm font-bold uppercase tracking-wider text-neutral-400">
-          Страна экспорта
+        <h3 className="font-display text-[10px] font-bold uppercase tracking-widest text-neutral-500 flex items-center space-x-1">
+          <Sparkles className="w-3 h-3 text-amber-400" />
+          <span>Страна экспорта</span>
         </h3>
         <div className="grid grid-cols-3 gap-2.5 mt-2.5">
           {[
@@ -93,10 +90,10 @@ export default function Home() {
             <button
               key={c.id}
               onClick={() => handleCountrySelect(c.id as any)}
-              className="bg-white border border-neutral-200/80 hover:border-amber-400 active:scale-95 transition-all p-3 rounded-2xl flex flex-col items-center justify-center text-center shadow-[0_2px_8px_rgba(0,0,0,0.02)] cursor-pointer"
+              className="bg-[#121215]/80 border border-white/[0.03] hover:border-amber-400/40 hover:bg-[#16161a] active:scale-95 transition-bezier p-3.5 rounded-2xl flex flex-col items-center justify-center text-center shadow-lg cursor-pointer group"
             >
-              <span className="font-semibold text-xs text-neutral-900">{c.label}</span>
-              <span className="text-[8px] text-gray-400 mt-1">{c.desc}</span>
+              <span className="font-bold text-xs text-gray-100 group-hover:text-amber-400 transition-colors">{c.label}</span>
+              <span className="text-[8px] text-neutral-400 mt-1 leading-snug">{c.desc}</span>
             </button>
           ))}
         </div>
@@ -105,8 +102,8 @@ export default function Home() {
       {/* 3. Категории по типу двигателя */}
       <div className="px-4 mt-6">
         <div className="flex justify-between items-center">
-          <h3 className="font-display text-sm font-bold uppercase tracking-wider text-neutral-400">
-            Популярные категории
+          <h3 className="font-display text-[10px] font-bold uppercase tracking-widest text-neutral-500">
+            Двигатели под заказ
           </h3>
         </div>
         <div className="flex space-x-2 overflow-x-auto pt-2 pb-1 scrollbar-none">
@@ -119,7 +116,7 @@ export default function Home() {
             <button
               key={cat.id}
               onClick={() => handleCategorySelect(cat.key, cat.id)}
-              className="bg-white border border-neutral-200/80 hover:border-amber-400 shrink-0 px-4 py-2 rounded-xl text-xs font-medium text-neutral-800 transition active:scale-95 cursor-pointer shadow-[0_1px_4px_rgba(0,0,0,0.01)]"
+              className="bg-[#121215]/90 border border-white/[0.03] hover:border-amber-400/40 hover:bg-[#16161a] shrink-0 px-4.5 py-2.5 rounded-xl text-xs font-semibold text-gray-200 transition-bezier active:scale-95 cursor-pointer shadow-md"
             >
               {cat.label}
             </button>
@@ -129,9 +126,9 @@ export default function Home() {
 
       {/* 4. Горячие Предложения (Сетка) */}
       <div className="px-4 mt-6">
-        <div className="flex justify-between items-center mb-3">
-          <h3 className="font-display text-sm font-bold uppercase tracking-wider text-neutral-400 flex items-center space-x-1.5">
-            <Flame className="w-4 h-4 text-amber-500 fill-amber-500" />
+        <div className="flex justify-between items-center mb-3.5">
+          <h3 className="font-display text-[10px] font-bold uppercase tracking-widest text-neutral-500 flex items-center space-x-1.5">
+            <Flame className="w-3.5 h-3.5 text-amber-500 fill-amber-500 animate-pulse" />
             <span>Горячие авто под заказ</span>
           </h3>
           <button
@@ -140,7 +137,7 @@ export default function Home() {
               setFilters({});
               setCurrentTab('catalog');
             }}
-            className="text-xs text-amber-600 font-bold hover:underline"
+            className="text-xs text-amber-400 font-bold hover:text-amber-300 transition-colors"
           >
             Все авто
           </button>
@@ -152,12 +149,12 @@ export default function Home() {
             return (
               <motion.div
                 key={car.id}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 25 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-20px' }}
+                viewport={{ once: true, margin: '-10px' }}
                 transition={{ duration: 0.45, ease: 'easeOut' }}
                 onClick={() => handleOpenCar(car.id)}
-                className="bg-white border border-neutral-200/80 rounded-3xl overflow-hidden flex flex-col shadow-[0_4px_16px_rgba(0,0,0,0.02)] hover:border-neutral-300 transition-all cursor-pointer group"
+                className="bg-[#121215] border border-white/[0.03] hover:border-white/[0.08] rounded-3xl overflow-hidden flex flex-col shadow-xl cursor-pointer group"
               >
                 <div 
                   onClick={(e) => {
@@ -165,7 +162,7 @@ export default function Home() {
                     triggerHaptic('medium');
                     setActiveStoryCarId(car.id);
                   }}
-                  className="h-44 overflow-hidden relative cursor-zoom-in"
+                  className="h-48 overflow-hidden relative cursor-zoom-in"
                   title="Смотреть Stories"
                 >
                   <img
@@ -175,42 +172,42 @@ export default function Home() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   {/* Кнопка "Сторис" */}
-                  <div className="absolute top-3 left-3 bg-amber-400 text-neutral-950 text-[9px] font-black px-2 py-0.5 rounded-md shadow-md flex items-center space-x-1.5 z-10">
+                  <div className="absolute top-3 left-3 bg-amber-400 text-neutral-950 text-[8px] font-black px-2 py-0.5 rounded shadow-lg flex items-center space-x-1 z-10">
                     <span className="w-1.5 h-1.5 bg-neutral-950 rounded-full animate-ping"></span>
                     <span>STORIES</span>
                   </div>
 
                   {/* Страна и Состояние */}
                   <div className="absolute top-3 right-3 flex space-x-1.5 z-10">
-                    <span className="bg-neutral-900/80 backdrop-blur-md text-white text-[9px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                    <span className="bg-neutral-950/80 backdrop-blur-md text-white text-[8px] font-bold px-2 py-1 rounded-md uppercase tracking-wider">
                       {car.country === 'China' ? 'КНР 🇨🇳' : car.country === 'South Korea' ? 'Корея 🇰🇷' : 'Киргизия 🇰🇬'}
                     </span>
-                    <span className={`text-[9px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${
-                      car.condition === 'new' ? 'bg-emerald-500 text-white' : 'bg-amber-400 text-neutral-900'
+                    <span className={`text-[8px] font-bold px-2 py-1 rounded-md uppercase tracking-wider ${
+                      car.condition === 'new' ? 'bg-emerald-500 text-white' : 'bg-amber-400 text-neutral-950'
                     }`}>
                       {car.condition === 'new' ? 'Новый' : `С пробегом`}
                     </span>
                   </div>
                   {/* Срок доставки */}
-                  <div className="absolute bottom-3 right-3 bg-neutral-900/80 backdrop-blur-md text-white text-[9px] font-bold px-2 py-0.5 rounded-lg flex items-center space-x-1 z-10">
-                    <Truck className="w-3.5 h-3.5 text-amber-400" />
+                  <div className="absolute bottom-3 right-3 bg-neutral-950/80 backdrop-blur-md text-white text-[8px] font-bold px-2 py-1 rounded-md flex items-center space-x-1 z-10">
+                    <Truck className="w-3 h-3 text-amber-400" />
                     <span>~{car.deliveryDays} дней</span>
                   </div>
                 </div>
 
-                <div className="p-4 flex flex-col">
+                <div className="p-4 flex flex-col bg-gradient-to-b from-[#121215] to-[#0d0d10]">
                   <div className="flex justify-between items-start">
                     <div>
-                      <h4 className="font-display font-bold text-base text-neutral-950">
+                      <h4 className="font-display font-bold text-sm text-gray-100 group-hover:text-amber-400 transition-colors">
                         {car.brand} {car.model}
                       </h4>
-                      <p className="text-[11px] text-gray-400 font-mono mt-0.5">
+                      <p className="text-[10px] text-gray-500 font-mono mt-0.5">
                         {car.year} г. • {car.engineVolume} • {car.power} л.с.
                       </p>
                     </div>
                     <div className="text-right">
-                      <span className="text-[10px] text-gray-400 block uppercase tracking-wider">Под ключ в Казани</span>
-                      <span className="font-display font-black text-amber-600 text-base">
+                      <span className="text-[8px] text-gray-500 block uppercase tracking-widest font-mono">Итого под ключ</span>
+                      <span className="font-display font-black text-amber-400 text-sm mt-0.5 block">
                         {formatCurrency(calculated.finalPriceRUB)}
                       </span>
                     </div>
@@ -224,46 +221,54 @@ export default function Home() {
 
       {/* 5. Преимущества Компании */}
       <div className="px-4 mt-8">
-        <h3 className="font-display text-sm font-bold uppercase tracking-wider text-neutral-400">
-          Почему выбирают DA!CAR
+        <h3 className="font-display text-[10px] font-bold uppercase tracking-widest text-neutral-500">
+          Преимущества сервиса DA!CAR
         </h3>
         <div className="grid grid-cols-2 gap-3 mt-3">
-          <div className="bg-white p-4 rounded-2xl border border-neutral-100 flex flex-col justify-between shadow-[0_2px_8px_rgba(0,0,0,0.01)]">
-            <ShieldCheck className="w-6 h-6 text-emerald-500" />
-            <div className="mt-2.5">
-              <h4 className="text-xs font-bold text-neutral-900">100% Страховка</h4>
-              <p className="text-[10px] text-gray-400 mt-1 leading-normal">
-                Полное страхование авто на всех этапах логистики.
+          <div className="bg-[#121215] p-4 rounded-2xl border border-white/[0.03] flex flex-col justify-between shadow-lg">
+            <div className="w-9 h-9 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-400">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div className="mt-4">
+              <h4 className="text-xs font-bold text-gray-200">100% Страховка</h4>
+              <p className="text-[9px] text-neutral-400 mt-1 leading-normal">
+                Полная финансовая защита на всех этапах доставки.
               </p>
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-neutral-100 flex flex-col justify-between shadow-[0_2px_8px_rgba(0,0,0,0.01)]">
-            <Coins className="w-6 h-6 text-amber-500" />
-            <div className="mt-2.5">
-              <h4 className="text-xs font-bold text-neutral-900">Официальный договор</h4>
-              <p className="text-[10px] text-gray-400 mt-1 leading-normal">
-                Оплата через банк на расчетный счет юрлица.
+          <div className="bg-[#121215] p-4 rounded-2xl border border-white/[0.03] flex flex-col justify-between shadow-lg">
+            <div className="w-9 h-9 bg-amber-500/10 rounded-xl flex items-center justify-center text-amber-400">
+              <Coins className="w-5 h-5" />
+            </div>
+            <div className="mt-4">
+              <h4 className="text-xs font-bold text-gray-200">Честный договор</h4>
+              <p className="text-[9px] text-neutral-400 mt-1 leading-normal">
+                Фиксированная сумма по счету без доплат по приезде.
               </p>
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-neutral-100 flex flex-col justify-between shadow-[0_2px_8px_rgba(0,0,0,0.01)]">
-            <Truck className="w-6 h-6 text-blue-500" />
-            <div className="mt-2.5">
-              <h4 className="text-xs font-bold text-neutral-900">Собственные автовозы</h4>
-              <p className="text-[10px] text-gray-400 mt-1 leading-normal">
-                Свои терминалы в Китае и Корее, регулярные рейсы в Казань.
+          <div className="bg-[#121215] p-4 rounded-2xl border border-white/[0.03] flex flex-col justify-between shadow-lg">
+            <div className="w-9 h-9 bg-blue-500/10 rounded-xl flex items-center justify-center text-blue-400">
+              <Truck className="w-5 h-5" />
+            </div>
+            <div className="mt-4">
+              <h4 className="text-xs font-bold text-gray-200">Личные автовозы</h4>
+              <p className="text-[9px] text-neutral-400 mt-1 leading-normal">
+                Регулярное отправление из Азии прямиком в РФ.
               </p>
             </div>
           </div>
 
-          <div className="bg-white p-4 rounded-2xl border border-neutral-100 flex flex-col justify-between shadow-[0_2px_8px_rgba(0,0,0,0.01)]">
-            <Percent className="w-6 h-6 text-purple-500" />
-            <div className="mt-2.5">
-              <h4 className="text-xs font-bold text-neutral-900">Без скрытых пошлин</h4>
-              <p className="text-[10px] text-gray-400 mt-1 leading-normal">
-                Честная калькуляция утильсбора и таможни на берегу.
+          <div className="bg-[#121215] p-4 rounded-2xl border border-white/[0.03] flex flex-col justify-between shadow-lg">
+            <div className="w-9 h-9 bg-purple-500/10 rounded-xl flex items-center justify-center text-purple-400">
+              <Percent className="w-5 h-5" />
+            </div>
+            <div className="mt-4">
+              <h4 className="text-xs font-bold text-gray-200">Таможенный расчет</h4>
+              <p className="text-[9px] text-neutral-400 mt-1 leading-normal">
+                Оптимальные маршруты растаможки без переплат.
               </p>
             </div>
           </div>
@@ -272,24 +277,23 @@ export default function Home() {
 
       {/* 6. Быстрый Коннект с Менеджером */}
       <div className="px-4 mt-8">
-        <div className="bg-amber-400 rounded-3xl p-5 flex items-center justify-between shadow-lg">
+        <div className="bg-gradient-to-r from-amber-400 to-amber-500 rounded-3xl p-5 flex items-center justify-between shadow-xl">
           <div className="max-w-[70%]">
-            <h4 className="font-display font-bold text-sm text-neutral-950 uppercase tracking-wide">
-              Нужна консультация?
+            <h4 className="font-display font-black text-xs text-neutral-950 uppercase tracking-wide">
+              Нужен особый подбор?
             </h4>
-            <p className="text-xs text-neutral-900 font-medium mt-1 leading-tight">
-              Индивидуальный подбор авто по вашему бюджету и параметрам
+            <p className="text-[11px] text-neutral-900 font-semibold mt-1 leading-snug">
+              Подберем автомобиль индивидуально под ваши критерии и бюджет
             </p>
           </div>
           <button
             onClick={() => {
               triggerHaptic('success');
-              // Перенаправляем на вкладку Профиль, где находится чат с менеджером
               setCurrentTab('profile');
             }}
-            className="w-12 h-12 bg-neutral-950 hover:bg-neutral-800 transition active:scale-95 rounded-full flex items-center justify-center text-white cursor-pointer"
+            className="w-11 h-11 bg-neutral-950 hover:bg-neutral-900 transition active:scale-95 rounded-full flex items-center justify-center text-white cursor-pointer shadow-md"
           >
-            <MessageSquare className="w-5 h-5 text-amber-400" />
+            <MessageSquare className="w-4 h-4 text-amber-400 fill-amber-400" />
           </button>
         </div>
       </div>

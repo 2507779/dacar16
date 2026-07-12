@@ -64,9 +64,9 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-neutral-900 p-0 sm:p-4 font-sans selection:bg-amber-400 selection:text-neutral-900">
+    <div className="flex justify-center items-center min-h-screen bg-[#050507] p-0 sm:p-4 font-sans selection:bg-amber-400 selection:text-neutral-900">
       {/* Контейнер смартфона/Mini App */}
-      <div className="w-full max-w-[440px] h-[100vh] sm:h-[880px] bg-neutral-50 sm:rounded-[40px] shadow-2xl overflow-hidden flex flex-col border border-neutral-800 relative">
+      <div className="w-full max-w-[440px] h-[100vh] sm:h-[880px] bg-[#0c0c0e] sm:rounded-[40px] shadow-[0_24px_64px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col border border-neutral-800/80 relative">
         
         {/* Анимация закрытого приложения (эмуляция чата Telegram) */}
         <AnimatePresence>
@@ -75,16 +75,16 @@ export default function Layout({ children }: LayoutProps) {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="absolute inset-0 z-50 bg-[#1e2c3a] flex flex-col text-white"
+              className="absolute inset-0 z-50 bg-[#0e1621] flex flex-col text-white"
             >
               {/* Шапка чата Telegram */}
               <div className="bg-[#17212b] p-3 flex items-center justify-between border-b border-[#10171d]">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-tr from-amber-500 to-amber-600 rounded-full flex items-center justify-center font-bold text-white shadow-md">
+                  <div className="w-10 h-10 bg-gradient-to-tr from-amber-400 to-amber-600 rounded-full flex items-center justify-center font-display font-black text-black shadow-md">
                     DC
                   </div>
                   <div>
-                    <div className="font-semibold flex items-center text-sm">
+                    <div className="font-semibold flex items-center text-sm font-display tracking-wide">
                       DA!CAR | Импорт Авто 🚘
                       <span className="ml-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-[8px] text-white">✓</span>
                     </div>
@@ -98,7 +98,7 @@ export default function Layout({ children }: LayoutProps) {
 
               {/* Область сообщений чата */}
               <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#0e1621] bg-opacity-95 text-sm flex flex-col justify-end">
-                <div className="text-center text-xs text-gray-500 my-4 bg-neutral-900/40 py-1 px-3 rounded-full self-center">
+                <div className="text-center text-xs text-gray-400 my-4 bg-neutral-950/60 border border-white/5 py-1 px-3 rounded-full self-center">
                   Чат с официальным ботом DA!CAR
                 </div>
                 
@@ -107,8 +107,8 @@ export default function Layout({ children }: LayoutProps) {
                     key={index}
                     className={`max-w-[80%] rounded-2xl p-3 flex flex-col relative shadow-sm ${
                       msg.sender === 'user'
-                        ? 'bg-[#2b5278] self-end rounded-tr-none'
-                        : 'bg-[#182533] self-start rounded-tl-none'
+                        ? 'bg-[#2b5278] text-white self-end rounded-tr-none'
+                        : 'bg-[#182533] text-gray-100 self-start rounded-tl-none'
                     }`}
                   >
                     <p className="leading-relaxed">{msg.text}</p>
@@ -124,9 +124,9 @@ export default function Layout({ children }: LayoutProps) {
                     triggerHaptic('success');
                     setIsAppClosed(false);
                   }}
-                  className="w-full py-3 bg-amber-500 hover:bg-amber-600 active:scale-[0.98] transition text-black font-semibold rounded-xl flex items-center justify-center space-x-2 shadow-lg cursor-pointer"
+                  className="w-full py-3.5 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 active:scale-[0.98] transition duration-200 text-black font-extrabold text-xs uppercase tracking-wider rounded-xl flex items-center justify-center space-x-2 shadow-lg cursor-pointer"
                 >
-                  <Car className="w-5 h-5" />
+                  <Car className="w-4 h-4 text-black fill-black" />
                   <span>Открыть Салон DA!CAR</span>
                 </button>
 
@@ -149,17 +149,17 @@ export default function Layout({ children }: LayoutProps) {
         </AnimatePresence>
 
         {/* 1. Системный статус-бар смартфона */}
-        <div className="bg-[#111111] text-white px-6 pt-3 pb-1 flex justify-between items-center text-xs font-medium tracking-tight select-none">
+        <div className="bg-[#0c0c0e] text-neutral-400 px-6 pt-3 pb-1 flex justify-between items-center text-xs font-semibold tracking-tight select-none">
           <span>{timeStr}</span>
           <div className="flex items-center space-x-1.5">
             <span className="text-[9px] bg-neutral-800 text-gray-300 px-1 py-0.5 rounded font-mono font-bold">5G</span>
-            <Wifi className="w-3.5 h-3.5 text-white" />
-            <Battery className="w-4 h-4 text-white" />
+            <Wifi className="w-3.5 h-3.5 text-neutral-400" />
+            <Battery className="w-4 h-4 text-neutral-400" />
           </div>
         </div>
 
         {/* 2. Шапка Telegram WebApp */}
-        <div className="bg-[#1a1a1a] text-white px-4 py-3 flex justify-between items-center shadow-md relative z-20 select-none">
+        <div className="bg-[#121215] text-white px-4 py-3 flex justify-between items-center border-b border-white/[0.03] shadow-md relative z-20 select-none">
           <div className="flex items-center space-x-2.5">
             {activeCarId ? (
               <button
@@ -167,110 +167,110 @@ export default function Layout({ children }: LayoutProps) {
                   triggerHaptic('light');
                   setActiveCarId(null);
                 }}
-                className="p-1 hover:bg-neutral-800 rounded-full transition"
+                className="p-1.5 hover:bg-neutral-800 rounded-full transition"
               >
-                <ArrowLeft className="w-5 h-5 text-gray-300" />
+                <ArrowLeft className="w-4 h-4 text-gray-300" />
               </button>
             ) : (
-              <div className="w-6 h-6 bg-amber-500 rounded-md flex items-center justify-center font-bold text-black text-xs">
+              <div className="w-6 h-6 bg-amber-400 rounded-md flex items-center justify-center font-display font-black text-neutral-950 text-xs">
                 D!
               </div>
             )}
             <div>
-              <div className="font-bold text-sm tracking-wide flex items-center">
-                Da!Car - Скажи "ДА" своей мечте
+              <div className="font-display font-bold text-xs tracking-wide flex items-center">
+                DA!CAR — Салон Премиум Импорта
                 <span className="ml-1 w-3.5 h-3.5 bg-blue-500 rounded-full flex items-center justify-center text-[7px] text-white font-black">
                   ✓
                 </span>
               </div>
-              <div className="text-[10px] text-gray-400">dacar_official_bot</div>
+              <div className="text-[9px] font-mono text-amber-500/80">dacar_official_bot</div>
             </div>
           </div>
-          <div className="flex items-center space-x-3 text-gray-300">
-            <MoreVertical className="w-5 h-5 cursor-pointer hover:text-white" />
+          <div className="flex items-center space-x-3 text-neutral-400">
+            <MoreVertical className="w-4 h-4 cursor-pointer hover:text-white" />
             <button
               onClick={() => {
                 triggerHaptic('heavy');
                 setIsAppClosed(true);
               }}
-              className="p-1.5 bg-neutral-800 hover:bg-neutral-700 active:scale-95 rounded-full transition cursor-pointer"
+              className="p-1.5 bg-neutral-800/80 hover:bg-neutral-700 active:scale-95 rounded-full transition cursor-pointer border border-white/5"
               title="Закрыть Mini App"
             >
-              <X className="w-4 h-4 text-red-400" />
+              <X className="w-3.5 h-3.5 text-red-400" />
             </button>
           </div>
         </div>
 
         {/* 3. Основная контентная область */}
-        <div id="applet-content" className="flex-1 overflow-y-auto bg-neutral-50 flex flex-col pb-24 relative">
+        <div id="applet-content" className="flex-1 overflow-y-auto bg-[#070709] flex flex-col pb-24 relative scrollbar-none">
           {children}
         </div>
 
         {/* 4. Навигация Bottom Navigation (Frosted Glass) */}
-        <div className="absolute bottom-0 left-0 right-0 h-20 bg-white/95 backdrop-blur-md border-t border-neutral-200/80 px-2 flex justify-around items-center z-30 shadow-[0_-5px_15px_rgba(0,0,0,0.03)] select-none">
+        <div className="absolute bottom-4 left-4 right-4 h-16 bg-[#121215]/80 backdrop-blur-xl border border-white/[0.04] rounded-2xl px-2 flex justify-around items-center z-30 shadow-[0_8px_32px_rgba(0,0,0,0.4)] select-none">
           
           <button
             id="nav-home"
             onClick={() => handleTabChange('home')}
-            className={`flex flex-col items-center justify-center flex-1 h-full py-2 transition-bezier cursor-pointer ${
-              currentTab === 'home' ? 'text-neutral-950 font-semibold' : 'text-neutral-400'
+            className={`flex flex-col items-center justify-center flex-1 h-full py-1 transition-bezier cursor-pointer ${
+              currentTab === 'home' ? 'text-amber-400 font-bold' : 'text-neutral-500 hover:text-neutral-300'
             }`}
           >
             <div className="relative">
-              <Home className={`w-5 h-5 transition-transform duration-200 ${currentTab === 'home' ? 'scale-110 text-amber-500' : ''}`} />
+              <Home className={`w-4 h-4 transition-transform duration-250 ${currentTab === 'home' ? 'scale-115 text-amber-400' : ''}`} />
             </div>
-            <span className="text-[10px] mt-1.5 tracking-tight">Главная</span>
+            <span className="text-[9px] mt-1 font-medium tracking-tight">Главная</span>
           </button>
 
           <button
             id="nav-catalog"
             onClick={() => handleTabChange('catalog')}
-            className={`flex flex-col items-center justify-center flex-1 h-full py-2 transition-bezier cursor-pointer ${
-              currentTab === 'catalog' ? 'text-neutral-950 font-semibold' : 'text-neutral-400'
+            className={`flex flex-col items-center justify-center flex-1 h-full py-1 transition-bezier cursor-pointer ${
+              currentTab === 'catalog' ? 'text-amber-400 font-bold' : 'text-neutral-500 hover:text-neutral-300'
             }`}
           >
-            <Car className={`w-5 h-5 transition-transform duration-200 ${currentTab === 'catalog' ? 'scale-110 text-amber-500' : ''}`} />
-            <span className="text-[10px] mt-1.5 tracking-tight">Каталог</span>
+            <Car className={`w-4 h-4 transition-transform duration-250 ${currentTab === 'catalog' ? 'scale-115 text-amber-400' : ''}`} />
+            <span className="text-[9px] mt-1 font-medium tracking-tight">Каталог</span>
           </button>
 
           <button
             id="nav-favorites"
             onClick={() => handleTabChange('favorites')}
-            className={`flex flex-col items-center justify-center flex-1 h-full py-2 transition-bezier cursor-pointer ${
-              currentTab === 'favorites' ? 'text-neutral-950 font-semibold' : 'text-neutral-400'
+            className={`flex flex-col items-center justify-center flex-1 h-full py-1 transition-bezier cursor-pointer ${
+              currentTab === 'favorites' ? 'text-amber-400 font-bold' : 'text-neutral-500 hover:text-neutral-300'
             }`}
           >
-            <Heart className={`w-5 h-5 transition-transform duration-200 ${currentTab === 'favorites' ? 'scale-110 text-amber-500' : ''}`} />
-            <span className="text-[10px] mt-1.5 tracking-tight">Избранное</span>
+            <Heart className={`w-4 h-4 transition-transform duration-250 ${currentTab === 'favorites' ? 'scale-115 text-amber-400' : ''}`} />
+            <span className="text-[9px] mt-1 font-medium tracking-tight">Избранное</span>
           </button>
 
           <button
             id="nav-orders"
             onClick={() => handleTabChange('orders')}
-            className={`flex flex-col items-center justify-center flex-1 h-full py-2 transition-bezier cursor-pointer ${
-              currentTab === 'orders' ? 'text-neutral-950 font-semibold' : 'text-neutral-400'
+            className={`flex flex-col items-center justify-center flex-1 h-full py-1 transition-bezier cursor-pointer ${
+              currentTab === 'orders' ? 'text-amber-400 font-bold' : 'text-neutral-500 hover:text-neutral-300'
             }`}
           >
             <div className="relative">
-              <Package className={`w-5 h-5 transition-transform duration-200 ${currentTab === 'orders' ? 'scale-110 text-amber-500' : ''}`} />
+              <Package className={`w-4 h-4 transition-transform duration-250 ${currentTab === 'orders' ? 'scale-115 text-amber-400' : ''}`} />
               {orders.length > 0 && (
-                <span className="absolute -top-1.5 -right-2 bg-amber-500 text-neutral-950 text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-sm">
+                <span className="absolute -top-1.5 -right-2 bg-amber-400 text-neutral-950 text-[8px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center shadow-md border border-[#121215]">
                   {orders.length}
                 </span>
               )}
             </div>
-            <span className="text-[10px] mt-1.5 tracking-tight">Заказы</span>
+            <span className="text-[9px] mt-1 font-medium tracking-tight">Заказы</span>
           </button>
 
           <button
             id="nav-profile"
             onClick={() => handleTabChange('profile')}
-            className={`flex flex-col items-center justify-center flex-1 h-full py-2 transition-bezier cursor-pointer ${
-              currentTab === 'profile' ? 'text-neutral-950 font-semibold' : 'text-neutral-400'
+            className={`flex flex-col items-center justify-center flex-1 h-full py-1 transition-bezier cursor-pointer ${
+              currentTab === 'profile' ? 'text-amber-400 font-bold' : 'text-neutral-500 hover:text-neutral-300'
             }`}
           >
-            <User className={`w-5 h-5 transition-transform duration-200 ${currentTab === 'profile' ? 'scale-110 text-amber-500' : ''}`} />
-            <span className="text-[10px] mt-1.5 tracking-tight">Профиль</span>
+            <User className={`w-4 h-4 transition-transform duration-250 ${currentTab === 'profile' ? 'scale-115 text-amber-400' : ''}`} />
+            <span className="text-[9px] mt-1 font-medium tracking-tight">Профиль</span>
           </button>
 
         </div>

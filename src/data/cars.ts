@@ -7,12 +7,12 @@ import { Car, ExchangeRates } from '../types';
 
 // Реальные курсы валют на текущую дату для точных расчетов
 export const EXCHANGE_RATES: ExchangeRates = {
-  USD_to_RUB: 80.80,
-  EUR_to_RUB: 85.20,
+  USD_to_RUB: 91.80,
+  EUR_to_RUB: 99.20,
 };
 
 // Фиксированные тарифы DA!CAR
-export const COMPANY_COMMISSION = 139000; // Комиссия компании за подбор и импорт под ключ
+export const COMPANY_COMMISSION = 120000; // Комиссия компании за подбор и импорт под ключ
 export const BROKER_FEE_RUB = 45000;      // СБКТС, ЭПТС, услуги таможенного брокера
 
 // Стоимость базовой доставки до Казани по странам-отправителям
@@ -65,7 +65,7 @@ export const CARS_DATA: Car[] = [
     priceUSD: 28500,
     recyclingFeeRUB: 3400,
     customsDutyEUR: 4800,
-    description: 'Новый АХУЕННЫЙ кроссовер Toyota RAV4 китайского производства, импортируемый по ускоренному каналу через Киргизию под ключ. Полная таможенная очистка, действующий ЭПТС. Отличная адаптация для суровых зим.',
+    description: 'Новый надежный кроссовер Toyota RAV4 китайского производства, импортируемый по ускоренному каналу через Киргизию под ключ. Полная таможенная очистка, действующий ЭПТС. Отличная адаптация для суровых зим.',
     features: ['Светодиодная оптика LED', "Зимний пакет (подогрев лобового и руля)", 'Адаптивный круиз-контроль', 'Камера заднего вида с динамической разметкой'],
     availability: 'on_order',
     deliveryDays: 14,
@@ -131,7 +131,7 @@ export const CARS_DATA: Car[] = [
     brand: 'Volkswagen',
     model: 'Tiguan L Pro',
     generation: 'III',
-    year: 2026,
+    year: 2024,
     mileage: 0,
     condition: 'new',
     country: 'Kyrgyzstan',

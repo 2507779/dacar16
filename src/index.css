@@ -10,16 +10,16 @@
 /* Стили для Telegram Mini App */
 body {
   font-family: var(--font-sans);
-  background-color: #f3f4f6; /* Премиальный мягкий светло-серый фон */
-  color: #111111;
+  background-color: #070709; /* Металлический премиальный обсидиановый фон */
+  color: #f3f4f6;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
 
 /* Скрытие дефолтных скроллбаров */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
@@ -27,17 +27,32 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(245, 158, 11, 0.2); /* Тонкий золотой акцент скроллбара */
   border-radius: 99px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(245, 158, 11, 0.4);
+}
+
+/* Элитное стекло */
+.glass-premium {
+  background: rgba(18, 18, 22, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.glass-premium-accent {
+  background: rgba(245, 158, 11, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(245, 158, 11, 0.12);
 }
 
 /* Кастомные плавные переходы */
 .transition-bezier {
   transition-property: all;
-  transition-duration: 300ms;
+  transition-duration: 350ms;
   transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
