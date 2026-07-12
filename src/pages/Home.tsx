@@ -110,8 +110,8 @@ export default function Home() {
           {[
             { id: 'electric', label: 'Электрокары ⚡', key: 'engineType' },
             { id: 'hybrid', label: 'Гибриды 🔋', key: 'engineType' },
-            { id: 'diesel', label: 'Дизельные ⚙️', key: 'engineType' },
             { id: 'gasoline', label: 'Бензиновые ⛽', key: 'engineType' },
+            { id: 'diesel', label: 'Дизельные ⚙️', key: 'engineType' },
           ].map((cat) => (
             <button
               key={cat.id}
