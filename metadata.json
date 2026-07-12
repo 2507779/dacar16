@@ -1,0 +1,6 @@
+{
+  "name": "DA!CAR",
+  "description": "Премиальное Telegram Mini App для заказа и импорта автомобилей из Китая, Южной Кореи и Киргизии в Россию.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
