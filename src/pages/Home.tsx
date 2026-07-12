@@ -47,8 +47,8 @@ export default function Home() {
                 Консьерж-сервис по заказу и покупке автомобилей
               </span>
               <h2 className="font-display text-2xl font-bold mt-3 tracking-tight leading-tight">
-                Автомобили из Азии <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500">под ключ в РФ</span>
+                Автомобили с доставкой из Китая,Кореи и Киргизии <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500">под ключ в любой город РФ</span>
               </h2>
             </div>
             <div className="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/20 flex items-center justify-center text-amber-400 shadow-inner">
@@ -103,7 +103,7 @@ export default function Home() {
       <div className="px-4 mt-6">
         <div className="flex justify-between items-center">
           <h3 className="font-display text-[10px] font-bold uppercase tracking-widest text-neutral-500">
-            Двигатели под заказ
+            Любые автомобили на заказ
           </h3>
         </div>
         <div className="flex space-x-2 overflow-x-auto pt-2 pb-1 scrollbar-none">
