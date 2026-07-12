@@ -19,6 +19,7 @@ export default function Catalog() {
     setSearchQuery,
     resetFilters,
     setActiveCarId,
+    setActiveStoryCarId,
     favorites,
     toggleFavorite
   } = useStore();
@@ -236,28 +237,46 @@ export default function Catalog() {
               const calculated = calculateFullCarPrice(car);
               const isFav = favorites.includes(car.id);
               return (
-                <div
+                <motion.div
                   key={car.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-20px' }}
+                  transition={{ duration: 0.4, ease: 'easeOut' }}
                   onClick={() => {
                     triggerHaptic('light');
                     setActiveCarId(car.id);
                   }}
                   className="bg-white border border-neutral-200/80 rounded-2xl overflow-hidden flex flex-col shadow-[0_2px_8px_rgba(0,0,0,0.01)] hover:border-neutral-300 transition-all cursor-pointer group relative"
                 >
-                  <div className="h-28 overflow-hidden relative">
+                  <div 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      triggerHaptic('medium');
+                      setActiveStoryCarId(car.id);
+                    }}
+                    className="h-28 overflow-hidden relative cursor-zoom-in"
+                    title="Смотреть Stories"
+                  >
                     <img
                       src={car.images[0]}
                       alt={`${car.brand} ${car.model}`}
                       referrerPolicy="no-referrer"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
+                    {/* Кнопка "Сторис" */}
+                    <div className="absolute top-2 left-2 bg-amber-400 text-neutral-950 text-[8px] font-black px-1.5 py-0.5 rounded shadow-sm flex items-center space-x-1 z-10">
+                      <span className="w-1.5 h-1.5 bg-neutral-950 rounded-full animate-ping"></span>
+                      <span>STORIES</span>
+                    </div>
+
                     <button
                       onClick={(e) => handleToggleFav(e, car.id)}
-                      className="absolute top-2 right-2 p-1.5 rounded-full bg-neutral-900/50 backdrop-blur-sm hover:bg-neutral-900/70 text-white transition active:scale-90"
+                      className="absolute top-2 right-2 p-1.5 rounded-full bg-neutral-900/50 backdrop-blur-sm hover:bg-neutral-900/70 text-white transition active:scale-90 z-10"
                     >
                       <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-red-500 text-red-500' : 'text-white'}`} />
                     </button>
-                    <span className="absolute bottom-1.5 left-2 bg-neutral-900/80 backdrop-blur-md text-white text-[8px] font-bold px-1.5 py-0.5 rounded uppercase">
+                    <span className="absolute bottom-1.5 left-2 bg-neutral-900/80 backdrop-blur-md text-white text-[8px] font-bold px-1.5 py-0.5 rounded uppercase z-10">
                       {car.country === 'China' ? 'Китай' : car.country === 'South Korea' ? 'Корея' : 'КР'}
                     </span>
                   </div>
@@ -278,7 +297,7 @@ export default function Catalog() {
                       </span>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
@@ -288,24 +307,42 @@ export default function Catalog() {
               const calculated = calculateFullCarPrice(car);
               const isFav = favorites.includes(car.id);
               return (
-                <div
+                <motion.div
                   key={car.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-20px' }}
+                  transition={{ duration: 0.4, ease: 'easeOut' }}
                   onClick={() => {
                     triggerHaptic('light');
                     setActiveCarId(car.id);
                   }}
                   className="bg-white border border-neutral-200/80 rounded-2xl overflow-hidden flex shadow-[0_2px_8px_rgba(0,0,0,0.01)] hover:border-neutral-300 transition-all cursor-pointer group relative"
                 >
-                  <div className="w-28 h-24 shrink-0 overflow-hidden relative">
+                  <div 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      triggerHaptic('medium');
+                      setActiveStoryCarId(car.id);
+                    }}
+                    className="w-28 h-24 shrink-0 overflow-hidden relative cursor-zoom-in"
+                    title="Смотреть Stories"
+                  >
                     <img
                       src={car.images[0]}
                       alt={`${car.brand} ${car.model}`}
                       referrerPolicy="no-referrer"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
+                    {/* Кнопка "Сторис" */}
+                    <div className="absolute top-2 left-2 bg-amber-400 text-neutral-950 text-[7px] font-black px-1 py-0.5 rounded shadow-sm flex items-center space-x-0.5 z-10">
+                      <span className="w-1 h-1 bg-neutral-950 rounded-full animate-ping"></span>
+                      <span>STORIES</span>
+                    </div>
+
                     <button
                       onClick={(e) => handleToggleFav(e, car.id)}
-                      className="absolute top-2 left-2 p-1.5 rounded-full bg-neutral-900/50 backdrop-blur-sm hover:bg-neutral-900/70 text-white transition active:scale-90"
+                      className="absolute top-2 right-2 p-1.5 rounded-full bg-neutral-900/50 backdrop-blur-sm hover:bg-neutral-900/70 text-white transition active:scale-90 z-10"
                     >
                       <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-red-500 text-red-500' : 'text-white'}`} />
                     </button>
@@ -338,7 +375,7 @@ export default function Catalog() {
                       </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>

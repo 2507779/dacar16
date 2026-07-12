@@ -68,6 +68,7 @@ interface FilterState {
 interface AppStore {
   currentTab: 'home' | 'catalog' | 'favorites' | 'orders' | 'profile';
   activeCarId: string | null;
+  activeStoryCarId: string | null;
   favorites: string[]; // Массив carId
   orders: Order[];
   searchQuery: string;
@@ -77,6 +78,7 @@ interface AppStore {
   // Экшны
   setCurrentTab: (tab: 'home' | 'catalog' | 'favorites' | 'orders' | 'profile') => void;
   setActiveCarId: (id: string | null) => void;
+  setActiveStoryCarId: (id: string | null) => void;
   toggleFavorite: (carId: string) => void;
   addOrder: (
     car: Car,
@@ -153,6 +155,7 @@ export const useStore = create<AppStore>((set, get) => {
   return {
     currentTab: 'home',
     activeCarId: null,
+    activeStoryCarId: null,
     favorites: parsedFavorites,
     orders: parsedOrders,
     searchQuery: '',
@@ -162,6 +165,8 @@ export const useStore = create<AppStore>((set, get) => {
     setCurrentTab: (tab) => set({ currentTab: tab }),
     
     setActiveCarId: (id) => set({ activeCarId: id }),
+
+    setActiveStoryCarId: (id) => set({ activeStoryCarId: id }),
 
     toggleFavorite: (carId) => {
       const currentFavs = get().favorites;

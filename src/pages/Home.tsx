@@ -10,7 +10,7 @@ import { ShieldCheck, Truck, Percent, Coins, MessageSquare, ArrowRight, Zap, Fla
 import { motion } from 'motion/react';
 
 export default function Home() {
-  const { cars, setCurrentTab, setFilters, setActiveCarId, orders } = useStore();
+  const { cars, setCurrentTab, setFilters, setActiveCarId, setActiveStoryCarId, orders } = useStore();
 
   const handleCountrySelect = (country: 'China' | 'South Korea' | 'Kyrgyzstan') => {
     triggerHaptic('medium');
@@ -150,20 +150,38 @@ export default function Home() {
           {hotCars.map((car) => {
             const calculated = calculateFullCarPrice(car);
             return (
-              <div
+              <motion.div
                 key={car.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-20px' }}
+                transition={{ duration: 0.45, ease: 'easeOut' }}
                 onClick={() => handleOpenCar(car.id)}
                 className="bg-white border border-neutral-200/80 rounded-3xl overflow-hidden flex flex-col shadow-[0_4px_16px_rgba(0,0,0,0.02)] hover:border-neutral-300 transition-all cursor-pointer group"
               >
-                <div className="h-44 overflow-hidden relative">
+                <div 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    triggerHaptic('medium');
+                    setActiveStoryCarId(car.id);
+                  }}
+                  className="h-44 overflow-hidden relative cursor-zoom-in"
+                  title="Смотреть Stories"
+                >
                   <img
                     src={car.images[0]}
                     alt={`${car.brand} ${car.model}`}
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
+                  {/* Кнопка "Сторис" */}
+                  <div className="absolute top-3 left-3 bg-amber-400 text-neutral-950 text-[9px] font-black px-2 py-0.5 rounded-md shadow-md flex items-center space-x-1.5 z-10">
+                    <span className="w-1.5 h-1.5 bg-neutral-950 rounded-full animate-ping"></span>
+                    <span>STORIES</span>
+                  </div>
+
                   {/* Страна и Состояние */}
-                  <div className="absolute top-3 left-3 flex space-x-1.5">
+                  <div className="absolute top-3 right-3 flex space-x-1.5 z-10">
                     <span className="bg-neutral-900/80 backdrop-blur-md text-white text-[9px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
                       {car.country === 'China' ? 'КНР 🇨🇳' : car.country === 'South Korea' ? 'Корея 🇰🇷' : 'Киргизия 🇰🇬'}
                     </span>
@@ -174,7 +192,7 @@ export default function Home() {
                     </span>
                   </div>
                   {/* Срок доставки */}
-                  <div className="absolute bottom-3 right-3 bg-neutral-900/80 backdrop-blur-md text-white text-[9px] font-bold px-2 py-0.5 rounded-lg flex items-center space-x-1">
+                  <div className="absolute bottom-3 right-3 bg-neutral-900/80 backdrop-blur-md text-white text-[9px] font-bold px-2 py-0.5 rounded-lg flex items-center space-x-1 z-10">
                     <Truck className="w-3.5 h-3.5 text-amber-400" />
                     <span>~{car.deliveryDays} дней</span>
                   </div>
@@ -198,7 +216,7 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             );
           })}
         </div>

@@ -11,6 +11,7 @@ import Favorites from './pages/Favorites';
 import Orders from './pages/Orders';
 import Profile from './pages/Profile';
 import VehicleDetails from './pages/VehicleDetails';
+import VehicleStories from './components/VehicleStories';
 import { AnimatePresence, motion } from 'motion/react';
 
 export default function App() {
@@ -103,6 +104,7 @@ export default function App() {
       <AnimatePresence mode="wait">
         {renderActiveTab()}
       </AnimatePresence>
+      <VehicleStories />
     </Layout>
   );
 }
