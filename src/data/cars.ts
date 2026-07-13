@@ -7,8 +7,8 @@ import { Car, ExchangeRates } from '../types';
 
 // Реальные курсы валют на текущую дату для точных расчетов
 export const EXCHANGE_RATES: ExchangeRates = {
-  USD_to_RUB: 80.80,
-  EUR_to_RUB: 85.20,
+  USD_to_RUB: 91.80,
+  EUR_to_RUB: 99.20,
 };
 
 // Фиксированные тарифы DA!CAR
@@ -17,9 +17,9 @@ export const BROKER_FEE_RUB = 45000;      // СБКТС, ЭПТС, услуги 
 
 // Стоимость базовой доставки до Казани по странам-отправителям
 export const BASE_DELIVERY_KAZAN_RUB = {
-  'China': 170000,
-  'South Korea': 170000,
-  'Kyrgyzstan': 160000,
+  'China': 180000,
+  'South Korea': 220000,
+  'Kyrgyzstan': 140000,
 };
 
 // Города доставки и их логистическая корректировка к базовому тарифу Казани

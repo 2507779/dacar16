@@ -29,13 +29,13 @@ export default function Favorites() {
   };
 
   return (
-    <div className="flex flex-col text-white pb-12 select-none">
+    <div className="flex flex-col text-[#111827] pb-12 select-none">
       
       {/* Шапка Избранного */}
-      <div className="px-4 pt-4 pb-3 border-b border-white/[0.03] flex justify-between items-center bg-[#070709]/95 sticky top-0 backdrop-blur-md z-10">
+      <div className="px-4 pt-4 pb-3 border-b border-[#E5E7EB] flex justify-between items-center bg-[#F5F7FA]/95 sticky top-0 backdrop-blur-md z-10">
         <div>
-          <h2 className="font-display font-black text-base text-white tracking-tight">Избранные авто</h2>
-          <p className="text-[10px] text-gray-500 mt-0.5 font-mono">В списке: {favoriteCars.length}</p>
+          <h2 className="font-display font-black text-base text-[#111827] tracking-tight">Избранные авто</h2>
+          <p className="text-[10px] text-[#64748B] mt-0.5 font-mono">В списке: {favoriteCars.length}</p>
         </div>
         
         {favoriteCars.length >= 2 && (
@@ -44,10 +44,10 @@ export default function Favorites() {
               triggerHaptic('medium');
               setIsCompareMode(!isCompareMode);
             }}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition active:scale-95 cursor-pointer border ${
+            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition active:scale-95 cursor-pointer border shadow-sm ${
               isCompareMode
-                ? 'bg-amber-400 border-amber-400 text-neutral-950'
-                : 'bg-white/5 border-white/[0.04] text-gray-300 hover:border-white/[0.1] hover:bg-white/[0.02]'
+                ? 'bg-[#2563EB] border-[#2563EB] text-white'
+                : 'bg-white border-[#E5E7EB] text-[#111827] hover:border-[#2563EB]/40 hover:bg-[#F5F7FA]'
             }`}
           >
             <Scale className="w-4 h-4" />
@@ -60,13 +60,13 @@ export default function Favorites() {
       <div className="px-4 mt-4">
         {favoriteCars.length === 0 ? (
           /* Пустое состояние */
-          <div className="bg-[#121215] rounded-3xl p-8 border border-white/[0.03] text-center flex flex-col items-center justify-center space-y-4 shadow-xl my-10">
-            <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center text-amber-400 shadow-inner">
-              <Heart className="w-7 h-7" />
+          <div className="bg-white rounded-3xl p-8 border border-[#E5E7EB] text-center flex flex-col items-center justify-center space-y-4 shadow-md my-10">
+            <div className="w-16 h-16 bg-[#F5F7FA] rounded-full flex items-center justify-center text-[#2563EB] border border-[#E5E7EB] shadow-inner animate-pulse">
+              <Heart className="w-7 h-7 fill-[#2563EB]/20" />
             </div>
             <div>
-              <h4 className="font-display font-bold text-sm text-gray-100">Список пуст</h4>
-              <p className="text-xs text-neutral-400 mt-1.5 leading-relaxed">
+              <h4 className="font-display font-bold text-sm text-[#111827]">Список пуст</h4>
+              <p className="text-xs text-[#64748B] mt-1.5 leading-relaxed">
                 Добавляйте понравившиеся автомобили из каталога в избранное, чтобы рассчитать финальную цену или сравнить их характеристики между собой.
               </p>
             </div>
@@ -75,7 +75,7 @@ export default function Favorites() {
                 triggerHaptic('medium');
                 setCurrentTab('catalog');
               }}
-              className="px-5 py-2.5 bg-amber-400 hover:bg-amber-500 text-black rounded-xl text-xs font-bold cursor-pointer active:scale-95 transition flex items-center space-x-1.5"
+              className="px-5 py-2.5 bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-xl text-xs font-bold cursor-pointer active:scale-95 transition flex items-center space-x-1.5 shadow-md"
             >
               <span>Открыть каталог</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -83,93 +83,93 @@ export default function Favorites() {
           </div>
         ) : isCompareMode && favoriteCars.length >= 2 ? (
           /* Экран детального сравнения */
-          <div className="bg-[#121215] rounded-3xl border border-white/[0.03] overflow-hidden shadow-xl p-4">
-            <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center space-x-1.5 font-mono">
-              <Scale className="w-3.5 h-3.5 text-amber-400" />
+          <div className="bg-white rounded-3xl border border-[#E5E7EB] overflow-hidden shadow-lg p-4">
+            <h4 className="text-[10px] font-bold text-[#64748B] uppercase tracking-widest mb-4 flex items-center space-x-1.5 font-mono">
+              <Scale className="w-3.5 h-3.5 text-[#2563EB]" />
               <span>Таблица характеристик</span>
             </h4>
  
             <div className="overflow-x-auto scrollbar-none">
               <table className="w-full text-xs text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-white/[0.04]">
-                    <th className="py-2.5 font-bold text-gray-500 uppercase text-[9px] w-[100px] shrink-0 font-mono">Параметр</th>
+                  <tr className="border-b border-[#E5E7EB]">
+                    <th className="py-2.5 font-bold text-[#64748B] uppercase text-[9px] w-[100px] shrink-0 font-mono">Параметр</th>
                     {favoriteCars.map(car => (
-                      <th key={car.id} className="py-2.5 px-3 font-display font-bold text-gray-200 text-center min-w-[120px]">
-                        {car.brand} <span className="text-amber-400 block text-[10px] font-medium mt-0.5">{car.model}</span>
+                      <th key={car.id} className="py-2.5 px-3 font-display font-bold text-[#111827] text-center min-w-[120px]">
+                        {car.brand} <span className="text-[#2563EB] block text-[10px] font-medium mt-0.5">{car.model}</span>
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/[0.02]">
+                <tbody className="divide-y divide-[#E5E7EB]/50">
                   <tr>
-                    <td className="py-2.5 font-medium text-gray-400 font-sans">Страна импорта</td>
+                    <td className="py-2.5 font-medium text-[#64748B] font-sans">Страна импорта</td>
                     {favoriteCars.map(car => (
-                      <td key={car.id} className="py-2.5 px-3 text-center font-semibold text-gray-200">
+                      <td key={car.id} className="py-2.5 px-3 text-center font-semibold text-[#111827]">
                         {car.country === 'China' ? 'Китай 🇨🇳' : car.country === 'South Korea' ? 'Корея 🇰🇷' : 'Киргизия 🇰🇬'}
                       </td>
                     ))}
                   </tr>
                   <tr>
-                    <td className="py-2.5 font-medium text-gray-400">Двигатель</td>
+                    <td className="py-2.5 font-medium text-[#64748B]">Двигатель</td>
                     {favoriteCars.map(car => (
-                      <td key={car.id} className="py-2.5 px-3 text-center text-gray-300 font-mono capitalize">
+                      <td key={car.id} className="py-2.5 px-3 text-center text-[#111827] font-mono capitalize">
                         {car.engineType} ({car.engineVolume})
                       </td>
                     ))}
                   </tr>
                   <tr>
-                    <td className="py-2.5 font-medium text-gray-400">Мощность</td>
+                    <td className="py-2.5 font-medium text-[#64748B]">Мощность</td>
                     {favoriteCars.map(car => (
-                      <td key={car.id} className="py-2.5 px-3 text-center font-bold text-amber-400">
+                      <td key={car.id} className="py-2.5 px-3 text-center font-bold text-[#2563EB]">
                         {car.power} л.с.
                       </td>
                     ))}
                   </tr>
                   <tr>
-                    <td className="py-2.5 font-medium text-gray-400">Привод</td>
+                    <td className="py-2.5 font-medium text-[#64748B]">Привод</td>
                     {favoriteCars.map(car => (
-                      <td key={car.id} className="py-2.5 px-3 text-center text-gray-300">
+                      <td key={car.id} className="py-2.5 px-3 text-center text-[#111827]">
                         {car.driveType}
                       </td>
                     ))}
                   </tr>
                   <tr>
-                    <td className="py-2.5 font-medium text-gray-400">Трансмиссия</td>
+                    <td className="py-2.5 font-medium text-[#64748B]">Трансмиссия</td>
                     {favoriteCars.map(car => (
-                      <td key={car.id} className="py-2.5 px-3 text-center text-neutral-400 text-[10px]">
+                      <td key={car.id} className="py-2.5 px-3 text-center text-[#64748B] text-[10px]">
                         {car.transmission}
                       </td>
                     ))}
                   </tr>
                   <tr>
-                    <td className="py-2.5 font-medium text-gray-400">Состояние / Год</td>
+                    <td className="py-2.5 font-medium text-[#64748B]">Состояние / Год</td>
                     {favoriteCars.map(car => (
                       <td key={car.id} className="py-2.5 px-3 text-center font-semibold">
                         <span className={`text-[9px] px-1.5 py-0.5 rounded-md border ${
-                          car.condition === 'new' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/10' : 'bg-amber-400/10 text-amber-400 border-amber-400/10'
+                          car.condition === 'new' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-[#2563EB]/10 text-[#2563EB] border-[#2563EB]/20'
                         }`}>
                           {car.condition === 'new' ? 'Новый' : `${car.mileage.toLocaleString()} км`}
                         </span>
-                        <span className="block text-[9px] text-gray-500 mt-1 font-mono">{car.year} г.</span>
+                        <span className="block text-[9px] text-[#64748B] mt-1 font-mono">{car.year} г.</span>
                       </td>
                     ))}
                   </tr>
                   <tr>
-                    <td className="py-2.5 font-medium text-gray-400">Доставка</td>
+                    <td className="py-2.5 font-medium text-[#64748B]">Доставка</td>
                     {favoriteCars.map(car => (
-                      <td key={car.id} className="py-2.5 px-3 text-center text-emerald-400 font-medium">
+                      <td key={car.id} className="py-2.5 px-3 text-center text-emerald-600 font-bold">
                         ~{car.deliveryDays} дней
                       </td>
                     ))}
                   </tr>
-                  <tr className="bg-amber-400/[0.02]">
-                    <td className="py-3 font-bold text-gray-100">Цена под ключ</td>
+                  <tr className="bg-[#F5F7FA]">
+                    <td className="py-3 font-bold text-[#111827]">Цена под ключ</td>
                     {favoriteCars.map(car => {
                       const calculated = calculateFullCarPrice(car);
                       return (
                         <td key={car.id} className="py-3 px-3 text-center">
-                          <span className="font-display font-black text-amber-400 text-xs block">
+                          <span className="font-display font-black text-[#2563EB] text-xs block">
                             {formatCurrency(calculated.finalPriceRUB)}
                           </span>
                         </td>
@@ -177,12 +177,12 @@ export default function Favorites() {
                     })}
                   </tr>
                   <tr>
-                    <td className="py-3 font-medium text-gray-500 font-mono">Действие</td>
+                    <td className="py-3 font-medium text-[#64748B] font-mono">Действие</td>
                     {favoriteCars.map(car => (
                       <td key={car.id} className="py-3 px-3 text-center">
                         <button
                           onClick={() => handleOpenCar(car.id)}
-                          className="bg-amber-400 hover:bg-amber-500 text-black px-3 py-1.5 rounded-lg text-[9px] font-bold active:scale-95 transition-bezier cursor-pointer"
+                          className="bg-[#2563EB] hover:bg-[#1D4ED8] text-white px-3 py-1.5 rounded-lg text-[9px] font-bold active:scale-95 transition-bezier cursor-pointer shadow-sm"
                         >
                           Открыть карточку
                         </button>
@@ -202,7 +202,7 @@ export default function Favorites() {
                 <div
                   key={car.id}
                   onClick={() => handleOpenCar(car.id)}
-                  className="bg-[#121215] border border-white/[0.03] hover:border-white/[0.08] rounded-2xl overflow-hidden flex shadow-xl cursor-pointer group relative"
+                  className="bg-white border border-[#E5E7EB] hover:border-[#2563EB]/25 rounded-3xl overflow-hidden flex shadow-md cursor-pointer group relative"
                 >
                   <div className="w-28 h-24 shrink-0 overflow-hidden relative">
                     <img
@@ -213,35 +213,35 @@ export default function Favorites() {
                     />
                     <button
                       onClick={(e) => handleRemoveFavorite(e, car.id)}
-                      className="absolute top-2 left-2 p-1.5 rounded-full bg-red-500/95 hover:bg-red-600 text-white transition active:scale-90"
+                      className="absolute top-2 left-2 p-1.5 rounded-full bg-rose-600 text-white shadow-md hover:bg-rose-700 transition active:scale-90"
                       title="Удалить из избранного"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
 
-                  <div className="p-3.5 flex-1 flex flex-col justify-between min-w-0 bg-gradient-to-r from-[#121215] to-[#0e0e11]">
+                  <div className="p-3.5 flex-1 flex flex-col justify-between min-w-0 bg-white">
                     <div className="flex justify-between items-start">
                       <div className="min-w-0">
-                        <h4 className="font-display font-bold text-xs text-gray-100 group-hover:text-amber-400 transition-colors truncate">
+                        <h4 className="font-display font-bold text-xs text-[#111827] group-hover:text-[#2563EB] transition-colors truncate">
                           {car.brand} {car.model}
                         </h4>
-                        <p className="text-[10px] text-gray-500 mt-0.5">
+                        <p className="text-[10px] text-[#64748B] mt-0.5">
                           {car.year} г. • {car.power} л.с.
                         </p>
                       </div>
-                      <span className="bg-white/5 text-gray-300 text-[8px] font-bold px-2 py-0.5 rounded-md shrink-0 uppercase tracking-wider ml-1">
+                      <span className="bg-[#F5F7FA] border border-[#E5E7EB] text-[#111827] text-[8px] font-bold px-2 py-0.5 rounded-md shrink-0 uppercase tracking-wider ml-1">
                         {car.country === 'China' ? 'КНР 🇨🇳' : car.country === 'South Korea' ? 'Корея 🇰🇷' : 'КР 🇰🇬'}
                       </span>
                     </div>
 
-                    <div className="flex justify-between items-end border-t border-white/[0.03] pt-1.5 mt-1.5">
-                      <span className="text-[9px] text-emerald-400 font-semibold flex items-center space-x-0.5">
+                    <div className="flex justify-between items-end border-t border-[#E5E7EB]/40 pt-1.5 mt-1.5">
+                      <span className="text-[9px] text-[#2563EB] font-bold flex items-center space-x-0.5">
                         <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-                        <span>Доставка ~{car.deliveryDays} дней</span>
+                        <span>~{car.deliveryDays} дней</span>
                       </span>
                       <div className="text-right">
-                        <span className="font-display font-black text-amber-400 text-xs">
+                        <span className="font-display font-black text-[#2563EB] text-xs">
                           {formatCurrency(calculated.finalPriceRUB)}
                         </span>
                       </div>

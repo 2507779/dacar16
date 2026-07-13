@@ -7,11 +7,23 @@
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
+:root {
+  --bg-primary: #F5F7FA; /* Premium Slate/Alabaster Light Background */
+  --bg-secondary: #FFFFFF; /* Crisp White Cards */
+  --bg-tertiary: #E5E7EB; /* Refined Border/Lighter Grey */
+  --text-primary: #111827; /* Deep Charcoal/Graphite */
+  --text-secondary: #64748B; /* Slate Blue-Grey Muted */
+  --accent-primary: #2563EB; /* Porsche/BMW Electric Tech Blue */
+  --accent-primary-hover: #1D4ED8;
+  --border-light: #E5E7EB;
+  --border-primary: rgba(37, 99, 235, 0.15);
+}
+
 /* Стили для Telegram Mini App */
 body {
   font-family: var(--font-sans);
-  background-color: #070709; /* Металлический премиальный обсидиановый фон */
-  color: #f3f4f6;
+  background-color: #F5F7FA; /* Элегантный светлый премиальный фон 2026 года */
+  color: #111827;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
@@ -27,27 +39,27 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(245, 158, 11, 0.2); /* Тонкий золотой акцент скроллбара */
+  background: rgba(37, 99, 235, 0.25); /* Тонкий синий акцент скроллбара */
   border-radius: 99px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(245, 158, 11, 0.4);
+  background: rgba(37, 99, 235, 0.45);
 }
 
-/* Элитное стекло */
+/* Элитное стекло в светлых тонах */
 .glass-premium {
-  background: rgba(18, 18, 22, 0.75);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(37, 99, 235, 0.12);
 }
 
 .glass-premium-accent {
-  background: rgba(245, 158, 11, 0.03);
+  background: rgba(37, 99, 235, 0.04);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(37, 99, 235, 0.18);
 }
 
 /* Кастомные плавные переходы */

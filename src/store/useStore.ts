@@ -74,6 +74,9 @@ interface AppStore {
   searchQuery: string;
   filters: FilterState;
   cars: Car[]; // Динамический список автомобилей
+  homepageBannerUrl: string;
+  homepageBannerTitle: string;
+  homepageBannerSubtitle: string;
   
   // Экшны
   setCurrentTab: (tab: 'home' | 'catalog' | 'favorites' | 'orders' | 'profile') => void;
@@ -91,7 +94,11 @@ interface AppStore {
   resetFilters: () => void;
   advanceOrderProgress: (orderId: string) => void; // Симулятор движения заказа по таймлайну
   addCar: (car: Car) => void; // Добавление нового автомобиля
+  editCar: (carId: string, updatedCar: Car) => void; // Редактирование автомобиля
   deleteCar: (carId: string) => void; // Удаление автомобиля
+  setHomepageBannerUrl: (url: string) => void;
+  setHomepageBannerTitle: (title: string) => void;
+  setHomepageBannerSubtitle: (sub: string) => void;
 }
 
 const initialFilters: FilterState = {
@@ -106,10 +113,25 @@ export const useStore = create<AppStore>((set, get) => {
   // Загрузка favorites и orders из localStorage при наличии
   const localFavorites = localStorage.getItem('dacar_favorites');
   const localOrders = localStorage.getItem('dacar_orders');
-  const localCustomCars = localStorage.getItem('dacar_custom_cars');
+  
+  // Загрузка всех автомобилей (сохраняем в единую коллекцию, чтобы можно было редактировать любые!)
+  const localAllCars = localStorage.getItem('dacar_all_cars');
+  let loadedCars: Car[] = [];
+  if (localAllCars) {
+    try {
+      loadedCars = JSON.parse(localAllCars);
+    } catch (e) {
+      loadedCars = CARS_DATA;
+    }
+  } else {
+    loadedCars = CARS_DATA;
+    localStorage.setItem('dacar_all_cars', JSON.stringify(CARS_DATA));
+  }
 
-  const customCars: Car[] = localCustomCars ? JSON.parse(localCustomCars) : [];
-  const mergedCars = [...CARS_DATA, ...customCars];
+  // Загрузка кастомизации баннера
+  const savedBannerUrl = localStorage.getItem('dacar_banner_url') || '';
+  const savedBannerTitle = localStorage.getItem('dacar_banner_title') || 'Автомобили из Азии';
+  const savedBannerSubtitle = localStorage.getItem('dacar_banner_subtitle') || 'под ключ в РФ';
 
   // Демонстрационные заказы по умолчанию, чтобы приложение выглядело "живым" и готовым
   const sampleOrders: Order[] = [
@@ -120,7 +142,7 @@ export const useStore = create<AppStore>((set, get) => {
       carModel: '001 YOU 100kWh',
       carImage: 'https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=800&q=80',
       carYear: 2024,
-      finalPriceRUB: calculateFullCarPrice(mergedCars.find(c => c.id === 'zeekr-001-you-2024') || CARS_DATA[1], 'Москва').finalPriceRUB,
+      finalPriceRUB: calculateFullCarPrice(loadedCars.find(c => c.id === 'zeekr-001-you-2024') || CARS_DATA[1], 'Москва').finalPriceRUB,
       customerName: 'Константин',
       customerPhone: '+7 (927) 444-11-22',
       customerCity: 'Москва',
@@ -135,7 +157,7 @@ export const useStore = create<AppStore>((set, get) => {
       carModel: 'Palisade Calligraphy',
       carImage: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80',
       carYear: 2022,
-      finalPriceRUB: calculateFullCarPrice(mergedCars.find(c => c.id === 'hyundai-palisade-2022') || CARS_DATA[2], 'Казань (Главный филиал)').finalPriceRUB,
+      finalPriceRUB: calculateFullCarPrice(loadedCars.find(c => c.id === 'hyundai-palisade-2022') || CARS_DATA[2], 'Казань (Главный филиал)').finalPriceRUB,
       customerName: 'Евгений',
       customerPhone: '+7 (917) 222-33-44',
       customerCity: 'Казань (Главный филиал)',
@@ -160,7 +182,10 @@ export const useStore = create<AppStore>((set, get) => {
     orders: parsedOrders,
     searchQuery: '',
     filters: initialFilters,
-    cars: mergedCars,
+    cars: loadedCars,
+    homepageBannerUrl: savedBannerUrl,
+    homepageBannerTitle: savedBannerTitle,
+    homepageBannerSubtitle: savedBannerSubtitle,
 
     setCurrentTab: (tab) => set({ currentTab: tab }),
     
@@ -238,25 +263,41 @@ export const useStore = create<AppStore>((set, get) => {
     },
 
     addCar: (newCar) => {
-      const currentCustom = localStorage.getItem('dacar_custom_cars');
-      const parsedCustom: Car[] = currentCustom ? JSON.parse(currentCustom) : [];
-      
-      const updatedCustom = [...parsedCustom, newCar];
-      localStorage.setItem('dacar_custom_cars', JSON.stringify(updatedCustom));
-      
-      set({ cars: [...CARS_DATA, ...updatedCustom] });
+      const updatedCars = [...get().cars, newCar];
+      localStorage.setItem('dacar_all_cars', JSON.stringify(updatedCars));
+      set({ cars: updatedCars });
+    },
+
+    editCar: (carId, updatedCar) => {
+      const updatedCars = get().cars.map((car) => {
+        if (car.id === carId) {
+          return { ...car, ...updatedCar };
+        }
+        return car;
+      });
+      localStorage.setItem('dacar_all_cars', JSON.stringify(updatedCars));
+      set({ cars: updatedCars });
     },
 
     deleteCar: (carId) => {
-      // 1. Из кастомных в localStorage
-      const currentCustom = localStorage.getItem('dacar_custom_cars');
-      const parsedCustom: Car[] = currentCustom ? JSON.parse(currentCustom) : [];
-      const updatedCustom = parsedCustom.filter(c => c.id !== carId);
-      localStorage.setItem('dacar_custom_cars', JSON.stringify(updatedCustom));
-
-      // 2. Из общего списка в стейте (также фильтруем дефолтные, чтобы пользователь мог временно "скрыть" и дефолтные авто на своем устройстве!)
       const updatedCars = get().cars.filter(c => c.id !== carId);
+      localStorage.setItem('dacar_all_cars', JSON.stringify(updatedCars));
       set({ cars: updatedCars });
+    },
+
+    setHomepageBannerUrl: (url) => {
+      localStorage.setItem('dacar_banner_url', url);
+      set({ homepageBannerUrl: url });
+    },
+
+    setHomepageBannerTitle: (title) => {
+      localStorage.setItem('dacar_banner_title', title);
+      set({ homepageBannerTitle: title });
+    },
+
+    setHomepageBannerSubtitle: (sub) => {
+      localStorage.setItem('dacar_banner_subtitle', sub);
+      set({ homepageBannerSubtitle: sub });
     }
   };
 });
