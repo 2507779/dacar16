@@ -324,7 +324,7 @@ export default function Home() {
           </div>
 
           <p className="text-[7.5px] text-[#78716C] font-black uppercase tracking-wider">
-            Мировой опыт • Местное доверие • Индивидуальный подход
+            Опыт с 2022 года • Местное доверие • Индивидуальный подход
           </p>
         </div>
       </div>
@@ -338,7 +338,7 @@ export default function Home() {
               Индивидуальный консьерж-подбор
             </h4>
             <p className="text-[10px] text-stone-300 font-bold mt-1 leading-tight">
-              Оставьте заявку — куратор свяжется с вами для детального согласования
+              Оставьте заявку — менеджер свяжется с вами для детального согласования
             </p>
           </div>
           <button
