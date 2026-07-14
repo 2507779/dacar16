@@ -60,7 +60,7 @@ export const CARS_DATA: Car[] = [
     color: 'Белый жемчуг (White Pearl)',
     images: [
       'https://cloud.mail.ru/public/e1c2/ML717keux',
-      'https://images.unsplash.com/photo-1567818735868-e71b99932e29?auto=format&fit=crop&w=800&q=80'
+      'https://cloud.mail.ru/public/e1c2/ML717keux'
     ],
     priceUSD: 28500,
     recyclingFeeRUB: 3400,
