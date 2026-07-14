@@ -534,6 +534,7 @@ export default function VehicleStories() {
                     <img 
                       src={car.images[0]} 
                       alt="" 
+                      referrerPolicy="no-referrer"
                       className="w-12 h-12 rounded-lg object-cover"
                     />
                     <div>

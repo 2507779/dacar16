@@ -28,6 +28,7 @@ export interface Car {
   priceUSD: number; // Base price at origin country in USD
   recyclingFeeRUB: number; // Утильсбор РФ
   customsDutyEUR: number; // Таможенная пошлина в EUR
+  customFinalPriceRUB?: number; // Цена под ключ (если введена вручную)
   description: string;
   features: string[]; // Premium features list
   availability: CarAvailability;

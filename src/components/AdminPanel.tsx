@@ -254,6 +254,8 @@ export function AdminPanel() {
   const [newPriceUSD, setNewPriceUSD] = useState(28000);
   const [newCustomsEUR, setNewCustomsEUR] = useState(4500);
   const [newRecyclingRUB, setNewRecyclingRUB] = useState(3400);
+  const [newCustomFinalPrice, setNewCustomFinalPrice] = useState<number | ''>('');
+  const [formSection, setFormSection] = useState<'basic' | 'tech' | 'pricing' | 'media'>('basic');
   const [newImgUrl, setNewImgUrl] = useState('');
   const [newDesc, setNewDesc] = useState('');
   const [newFeatures, setNewFeatures] = useState('Светодиодные фары, Панорамная крыша, Адаптивный круиз-контроль, Вентиляция сидений');
@@ -352,8 +354,9 @@ export function AdminPanel() {
     setNewTrans(car.transmission || 'Automatic');
     setNewColor(car.color || 'Черный металлик');
     setNewPriceUSD(car.priceUSD || 25000);
-    setNewCustomsEUR(car.customsEUR || 3500);
-    setNewRecyclingRUB(car.recyclingRUB || 3400);
+    setNewCustomsEUR(car.customsEUR || car.customsDutyEUR || 3500);
+    setNewRecyclingRUB(car.recyclingRUB || car.recyclingFeeRUB || 3400);
+    setNewCustomFinalPrice(car.customFinalPriceRUB || car.customFinalPrice || '');
     setNewImgUrl(car.images?.join('\n') || '');
     setNewDesc(car.description || '');
     setNewFeatures(car.features?.join(', ') || '');
@@ -380,6 +383,8 @@ export function AdminPanel() {
     setNewPriceUSD(28000);
     setNewCustomsEUR(4500);
     setNewRecyclingRUB(3400);
+    setNewCustomFinalPrice('');
+    setFormSection('basic');
     setNewImgUrl('');
     setNewDesc('');
     setNewFeatures('Светодиодные фары, Панорамная крыша, Адаптивный круиз-контроль, Вентиляция сидений');
@@ -456,6 +461,8 @@ export function AdminPanel() {
       priceUSD: Number(newPriceUSD),
       customsEUR: Number(newCustomsEUR),
       recyclingRUB: Number(newRecyclingRUB),
+      customFinalPriceRUB: newCustomFinalPrice ? Number(newCustomFinalPrice) : undefined,
+      customFinalPrice: newCustomFinalPrice ? Number(newCustomFinalPrice) : undefined,
       images: finalImgList,
       description: newDesc.trim() || `Премиальный автомобиль ${newBrand} ${newModel} напрямую из ${newCountry === 'China' ? 'Китая' : 'Южной Кореи'} под заказ.`,
       features: newFeatures.split(',').map(f => f.trim()).filter(Boolean),
@@ -1575,7 +1582,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                           <div className="bg-white border border-[#EFEBE4] rounded-2xl p-3.5 space-y-2.5 shadow-md">
                             <h6 className="text-[11px] font-black text-[#1C1917] flex items-center">
                               <span className="w-4 h-4 bg-[#C5A880]/15 rounded flex items-center justify-center text-[9px] font-black text-[#C5A880] mr-1">8</span>
-                              <span>Кастомизатор цветовой гаммы TMA</span>
+                              <span>Кастомизатор Темы TMA</span>
                             </h6>
                             <p className="text-[9px] text-[#78716C] leading-normal">
                               Выберите визуальный стиль Mini App. Изменение цвета мгновенно применится ко всему приложению.
@@ -1694,7 +1701,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                     {adminTab === 'add' && (
                       <form onSubmit={handleFormSubmit} className="space-y-3.5">
                         <div className="flex justify-between items-center">
-                          <h5 className="text-[11px] font-bold text-[#2563EB] uppercase tracking-wider font-mono">
+                          <h5 className="text-[11px] font-bold text-[#2563EB] uppercase tracking-wider font-mono font-black">
                             {editingCarId ? 'Редактирование характеристик' : 'Новая карточка автомобиля'}
                           </h5>
                           {editingCarId && (
@@ -1708,271 +1715,368 @@ export const CARS_DATA: Car[] = ${formattedCars};
                           )}
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2.5">
-                          <div>
-                            <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Марка *</label>
-                            <input
-                              type="text"
-                              value={newBrand}
-                              onChange={(e) => setNewBrand(e.target.value)}
-                              placeholder="Напр. Lixiang"
-                              required
-                              className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-xs outline-none focus:border-[#2563EB] text-[#111827]"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Модель *</label>
-                            <input
-                              type="text"
-                              value={newModel}
-                              onChange={(e) => setNewModel(e.target.value)}
-                              placeholder="Напр. L9 Ultra"
-                              required
-                              className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-xs outline-none focus:border-[#2563EB] text-[#111827]"
-                            />
-                          </div>
+                        {/* Компактный переключатель разделов формы для удобства на смартфонах */}
+                        <div className="flex bg-[#F1F5F9] p-0.5 rounded-xl border border-[#E2E8F0] overflow-x-auto scrollbar-none space-x-1 shrink-0 mb-3">
+                          <button
+                            type="button"
+                            onClick={() => { triggerHaptic('light'); setFormSection('basic'); }}
+                            className={`flex-1 py-2 px-2 text-center text-[10px] font-bold rounded-lg transition whitespace-nowrap ${
+                              formSection === 'basic' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#64748B] hover:text-[#111827]'
+                            }`}
+                          >
+                            📝 Основное
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { triggerHaptic('light'); setFormSection('tech'); }}
+                            className={`flex-1 py-2 px-2 text-center text-[10px] font-bold rounded-lg transition whitespace-nowrap ${
+                              formSection === 'tech' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#64748B] hover:text-[#111827]'
+                            }`}
+                          >
+                            ⚙️ Техданные
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { triggerHaptic('light'); setFormSection('pricing'); }}
+                            className={`flex-1 py-2 px-2 text-center text-[10px] font-bold rounded-lg transition whitespace-nowrap ${
+                              formSection === 'pricing' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#64748B] hover:text-[#111827]'
+                            }`}
+                          >
+                            💰 Цена (₽)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => { triggerHaptic('light'); setFormSection('media'); }}
+                            className={`flex-1 py-2 px-2 text-center text-[10px] font-bold rounded-lg transition whitespace-nowrap ${
+                              formSection === 'media' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#64748B] hover:text-[#111827]'
+                            }`}
+                          >
+                            🖼️ Медиа & ИИ
+                          </button>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-2">
-                          <div>
-                            <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Поколение</label>
-                            <input
-                              type="text"
-                              value={newGen}
-                              onChange={(e) => setNewGen(e.target.value)}
-                              className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2 py-1.5 text-xs outline-none text-[#111827]"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Год</label>
-                            <input
-                              type="number"
-                              value={newYear}
-                              onChange={(e) => setNewYear(Number(e.target.value))}
-                              className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2 py-1.5 text-xs outline-none text-[#111827]"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Пробег (км)</label>
-                            <input
-                              type="number"
-                              value={newMileage}
-                              onChange={(e) => setNewMileage(Number(e.target.value))}
-                              className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2 py-1.5 text-xs outline-none text-[#111827]"
-                            />
-                          </div>
-                        </div>
+                        {/* ШАГ 1: ОСНОВНЫЕ ПАРАМЕТРЫ */}
+                        {formSection === 'basic' && (
+                          <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-2.5">
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Марка *</label>
+                                <input
+                                  type="text"
+                                  value={newBrand}
+                                  onChange={(e) => setNewBrand(e.target.value)}
+                                  placeholder="Напр. Lixiang"
+                                  required
+                                  className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-xs outline-none focus:border-[#2563EB] text-[#111827] font-bold"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Модель *</label>
+                                <input
+                                  type="text"
+                                  value={newModel}
+                                  onChange={(e) => setNewModel(e.target.value)}
+                                  placeholder="Напр. L9 Ultra"
+                                  required
+                                  className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-xs outline-none focus:border-[#2563EB] text-[#111827] font-bold"
+                                />
+                              </div>
+                            </div>
 
-                        <div className="grid grid-cols-3 gap-2">
-                          <div>
-                            <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Состояние</label>
-                            <select
-                              value={newCond}
-                              onChange={(e: any) => setNewCond(e.target.value)}
-                              className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-1 py-1.5 text-[10px] outline-none text-[#111827] font-bold"
-                            >
-                              <option value="new">Новый</option>
-                              <option value="used">С пробегом</option>
-                            </select>
-                          </div>
-                          <div>
-                            <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Экспорт</label>
-                            <select
-                              value={newCountry}
-                              onChange={(e: any) => setNewCountry(e.target.value)}
-                              className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-1 py-1.5 text-[10px] outline-none text-[#111827] font-bold"
-                            >
-                              <option value="China">Китай 🇨🇳</option>
-                              <option value="South Korea">Корея 🇰🇷</option>
-                              <option value="Kyrgyzstan">Киргизия 🇰🇬</option>
-                            </select>
-                          </div>
-                          <div>
-                            <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Кузов</label>
-                            <input
-                              type="text"
-                              value={newBody}
-                              onChange={(e) => setNewBody(e.target.value)}
-                              className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2 py-1.5 text-xs outline-none text-[#111827]"
-                            />
-                          </div>
-                        </div>
+                            <div className="grid grid-cols-3 gap-2">
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Поколение</label>
+                                <input
+                                  type="text"
+                                  value={newGen}
+                                  onChange={(e) => setNewGen(e.target.value)}
+                                  className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2 py-1.5 text-xs outline-none text-[#111827]"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Год</label>
+                                <input
+                                  type="number"
+                                  value={newYear}
+                                  onChange={(e) => setNewYear(Number(e.target.value))}
+                                  className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2 py-1.5 text-xs outline-none text-[#111827]"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Пробег (км)</label>
+                                <input
+                                  type="number"
+                                  value={newMileage}
+                                  onChange={(e) => setNewMileage(Number(e.target.value))}
+                                  className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2 py-1.5 text-xs outline-none text-[#111827]"
+                                />
+                              </div>
+                            </div>
 
-                        <div className="grid grid-cols-2 gap-2.5">
-                          <div>
-                            <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Двигатель</label>
-                            <select
-                              value={newEngine}
-                              onChange={(e: any) => setNewEngine(e.target.value)}
-                              className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2 py-1.5 text-[11px] outline-none text-[#111827] font-bold"
-                            >
-                              <option value="gasoline">Бензин ⛽</option>
-                              <option value="diesel">Дизель ⚙️</option>
-                              <option value="hybrid">Гибрид 🔋</option>
-                              <option value="electric">Электро ⚡</option>
-                            </select>
+                            <div className="grid grid-cols-3 gap-2">
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Состояние</label>
+                                <select
+                                  value={newCond}
+                                  onChange={(e: any) => setNewCond(e.target.value)}
+                                  className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-1 py-1.5 text-[10px] outline-none text-[#111827] font-bold"
+                                >
+                                  <option value="new">Новый</option>
+                                  <option value="used">С пробегом</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Экспорт</label>
+                                <select
+                                  value={newCountry}
+                                  onChange={(e: any) => setNewCountry(e.target.value)}
+                                  className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-1 py-1.5 text-[10px] outline-none text-[#111827] font-bold"
+                                >
+                                  <option value="China">Китай 🇨🇳</option>
+                                  <option value="South Korea">Корея 🇰🇷</option>
+                                  <option value="Kyrgyzstan">Киргизия 🇰🇬</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Кузов</label>
+                                <input
+                                  type="text"
+                                  value={newBody}
+                                  onChange={(e) => setNewBody(e.target.value)}
+                                  className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2 py-1.5 text-xs outline-none text-[#111827]"
+                                />
+                              </div>
+                            </div>
                           </div>
-                          <div>
-                            <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Объем/ДВС</label>
-                            <input
-                              type="text"
-                              value={newEngineVol}
-                              onChange={(e) => setNewEngineVol(e.target.value)}
-                              className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2 py-1.5 text-xs outline-none text-[#111827]"
-                            />
-                          </div>
-                        </div>
+                        )}
 
-                        <div className="grid grid-cols-3 gap-2">
-                          <div>
-                            <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Мощность л.с.</label>
-                            <input
-                              type="number"
-                              value={newPower}
-                              onChange={(e) => setNewPower(Number(e.target.value))}
-                              className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2 py-1.5 text-xs outline-none text-[#111827]"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Привод</label>
-                            <select
-                              value={newDrive}
-                              onChange={(e: any) => setNewDrive(e.target.value)}
-                              className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-1 py-1.5 text-[10px] outline-none text-[#111827] font-bold"
-                            >
-                              <option value="AWD">Полный</option>
-                              <option value="FWD">Передний</option>
-                              <option value="RWD">Задний</option>
-                            </select>
-                          </div>
-                          <div>
-                            <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">КПП</label>
-                            <select
-                              value={newTrans}
-                              onChange={(e: any) => setNewTrans(e.target.value)}
-                              className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-1 py-1.5 text-[10px] outline-none text-[#111827] font-bold"
-                            >
-                              <option value="Automatic">Автомат</option>
-                              <option value="Robotic">Робот</option>
-                              <option value="Manual">Механика</option>
-                              <option value="Single-speed">Редуктор</option>
-                            </select>
-                          </div>
-                        </div>
+                        {/* ШАГ 2: ТЕХНИЧЕСКИЕ ДАННЫЕ */}
+                        {formSection === 'tech' && (
+                          <div className="space-y-3">
+                            <div className="grid grid-cols-2 gap-2.5">
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Двигатель</label>
+                                <select
+                                  value={newEngine}
+                                  onChange={(e: any) => setNewEngine(e.target.value)}
+                                  className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2 py-1.5 text-[11px] outline-none text-[#111827] font-bold"
+                                >
+                                  <option value="gasoline">Бензин ⛽</option>
+                                  <option value="diesel">Дизель ⚙️</option>
+                                  <option value="hybrid">Гибрид 🔋</option>
+                                  <option value="electric">Электро ⚡</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Объем/ДВС</label>
+                                <input
+                                  type="text"
+                                  value={newEngineVol}
+                                  onChange={(e) => setNewEngineVol(e.target.value)}
+                                  className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2 py-1.5 text-xs outline-none text-[#111827]"
+                                />
+                              </div>
+                            </div>
 
-                        <div className="grid grid-cols-3 gap-2">
-                          <div>
-                            <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Цвет кузова</label>
-                            <input
-                              type="text"
-                              value={newColor}
-                              onChange={(e) => setNewColor(e.target.value)}
-                              className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2 py-1.5 text-xs outline-none text-[#111827]"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Цена закупа ($)</label>
-                            <input
-                              type="number"
-                              value={newPriceUSD}
-                              onChange={(e) => setNewPriceUSD(Number(e.target.value))}
-                              className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2 py-1.5 text-xs outline-none text-[#111827]"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Таможня (€)</label>
-                            <input
-                              type="number"
-                              value={newCustomsEUR}
-                              onChange={(e) => setNewCustomsEUR(Number(e.target.value))}
-                              className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2 py-1.5 text-xs outline-none text-[#111827]"
-                            />
-                          </div>
-                        </div>
+                            <div className="grid grid-cols-3 gap-2">
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Мощность л.с.</label>
+                                <input
+                                  type="number"
+                                  value={newPower}
+                                  onChange={(e) => setNewPower(Number(e.target.value))}
+                                  className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2 py-1.5 text-xs outline-none text-[#111827]"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Привод</label>
+                                <select
+                                  value={newDrive}
+                                  onChange={(e: any) => setNewDrive(e.target.value)}
+                                  className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-1 py-1.5 text-[10px] outline-none text-[#111827] font-bold"
+                                >
+                                  <option value="AWD">Полный</option>
+                                  <option value="FWD">Передний</option>
+                                  <option value="RWD">Задний</option>
+                                </select>
+                              </div>
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">КПП</label>
+                                <select
+                                  value={newTrans}
+                                  onChange={(e: any) => setNewTrans(e.target.value)}
+                                  className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-1 py-1.5 text-[10px] outline-none text-[#111827] font-bold"
+                                >
+                                  <option value="Automatic">Автомат</option>
+                                  <option value="Robotic">Робот</option>
+                                  <option value="Manual">Механика</option>
+                                  <option value="Single-speed">Редуктор</option>
+                                </select>
+                              </div>
+                            </div>
 
-                        <div>
-                          <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Утильсбор (₽)</label>
-                          <input
-                            type="number"
-                            value={newRecyclingRUB}
-                            onChange={(e) => setNewRecyclingRUB(Number(e.target.value))}
-                            className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-xs outline-none text-[#111827]"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">
-                            Ссылки на фотографии авто (Каждая ссылка с новой строки. Вставьте ссылки из вашего TG-канала) *
-                          </label>
-                          <textarea
-                            value={newImgUrl}
-                            onChange={(e) => setNewImgUrl(e.target.value)}
-                            rows={3}
-                            placeholder="https://t.me/your_channel/123&#10;https://t.me/your_channel/124&#10;https://images.unsplash.com/photo..."
-                            className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-xs outline-none text-[#111827] font-mono text-[9.5px] resize-y"
-                          />
-                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-1.5 gap-1.5">
-                            <p className="text-[7.5px] text-[#64748B] leading-normal font-medium max-w-full sm:max-w-[70%]">
-                              💡 Скопируйте ссылки на посты в Telegram-канале (например, <code className="bg-stone-100 px-1 py-0.5 rounded text-[7px]">https://t.me/channel/123</code>), вставьте их выше и нажмите кнопку справа для моментального превращения в прямые изображения!
-                            </p>
-                            <button
-                              type="button"
-                              onClick={resolveTelegramLinks}
-                              disabled={isResolvingTGLinks}
-                              className="text-[8px] bg-[#C5A880]/10 text-[#C5A880] hover:bg-[#C5A880]/20 disabled:bg-stone-100 disabled:text-stone-400 font-extrabold uppercase px-2.5 py-1.5 rounded-lg border border-[#C5A880]/20 transition-all flex items-center justify-center space-x-1 shrink-0 self-end sm:self-auto cursor-pointer"
-                            >
-                              {isResolvingTGLinks ? (
-                                <>
-                                  <span className="w-2.5 h-2.5 border-2 border-[#C5A880] border-t-transparent rounded-full animate-spin mr-1"></span>
-                                  <span>Преобразуем...</span>
-                                </>
-                              ) : (
-                                <>
-                                  <Sparkles className="w-2.5 h-2.5 mr-0.5 text-[#C5A880]" />
-                                  <span>Преобразовать ссылки TG</span>
-                                </>
-                              )}
-                            </button>
+                            <div>
+                              <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Цвет кузова</label>
+                              <input
+                                type="text"
+                                value={newColor}
+                                onChange={(e) => setNewColor(e.target.value)}
+                                className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-xs outline-none text-[#111827]"
+                              />
+                            </div>
                           </div>
-                        </div>
+                        )}
 
-                        <div className="space-y-1.5">
-                          <div className="flex justify-between items-center">
-                            <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono">Описание автомобиля</label>
-                            <button
-                              type="button"
-                              onClick={handleGenerateAIDescription}
-                              className="text-[8.5px] text-blue-600 hover:text-blue-700 font-black uppercase tracking-wider flex items-center space-x-0.5"
-                            >
-                              <Sparkles className="w-3 h-3 text-blue-500 animate-pulse" />
-                              <span>🪄 Сгенерировать ИИ-описание</span>
-                            </button>
+                        {/* ШАГ 3: ЦЕНООБРАЗОВАНИЕ */}
+                        {formSection === 'pricing' && (
+                          <div className="space-y-3">
+                            <div className="bg-[#2563EB]/5 border border-[#2563EB]/15 p-3 rounded-2xl">
+                              <label className="block text-[9px] text-[#2563EB] uppercase font-black font-mono mb-1.5">
+                                ⭐️ СТОИМОСТЬ ПОД КЛЮЧ (₽) — СВОЙ ВАРИАНТ
+                              </label>
+                              <input
+                                type="number"
+                                value={newCustomFinalPrice}
+                                onChange={(e) => setNewCustomFinalPrice(e.target.value === '' ? '' : Number(e.target.value))}
+                                placeholder="Введите точную конечную цену под ключ..."
+                                className="w-full bg-white border border-[#2563EB]/35 rounded-xl px-3 py-2 text-sm outline-none text-[#111827] font-extrabold focus:border-[#2563EB] shadow-inner"
+                              />
+                              <p className="text-[7.5px] text-[#64748B] leading-relaxed mt-1.5 font-medium">
+                                💡 <strong>Укажите точную сумму под ключ в рублях</strong>, чтобы не зависеть от авторасчета по курсу валют. Если поле заполнено, калькулятор автоматически вычтет пошлину и расходы, а клиенту будет видна именно ваша фиксированная цена! Оставьте пустым, чтобы калькулировать автоматически.
+                              </p>
+                            </div>
+
+                            <div className="text-[9px] text-stone-500 uppercase font-bold tracking-wider font-mono border-b pb-1">
+                              Или укажите составляющие для авторасчета:
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-2">
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Закуп ($)</label>
+                                <input
+                                  type="number"
+                                  value={newPriceUSD}
+                                  onChange={(e) => setNewPriceUSD(Number(e.target.value))}
+                                  className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2 py-1.5 text-xs outline-none text-[#111827]"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Таможня (€)</label>
+                                <input
+                                  type="number"
+                                  value={newCustomsEUR}
+                                  onChange={(e) => setNewCustomsEUR(Number(e.target.value))}
+                                  className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2 py-1.5 text-xs outline-none text-[#111827]"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Утиль (₽)</label>
+                                <input
+                                  type="number"
+                                  value={newRecyclingRUB}
+                                  onChange={(e) => setNewRecyclingRUB(Number(e.target.value))}
+                                  className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2 py-1.5 text-xs outline-none text-[#111827]"
+                                />
+                              </div>
+                            </div>
                           </div>
-                          <textarea
-                            value={newDesc}
-                            onChange={(e) => setNewDesc(e.target.value)}
-                            rows={4}
-                            placeholder="Оставьте пустым для автогенерации или нажмите кнопку выше для мгновенного ИИ-расчета..."
-                            className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-[10px] outline-none text-[#111827] resize-y leading-relaxed"
-                          />
-                        </div>
+                        )}
 
-                        <div>
-                          <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Опции премиум (через запятую)</label>
-                          <input
-                            type="text"
-                            value={newFeatures}
-                            onChange={(e) => setNewFeatures(e.target.value)}
-                            className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-xs outline-none text-[#111827]"
-                          />
-                        </div>
+                        {/* ШАГ 4: ФОТОГРАФИИ, ОПИСАНИЕ И ОПЦИИ */}
+                        {formSection === 'media' && (
+                          <div className="space-y-3">
+                            <div className="space-y-1">
+                              <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">
+                                Ссылки на фото (каждая с новой строки) *
+                              </label>
+                              <textarea
+                                value={newImgUrl}
+                                onChange={(e) => setNewImgUrl(e.target.value)}
+                                rows={3}
+                                placeholder="https://t.me/your_channel/123&#10;https://t.me/your_channel/124"
+                                className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-xs outline-none text-[#111827] font-mono text-[9.5px] resize-y"
+                              />
+                              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-1.5 gap-1.5">
+                                <p className="text-[7.5px] text-[#64748B] leading-normal font-medium max-w-full sm:max-w-[70%]">
+                                  💡 Вставьте ссылки на посты в Telegram и нажмите кнопку справа для конвертации в фото!
+                                </p>
+                                <button
+                                  type="button"
+                                  onClick={resolveTelegramLinks}
+                                  disabled={isResolvingTGLinks}
+                                  className="text-[8px] bg-[#C5A880]/10 text-[#C5A880] hover:bg-[#C5A880]/20 disabled:bg-stone-100 disabled:text-stone-400 font-extrabold uppercase px-2.5 py-1.5 rounded-lg border border-[#C5A880]/20 transition-all flex items-center justify-center space-x-1 shrink-0 self-end sm:self-auto cursor-pointer font-mono"
+                                >
+                                  {isResolvingTGLinks ? (
+                                    <>
+                                      <span className="w-2.5 h-2.5 border-2 border-[#C5A880] border-t-transparent rounded-full animate-spin mr-1"></span>
+                                      <span>Преобразуем...</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Sparkles className="w-2.5 h-2.5 mr-0.5 text-[#C5A880]" />
+                                      <span>Конвертировать TG-посты</span>
+                                    </>
+                                  )}
+                                </button>
+                              </div>
+                            </div>
+
+                            <div className="space-y-1">
+                              <div className="flex justify-between items-center">
+                                <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono">Описание автомобиля</label>
+                                <button
+                                  type="button"
+                                  onClick={handleGenerateAIDescription}
+                                  className="text-[8.5px] text-blue-600 hover:text-blue-700 font-black uppercase tracking-wider flex items-center space-x-0.5"
+                                >
+                                  <Sparkles className="w-3 h-3 text-blue-500 animate-pulse" />
+                                  <span>🪄 ИИ-генерация текста</span>
+                                </button>
+                              </div>
+                              <textarea
+                                value={newDesc}
+                                onChange={(e) => setNewDesc(e.target.value)}
+                                rows={3}
+                                placeholder="Оставьте пустым для автогенерации или нажмите кнопку выше..."
+                                className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-[10px] outline-none text-[#111827] resize-y leading-relaxed"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Опции премиум (через запятую)</label>
+                              <input
+                                type="text"
+                                value={newFeatures}
+                                onChange={(e) => setNewFeatures(e.target.value)}
+                                className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-xs outline-none text-[#111827]"
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {/* НАВИГАЦИОННАЯ КНОПКА ДАЛЕЕ ДЛЯ ТЕЛЕФОНОВ */}
+                        {formSection !== 'media' && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              triggerHaptic('medium');
+                              if (formSection === 'basic') setFormSection('tech');
+                              else if (formSection === 'tech') setFormSection('pricing');
+                              else if (formSection === 'pricing') setFormSection('media');
+                            }}
+                            className="w-full py-2 bg-[#2563EB]/10 hover:bg-[#2563EB]/15 text-[#2563EB] font-bold text-xs rounded-xl transition cursor-pointer flex items-center justify-center space-x-1 uppercase tracking-wider"
+                          >
+                            <span>Далее</span>
+                            <span className="text-sm font-black">➔</span>
+                          </button>
+                        )}
 
                         <button
                           type="submit"
                           className="w-full py-3 bg-[#2563EB] hover:bg-[#A8884C] text-white font-black text-xs rounded-2xl transition cursor-pointer active:scale-95 shadow-md flex items-center justify-center space-x-1.5 uppercase tracking-wider"
                         >
                           <Check className="w-4 h-4" />
-                          <span>{editingCarId ? 'Сохранить изменения' : 'Добавить автомобиль'}</span>
+                          <span>{editingCarId ? 'Сохранить изменения' : 'Добавить в каталог'}</span>
                         </button>
                       </form>
                     )}

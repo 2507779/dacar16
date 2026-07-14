@@ -965,14 +965,10 @@ export function calculateFullCarPrice(
   const usdRate = EXCHANGE_RATES.USD_to_RUB;
   const eurRate = EXCHANGE_RATES.EUR_to_RUB;
 
-  // 1. Базовая цена авто
-  const carBasePriceRUB = Math.round(car.priceUSD * usdRate);
-
-  // 2. Пошлина
-  const customsDutyRUB = Math.round(car.customsDutyEUR * eurRate);
-
-  // 3. Утильсбор
-  const recyclingFeeRUB = car.recyclingFeeRUB;
+  // Поддержка альтернативных имен свойств утильсбора и пошлины из панели администратора
+  const recyclingFeeRUB = car.recyclingFeeRUB || (car as any).recyclingRUB || 5200;
+  const customsDutyEUR = car.customsDutyEUR || (car as any).customsEUR || 0;
+  const customFinalPriceRUB = car.customFinalPriceRUB || (car as any).customFinalPrice || 0;
 
   // 4. Оформление документов
   const brokerFeeRUB = BROKER_FEE_RUB;
@@ -985,6 +981,35 @@ export function calculateFullCarPrice(
 
   // 6. Наша комиссия
   const companyCommissionRUB = COMPANY_COMMISSION;
+
+  // Если задана кастомная стоимость "под ключ", рассчитываем составляющие обратным методом
+  if (customFinalPriceRUB && customFinalPriceRUB > 0) {
+    const finalPriceRUB = customFinalPriceRUB;
+    
+    // Пошлина: если указана пошлина в EUR, используем её, иначе рассчитываем примерный процент
+    const customsDutyRUB = customsDutyEUR && customsDutyEUR > 0
+      ? Math.round(customsDutyEUR * eurRate)
+      : Math.round((finalPriceRUB - deliveryFeeRUB) * 0.12);
+
+    // Базовая цена автомобиля — остаток
+    const carBasePriceRUB = Math.max(0, finalPriceRUB - customsDutyRUB - recyclingFeeRUB - brokerFeeRUB - deliveryFeeRUB - companyCommissionRUB);
+
+    return {
+      carBasePriceRUB,
+      customsDutyRUB,
+      recyclingFeeRUB,
+      brokerFeeRUB,
+      deliveryFeeRUB,
+      companyCommissionRUB,
+      finalPriceRUB,
+    };
+  }
+
+  // 1. Базовая цена авто
+  const carBasePriceRUB = Math.round(car.priceUSD * usdRate);
+
+  // 2. Пошлина
+  const customsDutyRUB = Math.round(customsDutyEUR * eurRate);
 
   // Итого
   const finalPriceRUB = carBasePriceRUB + customsDutyRUB + recyclingFeeRUB + brokerFeeRUB + deliveryFeeRUB + companyCommissionRUB;
