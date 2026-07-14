@@ -96,7 +96,7 @@ export default function Home() {
 
           <div className="flex justify-between items-end z-10 border-t border-white/10 pt-3 mt-2">
             <div>
-              <p className="text-[8px] text-stone-400 uppercase tracking-widest font-mono">Главный шоурум</p>
+              <p className="text-[8px] text-stone-400 uppercase tracking-widest font-mono">Главный офис</p>
               <p className="text-[11px] font-bold text-white mt-0.5">г. Казань, ул. Серова, 48 к2</p>
             </div>
             <button
@@ -122,8 +122,8 @@ export default function Home() {
         <div className="grid grid-cols-3 gap-2 mt-2">
           {[
             { id: 'China', label: 'Китай 🇨🇳', desc: 'Электро / Гибриды' },
-            { id: 'South Korea', label: 'Корея 🇰🇷', desc: 'Дизель / Бензин' },
-            { id: 'Kyrgyzstan', label: 'Киргизия 🇰🇬', desc: 'Мгновенный транзит' }
+            { id: 'South Korea', label: 'Корея 🇰🇷', desc: 'Бензин / Газ' },
+            { id: 'Kyrgyzstan', label: 'Киргизия 🇰🇬', desc: 'Быстрая доставка' }
           ].map((c) => (
             <button
               key={c.id}
