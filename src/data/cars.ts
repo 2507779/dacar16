@@ -7,8 +7,8 @@ import { Car, ExchangeRates } from '../types';
 
 // Реальные курсы валют на текущую дату для точных расчетов
 export const EXCHANGE_RATES: ExchangeRates = {
-  USD_to_RUB: 91.80,
-  EUR_to_RUB: 99.20,
+  USD_to_RUB: 76.80,
+  EUR_to_RUB: 86.20,
 };
 
 // Фиксированные тарифы DA!CAR
@@ -59,7 +59,7 @@ export const CARS_DATA: Car[] = [
     transmission: 'Automatic',
     color: 'Белый жемчуг (White Pearl)',
     images: [
-      'https://images.unsplash.com/photo-1603386329225-868f9b1ee6c9?auto=format&fit=crop&w=800&q=80',
+      'https://cloud.mail.ru/public/e1c2/ML717keux',
       'https://images.unsplash.com/photo-1567818735868-e71b99932e29?auto=format&fit=crop&w=800&q=80'
     ],
     priceUSD: 28500,
