@@ -3,8 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
-import { Home, Car, Heart, Package, User, X, MoreVertical, Wifi, Battery, Send, ArrowLeft, Check } from 'lucide-react';
+import React, { useState } from 'react';
+import { Home, Car, Heart, Package, User, X, MoreVertical, Send, ArrowLeft, Check } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { triggerHaptic } from '../utils/haptics';
 import { AnimatePresence, motion } from 'motion/react';
@@ -16,23 +16,11 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const { currentTab, setCurrentTab, orders, activeCarId, setActiveCarId } = useStore();
   const [isAppClosed, setIsAppClosed] = useState(false);
-  const [timeStr, setTimeStr] = useState('09:41');
   const [chatMessages, setChatMessages] = useState<Array<{ sender: 'bot' | 'user'; text: string; time: string }>>([
     { sender: 'bot', text: 'Добро пожаловать в DA!CAR — премиальный сервис импорта автомобилей из Китая, Южной Кореи и Киргизии под ключ! 🚘✨', time: '12:00' },
     { sender: 'bot', text: 'Здесь вы можете выбрать любой автомобиль, рассчитать полную стоимость с учетом доставки, пошлин и утильсбора в РФ, а также отслеживать статус доставки в реальном времени.', time: '12:01' }
   ]);
   const [inputMessage, setInputMessage] = useState('');
-
-  // Обновление системного времени
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      setTimeStr(now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }));
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 60000);
-    return () => clearInterval(interval);
-  }, []);
 
   const handleTabChange = (tab: typeof currentTab) => {
     triggerHaptic('light');
@@ -147,16 +135,6 @@ export default function Layout({ children }: LayoutProps) {
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* 1. Системный статус-бар смартфона */}
-        <div className="bg-[#FAF8F5] text-[#78716C] px-6 pt-3 pb-1 flex justify-between items-center text-xs font-semibold tracking-tight select-none border-b border-[#EFEBE4]/40">
-          <span>{timeStr}</span>
-          <div className="flex items-center space-x-1.5">
-            <span className="text-[9px] bg-[#EFEBE4]/65 text-[#78716C] px-1 py-0.5 rounded font-mono font-bold">5G</span>
-            <Wifi className="w-3.5 h-3.5 text-[#78716C]" />
-            <Battery className="w-4 h-4 text-[#78716C]" />
-          </div>
-        </div>
 
         {/* 2. Шапка Telegram WebApp */}
         <div className="bg-[#FAF8F5] text-[#1C1917] px-4 py-3 flex justify-between items-center border-b border-[#EFEBE4] shadow-sm relative z-20 select-none">

@@ -258,6 +258,59 @@ export function AdminPanel() {
   const [newDesc, setNewDesc] = useState('');
   const [newFeatures, setNewFeatures] = useState('Светодиодные фары, Панорамная крыша, Адаптивный круиз-контроль, Вентиляция сидений');
 
+  // Состояния для автоматического резолвинга ссылок Telegram
+  const [isResolvingTGLinks, setIsResolvingTGLinks] = useState(false);
+
+  const resolveTelegramLinks = async () => {
+    const urls = newImgUrl.split('\n').map(u => u.trim()).filter(Boolean);
+    const hasTG = urls.some(url => url.includes('t.me/') && !url.includes('telegram-cdn.org') && !url.includes('cdn1.telecosm.org') && !url.includes('allorigins'));
+    
+    if (!hasTG) {
+      alert('В списке нет обычных ссылок на посты Telegram (t.me/.../123). Нечего конвертировать!');
+      return;
+    }
+    
+    setIsResolvingTGLinks(true);
+    triggerHaptic('light');
+    
+    const resolvedUrls = [...urls];
+    let resolvedCount = 0;
+    
+    for (let i = 0; i < resolvedUrls.length; i++) {
+      const url = resolvedUrls[i];
+      if (url.includes('t.me/') && !url.includes('telegram-cdn.org') && !url.includes('cdn1.telecosm.org') && !url.includes('allorigins')) {
+        try {
+          const embedUrl = url.includes('?') ? `${url}&embed=1` : `${url}?embed=1`;
+          const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(embedUrl)}`;
+          
+          const res = await fetch(proxyUrl);
+          const html = await res.text();
+          
+          const imgRegex = /background-image:\s*url\(\s*['"]?([^'")]*)['"]?\s*\)/i;
+          const match = html.match(imgRegex);
+          
+          if (match && match[1]) {
+            resolvedUrls[i] = match[1];
+            resolvedCount++;
+          }
+        } catch (e) {
+          console.error('Error resolving telegram link:', url, e);
+        }
+      }
+    }
+    
+    setNewImgUrl(resolvedUrls.join('\n'));
+    setIsResolvingTGLinks(false);
+    
+    if (resolvedCount > 0) {
+      triggerHaptic('success');
+      alert(`🎉 Успешно конвертировано ${resolvedCount} ссылок Telegram в прямые ссылки на изображения!`);
+    } else {
+      triggerHaptic('error');
+      alert('Не удалось автоматически преобразовать ссылки. Убедитесь, что ваш канал публичный, и ссылка ведет на конкретный пост с картинкой (например, https://t.me/channel_name/123).');
+    }
+  };
+
   // Авторизация по PIN-коду
   const handleVerifyPasscode = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1145,8 +1198,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                     </div>
                     <h5 className="text-xs font-bold uppercase tracking-wider text-[#111827]">Доступ ограничен</h5>
                     <p className="text-[10px] text-[#64748B] leading-normal max-w-xs mx-auto font-medium">
-                      Пожалуйста, укажите пароль администратора. <br />
-                      <span className="text-[#2563EB] font-mono font-bold">Пароль по умолчанию: 7777</span>
+                      Пожалуйста, укажите секретный пароль администратора для авторизации.
                     </p>
                   </div>
 
@@ -1859,9 +1911,29 @@ export const CARS_DATA: Car[] = ${formattedCars};
                             placeholder="https://t.me/your_channel/123&#10;https://t.me/your_channel/124&#10;https://images.unsplash.com/photo..."
                             className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-xs outline-none text-[#111827] font-mono text-[9.5px] resize-y"
                           />
-                          <p className="text-[7.5px] text-[#64748B] mt-1 leading-normal font-medium">
-                            💡 Очень удобно: просто скопируйте ссылки на фото в вашем Telegram-канале и вставьте сюда по одной на каждую строчку. Приложение само сформирует полноценную галерею фотографий для данного автомобиля!
-                          </p>
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-1.5 gap-1.5">
+                            <p className="text-[7.5px] text-[#64748B] leading-normal font-medium max-w-full sm:max-w-[70%]">
+                              💡 Скопируйте ссылки на посты в Telegram-канале (например, <code className="bg-stone-100 px-1 py-0.5 rounded text-[7px]">https://t.me/channel/123</code>), вставьте их выше и нажмите кнопку справа для моментального превращения в прямые изображения!
+                            </p>
+                            <button
+                              type="button"
+                              onClick={resolveTelegramLinks}
+                              disabled={isResolvingTGLinks}
+                              className="text-[8px] bg-[#C5A880]/10 text-[#C5A880] hover:bg-[#C5A880]/20 disabled:bg-stone-100 disabled:text-stone-400 font-extrabold uppercase px-2.5 py-1.5 rounded-lg border border-[#C5A880]/20 transition-all flex items-center justify-center space-x-1 shrink-0 self-end sm:self-auto cursor-pointer"
+                            >
+                              {isResolvingTGLinks ? (
+                                <>
+                                  <span className="w-2.5 h-2.5 border-2 border-[#C5A880] border-t-transparent rounded-full animate-spin mr-1"></span>
+                                  <span>Преобразуем...</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Sparkles className="w-2.5 h-2.5 mr-0.5 text-[#C5A880]" />
+                                  <span>Преобразовать ссылки TG</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
                         </div>
 
                         <div className="space-y-1.5">

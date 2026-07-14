@@ -14,6 +14,34 @@ export default function Profile() {
   const { orders } = useStore();
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const [activeConsultation, setActiveConsultation] = useState(false);
+  const [avatarClicks, setAvatarClicks] = useState(0);
+  const [isAdminPanelVisible, setIsAdminPanelVisible] = useState(() => {
+    if (localStorage.getItem('dacar_admin_authorized') === 'true') return true;
+    if (localStorage.getItem('dacar_admin_visible') === 'true') return true;
+    
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('admin') === 'true' || window.location.hash.includes('admin')) {
+        localStorage.setItem('dacar_admin_visible', 'true');
+        return true;
+      }
+    }
+    return false;
+  });
+
+  const handleAvatarClick = () => {
+    const nextClicks = avatarClicks + 1;
+    setAvatarClicks(nextClicks);
+    if (nextClicks >= 5) {
+      triggerHaptic('success');
+      setIsAdminPanelVisible(true);
+      localStorage.setItem('dacar_admin_visible', 'true');
+      alert('🔒 Панель администратора разблокирована! Теперь вы можете открыть её.');
+      setAvatarClicks(0);
+    } else {
+      triggerHaptic('light');
+    }
+  };
 
   const [consultationChat, setConsultationChat] = useState<Array<{ sender: 'manager' | 'user'; text: string }>>([
     { 
@@ -83,7 +111,10 @@ export default function Profile() {
       
       {/* Профиль Пользователя */}
       <div className="px-4 pt-6 pb-4 bg-[#FAF8F5] border-b border-[#EFEBE4]/40 flex items-center space-x-4">
-        <div className="w-16 h-16 bg-[#C5A880] rounded-full flex items-center justify-center font-display font-black text-[#1C1917] text-xl shadow-md relative shrink-0">
+        <div 
+          onClick={handleAvatarClick}
+          className="w-16 h-16 bg-[#C5A880] rounded-full flex items-center justify-center font-display font-black text-[#1C1917] text-xl shadow-md relative shrink-0 cursor-pointer active:scale-95 transition-transform"
+        >
           U
           <span className="absolute bottom-0 right-0 w-5 h-5 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center text-[8px] text-white font-black">✓</span>
         </div>
@@ -126,9 +157,11 @@ export default function Profile() {
       </div>
 
       {/* ПАНЕЛЬ УПРАВЛЕНИЯ / АДМИНКА (Добавление новых авто, изменение текстов) */}
-      <div className="px-4 mt-4">
-        <AdminPanel />
-      </div>
+      {isAdminPanelVisible && (
+        <div className="px-4 mt-4">
+          <AdminPanel />
+        </div>
+      )}
 
       {/* Гарантии и Юр. Информация */}
       <div className="px-4 mt-6">
