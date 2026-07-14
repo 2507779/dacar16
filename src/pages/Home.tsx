@@ -178,12 +178,12 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Горячие предложения */}
+      {/* Лидеры продаж */}
       <div className="px-4 mt-6">
         <div className="flex justify-between items-center mb-2.5">
           <h3 className="font-display text-[9px] font-black uppercase tracking-widest text-[#78716C] flex items-center space-x-1">
             <Flame className="w-3 h-3 text-[#C5A880] fill-[#C5A880]" />
-            <span>Горячие предложения каталога</span>
+            <span>Популярные модели</span>
           </h3>
           <button
             onClick={() => {
@@ -282,8 +282,8 @@ export default function Home() {
           {[
             { id: 'electric', label: 'Электрокары ⚡', key: 'engineType' },
             { id: 'hybrid', label: 'Гибриды 🔋', key: 'engineType' },
-            { id: 'diesel', label: 'Дизельные ⚙️', key: 'engineType' },
             { id: 'gasoline', label: 'Бензиновые ⛽', key: 'engineType' },
+            { id: 'diesel', label: 'Дизельные ⚙️', key: 'engineType' },
           ].map((cat) => (
             <button
               key={cat.id}
