@@ -70,6 +70,8 @@ export interface Order {
   status: OrderStatus;
   createdAt: string;
   timeline: TrackingStep[];
+  notes?: string;       // CRM внутренний комментарий
+  budgetUSD?: number;   // Оценочный бюджет в USD
 }
 
 export interface ExchangeRates {

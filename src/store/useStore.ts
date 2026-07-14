@@ -96,6 +96,10 @@ interface AppStore {
   addCar: (car: Car) => void; // Добавление нового автомобиля
   editCar: (carId: string, updatedCar: Car) => void; // Редактирование автомобиля
   deleteCar: (carId: string) => void; // Удаление автомобиля
+  setCars: (cars: Car[]) => void; // Массовое обновление автомобилей
+  updateOrderStatus: (orderId: string, status: OrderStatus) => void; // Обновление статуса CRM
+  deleteOrder: (orderId: string) => void; // Удаление заказа/лида
+  updateOrderNotes: (orderId: string, notes: string, budgetUSD?: number) => void; // Обновление комментов лида
   setHomepageBannerUrl: (url: string) => void;
   setHomepageBannerTitle: (title: string) => void;
   setHomepageBannerSubtitle: (sub: string) => void;
@@ -283,6 +287,47 @@ export const useStore = create<AppStore>((set, get) => {
       const updatedCars = get().cars.filter(c => c.id !== carId);
       localStorage.setItem('dacar_all_cars', JSON.stringify(updatedCars));
       set({ cars: updatedCars });
+    },
+
+    setCars: (newCars) => {
+      localStorage.setItem('dacar_all_cars', JSON.stringify(newCars));
+      set({ cars: newCars });
+    },
+
+    updateOrderStatus: (orderId, status) => {
+      const updatedOrders = get().orders.map((o) => {
+        if (o.id === orderId) {
+          return {
+            ...o,
+            status,
+            timeline: generateTimeline(status, o.createdAt)
+          };
+        }
+        return o;
+      });
+      localStorage.setItem('dacar_orders', JSON.stringify(updatedOrders));
+      set({ orders: updatedOrders });
+    },
+
+    deleteOrder: (orderId) => {
+      const updatedOrders = get().orders.filter(o => o.id !== orderId);
+      localStorage.setItem('dacar_orders', JSON.stringify(updatedOrders));
+      set({ orders: updatedOrders });
+    },
+
+    updateOrderNotes: (orderId, notes, budgetUSD) => {
+      const updatedOrders = get().orders.map((o) => {
+        if (o.id === orderId) {
+          return {
+            ...o,
+            notes,
+            budgetUSD
+          };
+        }
+        return o;
+      });
+      localStorage.setItem('dacar_orders', JSON.stringify(updatedOrders));
+      set({ orders: updatedOrders });
     },
 
     setHomepageBannerUrl: (url) => {
