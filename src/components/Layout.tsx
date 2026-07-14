@@ -64,9 +64,9 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-tr from-[#F5F7FA] via-[#E5E7EB] to-[#F5F7FA] p-0 sm:p-4 font-sans selection:bg-[#2563EB] selection:text-white">
+    <div className="flex justify-center items-center min-h-screen bg-[#FAF8F5] p-0 sm:p-4 font-sans selection:bg-[#C5A880] selection:text-white">
       {/* Контейнер смартфона/Mini App */}
-      <div className="w-full max-w-[440px] h-[100dvh] sm:h-[880px] bg-[#F5F7FA] sm:rounded-[40px] shadow-[0_24px_64px_rgba(37,99,235,0.06)] overflow-hidden flex flex-col border border-[#E5E7EB]/60 relative">
+      <div className="w-full max-w-[440px] h-[100dvh] sm:h-[880px] bg-[#FAF8F5] sm:rounded-[40px] shadow-[0_24px_64px_rgba(197,168,128,0.06)] overflow-hidden flex flex-col border border-[#EFEBE4] relative">
         
         {/* Анимация закрытого приложения (эмуляция чата Telegram) */}
         <AnimatePresence>
@@ -75,16 +75,16 @@ export default function Layout({ children }: LayoutProps) {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="absolute inset-0 z-50 bg-[#F5F7FA] flex flex-col text-[#111827]"
+              className="absolute inset-0 z-50 bg-[#F8FAFC] flex flex-col text-[#0F172A]"
             >
               {/* Шапка чата Telegram */}
-              <div className="bg-white p-3 flex items-center justify-between border-b border-[#E5E7EB]/40 shadow-sm">
+              <div className="bg-white p-3 flex items-center justify-between border-b border-[#E2E8F0]/40 shadow-sm">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-tr from-[#2563EB] to-[#60A5FA] rounded-full flex items-center justify-center font-display font-black text-white shadow-md">
+                  <div className="w-10 h-10 bg-[#2563EB] rounded-full flex items-center justify-center font-display font-black text-white shadow-md">
                     DC
                   </div>
                   <div>
-                    <div className="font-semibold flex items-center text-sm font-display tracking-wide text-[#111827]">
+                    <div className="font-semibold flex items-center text-sm font-display tracking-wide text-[#0F172A]">
                       DA!CAR | Импорт Авто 🚘
                       <span className="ml-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-[8px] text-white">✓</span>
                     </div>
@@ -97,8 +97,8 @@ export default function Layout({ children }: LayoutProps) {
               </div>
 
               {/* Область сообщений чата */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#F5F7FA] text-sm flex flex-col justify-end">
-                <div className="text-center text-xs text-[#64748B] my-4 bg-white/80 border border-[#E5E7EB]/30 py-1 px-3 rounded-full self-center">
+              <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#FAF8F5] text-sm flex flex-col justify-end">
+                <div className="text-center text-xs text-[#78716C] my-4 bg-white/80 border border-[#EFEBE4]/50 py-1 px-3 rounded-full self-center">
                   Чат с официальным ботом DA!CAR
                 </div>
                 
@@ -107,39 +107,39 @@ export default function Layout({ children }: LayoutProps) {
                     key={index}
                     className={`max-w-[80%] rounded-2xl p-3 flex flex-col relative shadow-sm ${
                       msg.sender === 'user'
-                        ? 'bg-[#E5E7EB] text-[#111827] self-end rounded-tr-none'
-                        : 'bg-white text-[#111827] border border-[#E5E7EB]/30 self-start rounded-tl-none'
+                        ? 'bg-[#EFEBE4] text-[#1C1917] self-end rounded-tr-none'
+                        : 'bg-white text-[#1C1917] border border-[#EFEBE4]/30 self-start rounded-tl-none'
                     }`}
                   >
                     <p className="leading-relaxed">{msg.text}</p>
-                    <span className="text-[10px] text-[#64748B] self-end mt-1">{msg.time}</span>
+                    <span className="text-[10px] text-[#78716C] self-end mt-1">{msg.time}</span>
                   </div>
                 ))}
               </div>
 
               {/* Кнопка запуска Mini App и панель ввода */}
-              <div className="p-3 bg-white border-t border-[#E5E7EB]/40 space-y-3">
+              <div className="p-3 bg-white border-t border-[#EFEBE4]/50 space-y-3">
                 <button
                   onClick={() => {
                     triggerHaptic('success');
                     setIsAppClosed(false);
                   }}
-                  className="w-full py-3.5 bg-gradient-to-r from-[#2563EB] to-[#60A5FA] hover:opacity-90 active:scale-[0.98] transition duration-200 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl flex items-center justify-center space-x-2 shadow-md cursor-pointer"
+                  className="w-full py-3.5 bg-[#1C1917] hover:bg-stone-850 active:scale-[0.98] transition duration-200 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl flex items-center justify-center space-x-2 shadow-md cursor-pointer"
                 >
                   <Car className="w-4 h-4 text-white fill-white" />
                   <span>Открыть Салон DA!CAR</span>
                 </button>
 
-                <div className="flex items-center space-x-2 bg-[#F5F7FA] border border-[#E5E7EB]/60 rounded-xl px-3 py-2">
+                <div className="flex items-center space-x-2 bg-[#FAF8F5] border border-[#EFEBE4]/60 rounded-xl px-3 py-2">
                   <input
                     type="text"
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                     placeholder="Написать боту..."
-                    className="flex-1 bg-transparent text-[#111827] outline-none placeholder-gray-400 text-sm"
+                    className="flex-1 bg-transparent text-[#1C1917] outline-none placeholder-gray-400 text-sm"
                   />
-                  <button onClick={handleSendMessage} className="text-[#2563EB] hover:opacity-80">
+                  <button onClick={handleSendMessage} className="text-[#1C1917] hover:opacity-85">
                     <Send className="w-5 h-5" />
                   </button>
                 </div>
@@ -149,17 +149,17 @@ export default function Layout({ children }: LayoutProps) {
         </AnimatePresence>
 
         {/* 1. Системный статус-бар смартфона */}
-        <div className="bg-[#F5F7FA] text-[#64748B] px-6 pt-3 pb-1 flex justify-between items-center text-xs font-semibold tracking-tight select-none border-b border-[#E5E7EB]/15">
+        <div className="bg-[#FAF8F5] text-[#78716C] px-6 pt-3 pb-1 flex justify-between items-center text-xs font-semibold tracking-tight select-none border-b border-[#EFEBE4]/40">
           <span>{timeStr}</span>
           <div className="flex items-center space-x-1.5">
-            <span className="text-[9px] bg-[#E5E7EB]/40 text-[#64748B] px-1 py-0.5 rounded font-mono font-bold">5G</span>
-            <Wifi className="w-3.5 h-3.5 text-[#64748B]" />
-            <Battery className="w-4 h-4 text-[#64748B]" />
+            <span className="text-[9px] bg-[#EFEBE4]/65 text-[#78716C] px-1 py-0.5 rounded font-mono font-bold">5G</span>
+            <Wifi className="w-3.5 h-3.5 text-[#78716C]" />
+            <Battery className="w-4 h-4 text-[#78716C]" />
           </div>
         </div>
 
         {/* 2. Шапка Telegram WebApp */}
-        <div className="bg-[#F5F7FA] text-[#111827] px-4 py-3 flex justify-between items-center border-b border-[#E5E7EB]/35 shadow-sm relative z-20 select-none">
+        <div className="bg-[#FAF8F5] text-[#1C1917] px-4 py-3 flex justify-between items-center border-b border-[#EFEBE4] shadow-sm relative z-20 select-none">
           <div className="flex items-center space-x-2.5">
             {activeCarId ? (
               <button
@@ -167,33 +167,33 @@ export default function Layout({ children }: LayoutProps) {
                   triggerHaptic('light');
                   setActiveCarId(null);
                 }}
-                className="p-1.5 hover:bg-[#E5E7EB]/30 rounded-full transition"
+                className="p-1.5 hover:bg-[#EFEBE4]/60 rounded-full transition"
               >
-                <ArrowLeft className="w-4 h-4 text-[#111827]" />
+                <ArrowLeft className="w-4 h-4 text-[#1C1917]" />
               </button>
             ) : (
-              <div className="w-6 h-6 bg-[#2563EB] rounded-md flex items-center justify-center font-display font-black text-white text-xs">
-                D!
+              <div className="w-6 h-6 rounded-md overflow-hidden flex items-center justify-center bg-white border border-[#EFEBE4] shadow-sm shrink-0">
+                <img src="/logo.png" className="w-full h-full object-contain scale-110" alt="D" />
               </div>
             )}
             <div>
-              <div className="font-display font-bold text-xs tracking-wide flex items-center text-[#111827]">
+              <div className="font-display font-bold text-xs tracking-wide flex items-center text-[#1C1917]">
                 DA!CAR — Салон Премиум Импорта
-                <span className="ml-1 w-3.5 h-3.5 bg-blue-500 rounded-full flex items-center justify-center text-[7px] text-white font-black">
+                <span className="ml-1 w-3.5 h-3.5 bg-[#1C1917] rounded-full flex items-center justify-center text-[7px] text-[#C5A880] font-black">
                   ✓
                 </span>
               </div>
-              <div className="text-[9px] font-mono text-[#2563EB] font-semibold">dacar_official_bot</div>
+              <div className="text-[9px] font-mono text-[#78716C] font-semibold">dacar_official_bot</div>
             </div>
           </div>
-          <div className="flex items-center space-x-3 text-[#64748B]">
-            <MoreVertical className="w-4 h-4 cursor-pointer hover:text-[#111827]" />
+          <div className="flex items-center space-x-3 text-[#78716C]">
+            <MoreVertical className="w-4 h-4 cursor-pointer hover:text-[#1C1917]" />
             <button
               onClick={() => {
                 triggerHaptic('heavy');
                 setIsAppClosed(true);
               }}
-              className="p-1.5 bg-[#E5E7EB]/30 hover:bg-[#E5E7EB]/50 active:scale-95 rounded-full transition cursor-pointer border border-black/[0.03]"
+              className="p-1.5 bg-[#EFEBE4]/40 hover:bg-[#EFEBE4]/70 active:scale-95 rounded-full transition cursor-pointer border border-black/[0.03]"
               title="Закрыть Mini App"
             >
               <X className="w-3.5 h-3.5 text-red-500 font-bold" />
@@ -202,22 +202,22 @@ export default function Layout({ children }: LayoutProps) {
         </div>
 
         {/* 3. Основная контентная область */}
-        <div id="applet-content" className="flex-1 overflow-y-auto bg-[#F5F7FA] flex flex-col pb-24 relative scrollbar-none">
+        <div id="applet-content" className="flex-1 overflow-y-auto bg-[#FAF8F5] flex flex-col pb-24 relative scrollbar-none">
           {children}
         </div>
 
         {/* 4. Навигация Bottom Navigation (Frosted Glass Light Premium) */}
-        <div className="absolute bottom-4 left-4 right-4 h-16 bg-white/80 backdrop-blur-xl border border-[#E5E7EB]/65 rounded-2xl px-2 flex justify-around items-center z-30 shadow-[0_12px_32px_rgba(37,99,235,0.04)] select-none">
+        <div className="absolute bottom-4 left-4 right-4 h-16 bg-white/80 backdrop-blur-xl border border-[#EFEBE4] rounded-2xl px-2 flex justify-around items-center z-30 shadow-[0_12px_32px_rgba(197,168,128,0.03)] select-none">
           
           <button
             id="nav-home"
             onClick={() => handleTabChange('home')}
             className={`flex flex-col items-center justify-center flex-1 h-full py-1 transition-bezier cursor-pointer ${
-              currentTab === 'home' ? 'text-[#2563EB] font-bold' : 'text-[#64748B] hover:text-[#111827]'
+              currentTab === 'home' ? 'text-[#C5A880] font-bold' : 'text-[#78716C] hover:text-[#1C1917]'
             }`}
           >
             <div className="relative">
-              <Home className={`w-4 h-4 transition-transform duration-250 ${currentTab === 'home' ? 'scale-115 text-[#2563EB]' : ''}`} />
+              <Home className={`w-4 h-4 transition-transform duration-250 ${currentTab === 'home' ? 'scale-115 text-[#C5A880]' : ''}`} />
             </div>
             <span className="text-[9px] mt-1 font-medium tracking-tight">Главная</span>
           </button>
@@ -226,10 +226,10 @@ export default function Layout({ children }: LayoutProps) {
             id="nav-catalog"
             onClick={() => handleTabChange('catalog')}
             className={`flex flex-col items-center justify-center flex-1 h-full py-1 transition-bezier cursor-pointer ${
-              currentTab === 'catalog' ? 'text-[#2563EB] font-bold' : 'text-[#64748B] hover:text-[#111827]'
+              currentTab === 'catalog' ? 'text-[#C5A880] font-bold' : 'text-[#78716C] hover:text-[#1C1917]'
             }`}
           >
-            <Car className={`w-4 h-4 transition-transform duration-250 ${currentTab === 'catalog' ? 'scale-115 text-[#2563EB]' : ''}`} />
+            <Car className={`w-4 h-4 transition-transform duration-250 ${currentTab === 'catalog' ? 'scale-115 text-[#C5A880]' : ''}`} />
             <span className="text-[9px] mt-1 font-medium tracking-tight">Каталог</span>
           </button>
 
@@ -237,10 +237,10 @@ export default function Layout({ children }: LayoutProps) {
             id="nav-favorites"
             onClick={() => handleTabChange('favorites')}
             className={`flex flex-col items-center justify-center flex-1 h-full py-1 transition-bezier cursor-pointer ${
-              currentTab === 'favorites' ? 'text-[#2563EB] font-bold' : 'text-[#64748B] hover:text-[#111827]'
+              currentTab === 'favorites' ? 'text-[#C5A880] font-bold' : 'text-[#78716C] hover:text-[#1C1917]'
             }`}
           >
-            <Heart className={`w-4 h-4 transition-transform duration-250 ${currentTab === 'favorites' ? 'scale-115 text-[#2563EB]' : ''}`} />
+            <Heart className={`w-4 h-4 transition-transform duration-250 ${currentTab === 'favorites' ? 'scale-115 text-[#C5A880]' : ''}`} />
             <span className="text-[9px] mt-1 font-medium tracking-tight">Избранное</span>
           </button>
 
@@ -248,13 +248,13 @@ export default function Layout({ children }: LayoutProps) {
             id="nav-orders"
             onClick={() => handleTabChange('orders')}
             className={`flex flex-col items-center justify-center flex-1 h-full py-1 transition-bezier cursor-pointer ${
-              currentTab === 'orders' ? 'text-[#2563EB] font-bold' : 'text-[#64748B] hover:text-[#111827]'
+              currentTab === 'orders' ? 'text-[#C5A880] font-bold' : 'text-[#78716C] hover:text-[#1C1917]'
             }`}
           >
             <div className="relative">
-              <Package className={`w-4 h-4 transition-transform duration-250 ${currentTab === 'orders' ? 'scale-115 text-[#2563EB]' : ''}`} />
+              <Package className={`w-4 h-4 transition-transform duration-250 ${currentTab === 'orders' ? 'scale-115 text-[#C5A880]' : ''}`} />
               {orders.length > 0 && (
-                <span className="absolute -top-1.5 -right-2 bg-[#2563EB] text-white text-[8px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center shadow-md border border-white">
+                <span className="absolute -top-1.5 -right-2 bg-[#C5A880] text-[#1C1917] text-[8px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center shadow-md border border-white">
                   {orders.length}
                 </span>
               )}
@@ -266,10 +266,10 @@ export default function Layout({ children }: LayoutProps) {
             id="nav-profile"
             onClick={() => handleTabChange('profile')}
             className={`flex flex-col items-center justify-center flex-1 h-full py-1 transition-bezier cursor-pointer ${
-              currentTab === 'profile' ? 'text-[#2563EB] font-bold' : 'text-[#64748B] hover:text-[#111827]'
+              currentTab === 'profile' ? 'text-[#C5A880] font-bold' : 'text-[#78716C] hover:text-[#1C1917]'
             }`}
           >
-            <User className={`w-4 h-4 transition-transform duration-250 ${currentTab === 'profile' ? 'scale-115 text-[#2563EB]' : ''}`} />
+            <User className={`w-4 h-4 transition-transform duration-250 ${currentTab === 'profile' ? 'scale-115 text-[#C5A880]' : ''}`} />
             <span className="text-[9px] mt-1 font-medium tracking-tight">Профиль</span>
           </button>
 

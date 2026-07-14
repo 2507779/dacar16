@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useStore } from '../store/useStore';
 import { calculateFullCarPrice, formatCurrency, DELIVERY_CITIES } from '../data/cars';
 import { triggerHaptic } from '../utils/haptics';
@@ -52,38 +52,7 @@ export default function VehicleStories() {
     setOrderSuccess(false);
   }, [activeStoryCarId]);
 
-  // Эффект для анимации прогресс-бара
-  useEffect(() => {
-    if (!car || isPaused || showOrderForm) {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      return;
-    }
-
-    const duration = 5000; // 5 секунд на слайд
-    const step = 50; // обновление каждые 50мс
-    const progressStep = (step / duration) * 100;
-
-    intervalRef.current = setInterval(() => {
-      setProgress(prev => {
-        if (prev >= 100) {
-          // Время вышло, переходим на следующий слайд
-          handleNextSlide();
-          return 0;
-        }
-        return prev + progressStep;
-      });
-    }, step);
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [car, currentSlideIndex, isPaused, showOrderForm]);
-
-  if (!car) return null;
-
-  const calculated = calculateFullCarPrice(car, selectedCity);
-
-  const handlePrevSlide = () => {
+  const handlePrevSlide = useCallback(() => {
     triggerHaptic('light');
     setProgress(0);
     if (currentSlideIndex > 0) {
@@ -98,9 +67,10 @@ export default function VehicleStories() {
         setCurrentSlideIndex(0);
       }
     }
-  };
+  }, [currentSlideIndex, carIndex, cars, setActiveStoryCarId]);
 
-  const handleNextSlide = () => {
+  const handleNextSlide = useCallback(() => {
+    if (!car) return;
     triggerHaptic('light');
     setProgress(0);
     if (currentSlideIndex < car.images.length - 1) {
@@ -115,7 +85,43 @@ export default function VehicleStories() {
         setActiveStoryCarId(null);
       }
     }
-  };
+  }, [currentSlideIndex, car, carIndex, cars, setActiveStoryCarId]);
+
+  // Эффект для автоматического перехода на следующий слайд при достижении 100% прогресса
+  useEffect(() => {
+    if (progress >= 100) {
+      handleNextSlide();
+    }
+  }, [progress, handleNextSlide]);
+
+  // Эффект для анимации прогресс-бара
+  useEffect(() => {
+    if (!car || isPaused || showOrderForm) {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      return;
+    }
+
+    const duration = 5000; // 5 секунд на слайд
+    const step = 50; // обновление каждые 50мс
+    const progressStep = (step / duration) * 100;
+
+    intervalRef.current = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 100) {
+          return 100;
+        }
+        return prev + progressStep;
+      });
+    }, step);
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [car, currentSlideIndex, isPaused, showOrderForm]);
+
+  if (!car) return null;
+
+  const calculated = calculateFullCarPrice(car, selectedCity);
 
   const handleClose = () => {
     triggerHaptic('medium');
@@ -160,11 +166,11 @@ export default function VehicleStories() {
   return (
     <div className="fixed inset-0 bg-black/45 backdrop-blur-md z-50 flex items-center justify-center select-none overflow-hidden">
       {/* Контейнер сторис */}
-      <div className="w-full h-full max-w-[440px] bg-[#F5F7FA] flex flex-col justify-between relative shadow-2xl overflow-y-auto scrollbar-none sm:rounded-[40px]">
+      <div className="w-full h-full max-w-[440px] bg-[#FAF8F5] flex flex-col justify-between relative shadow-2xl overflow-y-auto scrollbar-none sm:rounded-[40px]">
         
         {/* ФОНОВЫЕ СВЕЧЕНИЯ */}
-        <div className="absolute top-[-20%] left-[-20%] w-[80%] h-[50%] bg-[#2563EB]/8 rounded-full blur-3xl pointer-events-none"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[40%] bg-[#2563EB]/4 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute top-[-20%] left-[-20%] w-[80%] h-[50%] bg-[#C5A880]/8 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[40%] bg-[#C5A880]/4 rounded-full blur-3xl pointer-events-none"></div>
 
         {/* ШАПКА: Прогресс-бары и Кнопки управления */}
         <div className="absolute top-0 left-0 right-0 z-40 bg-gradient-to-b from-black/50 via-black/20 to-transparent p-4 flex flex-col space-y-3 shrink-0">
@@ -191,12 +197,12 @@ export default function VehicleStories() {
           <div className="flex justify-between items-center text-white">
             <div className="flex items-center space-x-2.5">
               <div className="w-9 h-9 bg-white border border-white/20 rounded-xl flex items-center justify-center shadow-lg">
-                <span className="font-display font-black text-[13px] text-[#2563EB]">DA</span>
+                <span className="font-display font-black text-[13px] text-[#C5A880]">DA</span>
               </div>
               <div>
                 <div className="flex items-center space-x-1">
                   <span className="font-display font-bold text-xs uppercase tracking-wider text-white">DA!CAR Premium</span>
-                  <BadgeCheck className="w-3.5 h-3.5 text-[#2563EB] fill-white" />
+                  <BadgeCheck className="w-3.5 h-3.5 text-[#C5A880] fill-white" />
                 </div>
                 <span className="text-[9px] text-white/85">АВТО ПОД ЗАКАЗ • КОРЕЯ & КИТАЙ</span>
               </div>
@@ -242,21 +248,21 @@ export default function VehicleStories() {
         </div>
 
         {/* ГЛАВНЫЙ СЛАЙД С КАРТОЧКОЙ В СТИЛЕ ПЛАКАТА */}
-        <div className="flex-1 w-full bg-[#F5F7FA] px-4 pt-16 pb-4 flex flex-col justify-between overflow-y-auto scrollbar-none relative z-10">
+        <div className="flex-1 w-full bg-[#FAF8F5] px-4 pt-16 pb-4 flex flex-col justify-between overflow-y-auto scrollbar-none relative z-10">
           
           {/* 1. ШАПКА КАРТОЧКИ */}
-          <div className="flex justify-between items-center border-b border-[#E5E7EB] pb-2.5 mt-3 shrink-0">
+          <div className="flex justify-between items-center border-b border-[#EFEBE4] pb-2.5 mt-3 shrink-0">
             <div className="flex flex-col">
-              <span className="font-display font-black text-xl text-[#111827] tracking-tight flex items-center">
-                DA<span className="text-[#2563EB]">!</span>CAR
+              <span className="font-display font-black text-xl text-[#1C1917] tracking-tight flex items-center">
+                DA<span className="text-[#C5A880]">!</span>CAR
               </span>
-              <span className="text-[7.5px] uppercase tracking-[0.12em] text-[#64748B] font-bold">
+              <span className="text-[7.5px] uppercase tracking-[0.12em] text-[#78716C] font-bold">
                 АВТО ПОД ЗАКАЗ ИЗ КОРЕИ И КИТАЯ
               </span>
             </div>
-            <div className="bg-[#2563EB]/5 border border-[#2563EB]/15 px-2 py-1 rounded flex items-center space-x-1 shrink-0 shadow-sm">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#2563EB]" />
-              <span className="text-[7.5px] font-black uppercase text-[#111827] tracking-wide">
+            <div className="bg-[#C5A880]/10 border border-[#C5A880]/20 px-2 py-1 rounded flex items-center space-x-1 shrink-0 shadow-sm">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#C5A880]" />
+              <span className="text-[7.5px] font-black uppercase text-[#1C1917] tracking-wide">
                 Проверенные авто с гарантией
               </span>
             </div>
@@ -265,15 +271,15 @@ export default function VehicleStories() {
           {/* 2. БОЛЬШОЙ ЗАГОЛОВОК И ДИНАМИЧНЫЕ ФИЧИ */}
           <div className="mt-4 flex flex-col shrink-0">
             <div className="flex flex-col">
-              <h1 className="font-display font-black text-3xl text-[#111827] uppercase leading-none tracking-tight">
+              <h1 className="font-display font-black text-3xl text-[#1C1917] uppercase leading-none tracking-tight">
                 {car.brand}
               </h1>
-              <h2 className="font-display font-bold text-2xl text-[#2563EB] uppercase leading-none tracking-tight mt-0.5">
+              <h2 className="font-display font-bold text-2xl text-[#C5A880] uppercase leading-none tracking-tight mt-0.5">
                 {car.model}
               </h2>
             </div>
             
-            <p className="text-[9.5px] font-semibold text-[#64748B] uppercase tracking-wider mt-2 bg-white py-1 px-2.5 rounded-lg border border-[#E5E7EB] inline-block self-start shadow-sm">
+            <p className="text-[9.5px] font-semibold text-[#78716C] uppercase tracking-wider mt-2 bg-white py-1 px-2.5 rounded-lg border border-[#EFEBE4] inline-block self-start shadow-sm">
               {car.engineVolume} {getEngineLabel()} • {car.power} л.с. • {car.transmission} • {car.driveType}
             </p>
           </div>
@@ -284,14 +290,14 @@ export default function VehicleStories() {
             <div className="w-[45%] flex flex-col space-y-3.5 z-10">
               {defaultFeatures.map((feat, i) => (
                 <div key={i} className="flex items-start space-x-1.5">
-                  <div className="w-4 h-4 bg-[#2563EB]/10 rounded-full flex items-center justify-center shrink-0 mt-0.5 border border-[#2563EB]/20">
-                    <Sparkles className="w-2.5 h-2.5 text-[#2563EB]" />
+                  <div className="w-4 h-4 bg-[#C5A880]/15 rounded-full flex items-center justify-center shrink-0 mt-0.5 border border-[#C5A880]/25">
+                    <Sparkles className="w-2.5 h-2.5 text-[#C5A880]" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[8.5px] font-bold text-[#111827] leading-tight">
+                    <span className="text-[8.5px] font-bold text-[#1C1917] leading-tight">
                       {feat.title}
                     </span>
-                    <span className="text-[8px] text-[#64748B] leading-tight">
+                    <span className="text-[8px] text-[#78716C] leading-tight">
                       {feat.desc}
                     </span>
                   </div>
@@ -302,7 +308,7 @@ export default function VehicleStories() {
             {/* Картинка автомобиля справа */}
             <div className="w-[53%] h-44 relative flex items-center justify-center">
               {/* Фоновая декоративная плашка */}
-              <div className="absolute inset-0 bg-white/50 rounded-2xl border border-[#E5E7EB] transform rotate-3 scale-95 pointer-events-none"></div>
+              <div className="absolute inset-0 bg-white/50 rounded-2xl border border-[#EFEBE4] transform rotate-3 scale-95 pointer-events-none"></div>
               
               <motion.div 
                 key={currentSlideIndex}
@@ -327,58 +333,58 @@ export default function VehicleStories() {
           {/* 4. СЕТКА ИНДИКАТОРОВ ТЕХНИЧЕСКИХ ДАННЫХ */}
           <div className="mt-4 grid grid-cols-3 gap-2 shrink-0">
             {/* ПРОБЕГ */}
-            <div className="bg-white border border-[#E5E7EB] p-2 rounded-xl flex flex-col items-center justify-center text-center shadow-sm">
-              <Activity className="w-4 h-4 text-[#2563EB] mb-1" />
-              <span className="text-[7.5px] font-bold text-[#64748B] uppercase tracking-wider">Пробег</span>
-              <span className="text-[9.5px] font-black text-[#111827] mt-0.5">
+            <div className="bg-white border border-[#EFEBE4] p-2 rounded-xl flex flex-col items-center justify-center text-center shadow-sm">
+              <Activity className="w-4 h-4 text-[#C5A880] mb-1" />
+              <span className="text-[7.5px] font-bold text-[#78716C] uppercase tracking-wider">Пробег</span>
+              <span className="text-[9.5px] font-black text-[#1C1917] mt-0.5">
                 {car.condition === 'new' ? '0 км (Новый)' : `${car.mileage.toLocaleString('ru-RU')} км`}
               </span>
             </div>
 
             {/* ОКРАС */}
-            <div className="bg-white border border-[#E5E7EB] p-2 rounded-xl flex flex-col items-center justify-center text-center shadow-sm">
-              <Award className="w-4 h-4 text-[#2563EB] mb-1" />
-              <span className="text-[7.5px] font-bold text-[#64748B] uppercase tracking-wider">Окрас</span>
-              <span className="text-[9.5px] font-black text-[#111827] mt-0.5">Заводской</span>
+            <div className="bg-white border border-[#EFEBE4] p-2 rounded-xl flex flex-col items-center justify-center text-center shadow-sm">
+              <Award className="w-4 h-4 text-[#C5A880] mb-1" />
+              <span className="text-[7.5px] font-bold text-[#78716C] uppercase tracking-wider">Окрас</span>
+              <span className="text-[9.5px] font-black text-[#1C1917] mt-0.5">Заводской</span>
             </div>
 
             {/* ГОД ВЫПУСКА */}
-            <div className="bg-white border border-[#E5E7EB] p-2 rounded-xl flex flex-col items-center justify-center text-center shadow-sm">
-              <Calendar className="w-4 h-4 text-[#2563EB] mb-1" />
-              <span className="text-[7.5px] font-bold text-[#64748B] uppercase tracking-wider">Год выпуска</span>
-              <span className="text-[9.5px] font-black text-[#111827] mt-0.5">{car.year}</span>
+            <div className="bg-white border border-[#EFEBE4] p-2 rounded-xl flex flex-col items-center justify-center text-center shadow-sm">
+              <Calendar className="w-4 h-4 text-[#C5A880] mb-1" />
+              <span className="text-[7.5px] font-bold text-[#78716C] uppercase tracking-wider">Год выпуска</span>
+              <span className="text-[9.5px] font-black text-[#1C1917] mt-0.5">{car.year}</span>
             </div>
 
             {/* ДВИГАТЕЛЬ */}
-            <div className="bg-white border border-[#E5E7EB] p-2 rounded-xl flex flex-col items-center justify-center text-center shadow-sm">
-              <Wrench className="w-4 h-4 text-[#2563EB] mb-1" />
-              <span className="text-[7.5px] font-bold text-[#64748B] uppercase tracking-wider">Двигатель</span>
-              <span className="text-[9.5px] font-black text-[#111827] mt-0.5 truncate max-w-full">
+            <div className="bg-white border border-[#EFEBE4] p-2 rounded-xl flex flex-col items-center justify-center text-center shadow-sm">
+              <Wrench className="w-4 h-4 text-[#C5A880] mb-1" />
+              <span className="text-[7.5px] font-bold text-[#78716C] uppercase tracking-wider">Двигатель</span>
+              <span className="text-[9.5px] font-black text-[#1C1917] mt-0.5 truncate max-w-full">
                 {car.engineVolume} ({car.power} лс)
               </span>
             </div>
 
             {/* КОРОБКА ПЕРЕДАЧ */}
-            <div className="bg-white border border-[#E5E7EB] p-2 rounded-xl flex flex-col items-center justify-center text-center shadow-sm">
-              <Zap className="w-4 h-4 text-[#2563EB] mb-1" />
-              <span className="text-[7.5px] font-bold text-[#64748B] uppercase tracking-wider">Коробка</span>
-              <span className="text-[9.5px] font-black text-[#111827] mt-0.5">
+            <div className="bg-white border border-[#EFEBE4] p-2 rounded-xl flex flex-col items-center justify-center text-center shadow-sm">
+              <Zap className="w-4 h-4 text-[#C5A880] mb-1" />
+              <span className="text-[7.5px] font-bold text-[#78716C] uppercase tracking-wider">Коробка</span>
+              <span className="text-[9.5px] font-black text-[#1C1917] mt-0.5">
                 {car.transmission === 'Automatic' ? 'АКПП' : car.transmission === 'Robotic' ? 'Робот' : car.transmission === 'Single-speed' ? 'Редуктор' : 'МКПП'}
               </span>
             </div>
 
             {/* ПРИВОД */}
-            <div className="bg-white border border-[#E5E7EB] p-2 rounded-xl flex flex-col items-center justify-center text-center shadow-sm">
-              <Info className="w-4 h-4 text-[#2563EB] mb-1" />
-              <span className="text-[7.5px] font-bold text-[#64748B] uppercase tracking-wider">Привод</span>
-              <span className="text-[9.5px] font-black text-[#111827] mt-0.5">{car.driveType}</span>
+            <div className="bg-white border border-[#EFEBE4] p-2 rounded-xl flex flex-col items-center justify-center text-center shadow-sm">
+              <Info className="w-4 h-4 text-[#C5A880] mb-1" />
+              <span className="text-[7.5px] font-bold text-[#78716C] uppercase tracking-wider">Привод</span>
+              <span className="text-[9.5px] font-black text-[#1C1917] mt-0.5">{car.driveType}</span>
             </div>
           </div>
 
           {/* 5. ИНТЕРАКТИВНЫЙ РАСЧЕТ СТОИМОСТИ ПОД КЛЮЧ */}
-          <div className="mt-4 bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] text-white rounded-2xl p-4 shadow-[0_12px_24px_rgba(37,99,235,0.16)] shrink-0 relative">
+          <div className="mt-4 bg-gradient-to-br from-[#C5A880] to-[#B0936B] text-[#1C1917] rounded-2xl p-4 shadow-[0_12px_24px_rgba(197,168,128,0.16)] shrink-0 relative">
             <div className="flex justify-between items-center">
-              <span className="text-[8px] uppercase tracking-[0.12em] font-black text-white/90">
+              <span className="text-[8px] uppercase tracking-[0.12em] font-black text-[#1C1917]/90">
                 Стоимость под ключ в город:
               </span>
               
@@ -390,10 +396,10 @@ export default function VehicleStories() {
                     triggerHaptic('light');
                     setSelectedCity(e.target.value);
                   }}
-                  className="bg-white/15 text-white text-[9px] font-bold px-2 py-1 rounded border border-white/20 outline-none cursor-pointer pr-1"
+                  className="bg-black/10 text-[#1C1917] text-[9px] font-black px-2 py-1 rounded border border-[#1C1917]/10 outline-none cursor-pointer pr-1"
                 >
                   {DELIVERY_CITIES.map(c => (
-                    <option key={c.name} value={c.name} className="bg-[#1D4ED8] text-white text-[9px]">
+                    <option key={c.name} value={c.name} className="bg-[#FAF8F5] text-[#1C1917] text-[9px]">
                       {c.name.split(' ')[0]}
                     </option>
                   ))}
@@ -403,48 +409,48 @@ export default function VehicleStories() {
 
             {/* Крупный ценник */}
             <div className="flex items-baseline space-x-1.5 mt-2.5">
-              <span className="text-[10px] font-bold text-white/70 uppercase">ОТ</span>
-              <span className="font-display font-black text-2xl text-white leading-none">
+              <span className="text-[10px] font-bold text-[#1C1917]/75 uppercase">ОТ</span>
+              <span className="font-display font-black text-2xl text-[#1C1917] leading-none">
                 {formatCurrency(calculated.finalPriceRUB).replace('₽', '')}
               </span>
-              <span className="text-xs font-bold text-white">РУБ.</span>
+              <span className="text-xs font-black text-[#1C1917]">РУБ.</span>
             </div>
 
             {/* Описание "включено всё" */}
-            <div className="mt-2.5 bg-white/10 border border-white/10 px-2 py-1.5 rounded text-center">
-              <span className="text-[7px] uppercase tracking-wider text-white/95 font-bold block">
+            <div className="mt-2.5 bg-[#FAF8F5]/35 border border-[#1C1917]/10 px-2 py-1.5 rounded text-center">
+              <span className="text-[7px] uppercase tracking-wider text-[#1C1917] font-black block">
                 Включено всё: Автомобиль + Доставка + Таможня + ЭПТС + Утильсбор РФ
               </span>
             </div>
           </div>
 
           {/* 6. ТЕЗИСЫ ЛОГИСТИКИ И ФУТЕР */}
-          <div className="mt-4 border-t border-[#E5E7EB] pt-3.5 flex flex-col shrink-0">
+          <div className="mt-4 border-t border-[#EFEBE4] pt-3.5 flex flex-col shrink-0">
             {/* Тезные полосы */}
             <div className="grid grid-cols-2 gap-x-2 gap-y-1.5 mb-3">
               <div className="flex items-center space-x-1">
-                <Check className="w-3 h-3 text-[#2563EB] shrink-0" />
-                <span className="text-[7.5px] font-bold text-[#64748B] uppercase">Проверка перед покупкой</span>
+                <Check className="w-3 h-3 text-[#C5A880] shrink-0" />
+                <span className="text-[7.5px] font-bold text-[#78716C] uppercase">Проверка перед покупкой</span>
               </div>
               <div className="flex items-center space-x-1">
-                <Check className="w-3 h-3 text-[#2563EB] shrink-0" />
-                <span className="text-[7.5px] font-bold text-[#64748B] uppercase">Таможня & ЭПТС под ключ</span>
+                <Check className="w-3 h-3 text-[#C5A880] shrink-0" />
+                <span className="text-[7.5px] font-bold text-[#78716C] uppercase">Таможня & ЭПТС под ключ</span>
               </div>
               <div className="flex items-center space-x-1">
-                <Check className="w-3 h-3 text-[#2563EB] shrink-0" />
-                <span className="text-[7.5px] font-bold text-[#64748B] uppercase">Доставка до {selectedCity.split(' ')[0]}</span>
+                <Check className="w-3 h-3 text-[#C5A880] shrink-0" />
+                <span className="text-[7.5px] font-bold text-[#78716C] uppercase">Доставка до {selectedCity.split(' ')[0]}</span>
               </div>
               <div className="flex items-center space-x-1">
-                <Check className="w-3 h-3 text-[#2563EB] shrink-0" />
-                <span className="text-[7.5px] font-bold text-[#64748B] uppercase">Полное сопровождение</span>
+                <Check className="w-3 h-3 text-[#C5A880] shrink-0" />
+                <span className="text-[7.5px] font-bold text-[#78716C] uppercase">Полное сопровождение</span>
               </div>
             </div>
 
             {/* Текстовый адресный футер */}
-            <div className="flex justify-between items-center text-[7.5px] font-bold text-[#64748B] uppercase tracking-wide border-t border-[#E5E7EB] pt-2.5">
+            <div className="flex justify-between items-center text-[7.5px] font-bold text-[#78716C] uppercase tracking-wide border-t border-[#EFEBE4] pt-2.5">
               <span>dacar-import.ru</span>
               <span className="flex items-center space-x-0.5">
-                <MapPin className="w-2.5 h-2.5 text-[#64748B]" />
+                <MapPin className="w-2.5 h-2.5 text-[#78716C]" />
                 <span>г. Казань, ул. Серова, д. 48</span>
               </span>
             </div>
@@ -453,15 +459,15 @@ export default function VehicleStories() {
         </div>
 
         {/* СЕГМЕНТ 7: КНОПКА ЗАКАЗА */}
-        <div className="bg-white border-t border-[#E5E7EB] p-4 shrink-0 relative z-40">
+        <div className="bg-white border-t border-[#EFEBE4] p-4 shrink-0 relative z-40">
           <button 
             onClick={() => {
               triggerHaptic('medium');
               setShowOrderForm(true);
             }}
-            className="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-display font-black text-xs uppercase py-3.5 px-4 rounded-xl shadow-lg transition active:scale-[0.98] flex items-center justify-center space-x-2 cursor-pointer"
+            className="w-full bg-[#C5A880] hover:bg-[#B0936B] text-[#1C1917] font-display font-black text-xs uppercase py-3.5 px-4 rounded-xl shadow-lg transition active:scale-[0.98] flex items-center justify-center space-x-2 cursor-pointer"
           >
-            <Zap className="w-4 h-4 fill-white" />
+            <Zap className="w-4 h-4 fill-[#1C1917]" />
             <span>Оставить заявку в 1 клик</span>
           </button>
         </div>
@@ -487,18 +493,18 @@ export default function VehicleStories() {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-              className="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-white border-t border-[#E5E7EB] rounded-t-[32px] p-6 z-50 select-none text-[#111827] shadow-2xl"
+              className="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-[#FAF8F5] border-t border-[#EFEBE4] rounded-t-[32px] p-6 z-50 select-none text-[#1C1917] shadow-2xl"
             >
-              <div className="w-12 h-1 bg-[#E5E7EB] rounded-full mx-auto mb-5"></div>
+              <div className="w-12 h-1 bg-[#EFEBE4] rounded-full mx-auto mb-5"></div>
 
               <div className="flex justify-between items-center mb-5">
                 <div>
-                  <h3 className="font-display font-bold text-base text-[#111827]">Быстрый заказ</h3>
-                  <p className="text-[10px] text-[#64748B] mt-0.5">Оставьте контакты, менеджер перезвонит через 5 минут</p>
+                  <h3 className="font-display font-bold text-base text-[#1C1917]">Быстрый заказ</h3>
+                  <p className="text-[10px] text-[#78716C] mt-0.5 font-medium">Оставьте контакты, менеджер перезвонит через 5 минут</p>
                 </div>
                 <button 
                   onClick={() => setShowOrderForm(false)}
-                  className="p-1.5 bg-[#F5F7FA] hover:bg-[#E5E7EB] rounded-full text-[#64748B] transition cursor-pointer"
+                  className="p-1.5 bg-[#FAF8F5] hover:bg-[#EFEBE4] rounded-full text-[#78716C] transition cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -515,7 +521,7 @@ export default function VehicleStories() {
                   </div>
                   <div>
                     <h4 className="font-display font-bold text-sm text-emerald-600">Заявка принята!</h4>
-                    <p className="text-[10px] text-[#64748B] mt-1 leading-relaxed">
+                    <p className="text-[10px] text-[#78716C] mt-1 leading-relaxed">
                       Автомобиль {car.brand} {car.model} забронирован за вами. Менеджер свяжется с вами по номеру в ближайшее время.
                     </p>
                   </div>
@@ -524,15 +530,15 @@ export default function VehicleStories() {
                 <form onSubmit={handleOrderSubmit} className="space-y-4">
                   
                   {/* Описание выбранного авто */}
-                  <div className="bg-[#F5F7FA] border border-[#E5E7EB] p-3 rounded-xl flex items-center space-x-3">
+                  <div className="bg-[#FAF8F5] border border-[#EFEBE4] p-3 rounded-xl flex items-center space-x-3">
                     <img 
                       src={car.images[0]} 
                       alt="" 
                       className="w-12 h-12 rounded-lg object-cover"
                     />
                     <div>
-                      <h4 className="text-xs font-bold text-[#111827]">{car.brand} {car.model}</h4>
-                      <p className="text-[9px] text-[#2563EB] font-bold mt-0.5">
+                      <h4 className="text-xs font-bold text-[#1C1917]">{car.brand} {car.model}</h4>
+                      <p className="text-[9px] text-[#C5A880] font-black mt-0.5">
                         {formatCurrency(calculated.finalPriceRUB)} • дост. до {selectedCity.split(' ')[0]}
                       </p>
                     </div>
@@ -540,26 +546,26 @@ export default function VehicleStories() {
 
                   {/* Поле имени */}
                   <div className="flex flex-col space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-[#64748B]">Ваше имя</label>
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-[#78716C]">Ваше имя</label>
                     <input 
                       type="text" 
                       placeholder="Иван Иванов"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-3.5 py-2.5 text-xs text-[#111827] outline-none focus:border-[#2563EB] font-sans transition"
+                      className="w-full bg-[#FAF8F5] border border-[#EFEBE4] rounded-xl px-3.5 py-2.5 text-xs text-[#1C1917] outline-none focus:border-[#C5A880] font-sans font-semibold transition"
                       required
                     />
                   </div>
 
                   {/* Поле телефона */}
                   <div className="flex flex-col space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-[#64748B]">Телефон для связи</label>
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-[#78716C]">Телефон для связи</label>
                     <input 
                       type="tel" 
                       placeholder="+7 (999) 123-45-67"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-3.5 py-2.5 text-xs text-[#111827] outline-none focus:border-[#2563EB] font-sans transition"
+                      className="w-full bg-[#FAF8F5] border border-[#EFEBE4] rounded-xl px-3.5 py-2.5 text-xs text-[#1C1917] outline-none focus:border-[#C5A880] font-sans font-semibold transition"
                       required
                     />
                   </div>
@@ -567,7 +573,7 @@ export default function VehicleStories() {
                   {/* Кнопка отправки */}
                   <button 
                     type="submit"
-                    className="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white font-display font-black text-xs uppercase py-3.5 px-4 rounded-xl shadow-lg transition active:scale-[0.98] flex items-center justify-center space-x-1.5 cursor-pointer mt-4"
+                    className="w-full bg-[#C5A880] hover:bg-[#B0936B] text-[#1C1917] font-display font-black text-xs uppercase py-3.5 px-4 rounded-xl shadow-lg transition active:scale-[0.98] flex items-center justify-center space-x-1.5 cursor-pointer mt-4"
                   >
                     <span>Отправить заявку менеджеру</span>
                     <ChevronRightIcon className="w-4 h-4" />

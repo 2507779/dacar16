@@ -98,19 +98,19 @@ export default function Catalog() {
   };
 
   return (
-    <div className="flex flex-col text-[#111827] pb-12 select-none">
+    <div className="flex flex-col text-[#1C1917] pb-12 select-none bg-[#FAF8F5]">
       
       {/* 1. Поисковая строка и Настройки вида */}
-      <div className="px-4 pt-4 sticky top-0 bg-[#F5F7FA]/95 backdrop-blur-md z-10 pb-3 border-b border-[#E5E7EB] flex flex-col space-y-3">
+      <div className="px-4 pt-4 sticky top-0 bg-[#FAF8F5]/95 backdrop-blur-md z-10 pb-3 border-b border-[#EFEBE4] flex flex-col space-y-3">
         <div className="flex items-center space-x-2">
-          <div className="flex-1 bg-white border border-[#E5E7EB] rounded-2xl px-3.5 py-2.5 flex items-center space-x-2 shadow-sm focus-within:border-[#2563EB]/70 transition-colors">
-            <Search className="w-4 h-4 text-[#64748B]/70" />
+          <div className="flex-1 bg-white border border-[#EFEBE4] rounded-2xl px-3.5 py-2.5 flex items-center space-x-2 shadow-sm focus-within:border-[#C5A880]/70 transition-colors">
+            <Search className="w-4 h-4 text-[#78716C]/70" />
             <input
               type="text"
               placeholder="Марка, модель авто..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-transparent text-sm text-[#111827] outline-none w-full placeholder-[#64748B]/60 font-sans"
+              className="bg-transparent text-sm text-[#1C1917] outline-none w-full placeholder-[#78716C]/60 font-sans"
             />
             {searchQuery && (
               <button
@@ -119,7 +119,7 @@ export default function Catalog() {
                   setSearchQuery('');
                 }}
               >
-                <X className="w-4 h-4 text-[#64748B]" />
+                <X className="w-4 h-4 text-[#78716C]" />
               </button>
             )}
           </div>
@@ -128,8 +128,8 @@ export default function Catalog() {
             onClick={handleOpenFilters}
             className={`p-3 rounded-2xl border flex items-center justify-center cursor-pointer transition-bezier shadow-sm ${
               Object.values(filters).some(v => v !== null)
-                ? 'bg-[#2563EB] border-[#2563EB] text-white'
-                : 'bg-white border-[#E5E7EB] text-[#64748B] hover:border-[#2563EB]/40'
+                ? 'bg-[#C5A880] border-[#C5A880] text-[#1C1917] font-bold'
+                : 'bg-white border-[#EFEBE4] text-[#78716C] hover:border-[#C5A880]/40'
             }`}
           >
             <SlidersHorizontal className="w-5 h-5" />
@@ -138,14 +138,14 @@ export default function Catalog() {
 
         {/* Сортировка и вид */}
         <div className="flex justify-between items-center text-[11px]">
-          <div className="flex items-center space-x-2 text-[#64748B]">
-            <span>Найдено: <b className="text-[#111827] font-bold">{sortedCars.length}</b></span>
+          <div className="flex items-center space-x-2 text-[#78716C]">
+            <span>Найдено: <b className="text-[#1C1917] font-bold">{sortedCars.length}</b></span>
             <span>•</span>
             <button
               onClick={toggleSort}
-              className="font-bold text-[#111827] flex items-center space-x-1.5 hover:text-[#2563EB] transition-colors"
+              className="font-bold text-[#1C1917] flex items-center space-x-1.5 hover:text-[#C5A880] transition-colors"
             >
-              <ArrowUpDown className="w-3.5 h-3.5 text-[#64748B]" />
+              <ArrowUpDown className="w-3.5 h-3.5 text-[#78716C]" />
               <span>
                 {sortOption === 'year_desc' && 'Сначала новые'}
                 {sortOption === 'price_asc' && 'Подешевле'}
@@ -154,13 +154,13 @@ export default function Catalog() {
             </button>
           </div>
 
-          <div className="flex bg-white border border-[#E5E7EB] rounded-xl p-0.5 shadow-sm">
+          <div className="flex bg-white border border-[#EFEBE4] rounded-xl p-0.5 shadow-sm">
             <button
               onClick={() => {
                 triggerHaptic('light');
                 setViewMode('grid');
               }}
-              className={`p-1.5 rounded-lg transition-bezier ${viewMode === 'grid' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#64748B]/70'}`}
+              className={`p-1.5 rounded-lg transition-bezier ${viewMode === 'grid' ? 'bg-[#C5A880] text-[#1C1917] font-black shadow-sm' : 'text-[#78716C]/70'}`}
             >
               <Grid className="w-3.5 h-3.5" />
             </button>
@@ -169,7 +169,7 @@ export default function Catalog() {
                 triggerHaptic('light');
                 setViewMode('list');
               }}
-              className={`p-1.5 rounded-lg transition-bezier ${viewMode === 'list' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#64748B]/70'}`}
+              className={`p-1.5 rounded-lg transition-bezier ${viewMode === 'list' ? 'bg-[#C5A880] text-[#1C1917] font-black shadow-sm' : 'text-[#78716C]/70'}`}
             >
               <List className="w-3.5 h-3.5" />
             </button>
@@ -180,27 +180,27 @@ export default function Catalog() {
         {Object.values(filters).some(v => v !== null) && (
           <div className="flex space-x-1.5 overflow-x-auto py-1 scrollbar-none">
             {filters.country && (
-              <span className="bg-white text-[#2563EB] text-[10px] font-bold px-3 py-1 rounded-full flex items-center space-x-1 border border-[#E5E7EB] shadow-sm">
+              <span className="bg-white text-[#C5A880] text-[10px] font-bold px-3 py-1 rounded-full flex items-center space-x-1 border border-[#EFEBE4] shadow-sm">
                 <span>{filters.country === 'China' ? 'Китай 🇨🇳' : filters.country === 'South Korea' ? 'Корея 🇰🇷' : 'Киргизия 🇰🇬'}</span>
-                <X className="w-3 h-3 cursor-pointer text-[#2563EB]" onClick={() => setFilters({ country: null })} />
+                <X className="w-3 h-3 cursor-pointer text-[#C5A880]" onClick={() => setFilters({ country: null })} />
               </span>
             )}
             {filters.fuel && (
-              <span className="bg-white text-[#2563EB] text-[10px] font-bold px-3 py-1 rounded-full flex items-center space-x-1 border border-[#E5E7EB] shadow-sm">
+              <span className="bg-white text-[#C5A880] text-[10px] font-bold px-3 py-1 rounded-full flex items-center space-x-1 border border-[#EFEBE4] shadow-sm">
                 <span className="capitalize">{filters.fuel}</span>
-                <X className="w-3 h-3 cursor-pointer text-[#2563EB]" onClick={() => setFilters({ fuel: null })} />
+                <X className="w-3 h-3 cursor-pointer text-[#C5A880]" onClick={() => setFilters({ fuel: null })} />
               </span>
             )}
             {filters.condition && (
-              <span className="bg-white text-[#2563EB] text-[10px] font-bold px-3 py-1 rounded-full flex items-center space-x-1 border border-[#E5E7EB] shadow-sm">
+              <span className="bg-white text-[#C5A880] text-[10px] font-bold px-3 py-1 rounded-full flex items-center space-x-1 border border-[#EFEBE4] shadow-sm">
                 <span>{filters.condition === 'new' ? 'Новые' : 'С пробегом'}</span>
-                <X className="w-3 h-3 cursor-pointer text-[#2563EB]" onClick={() => setFilters({ condition: null })} />
+                <X className="w-3 h-3 cursor-pointer text-[#C5A880]" onClick={() => setFilters({ condition: null })} />
               </span>
             )}
             {filters.brand && (
-              <span className="bg-white text-[#2563EB] text-[10px] font-bold px-3 py-1 rounded-full flex items-center space-x-1 border border-[#E5E7EB] shadow-sm">
+              <span className="bg-white text-[#C5A880] text-[10px] font-bold px-3 py-1 rounded-full flex items-center space-x-1 border border-[#EFEBE4] shadow-sm">
                 <span>{filters.brand}</span>
-                <X className="w-3 h-3 cursor-pointer text-[#2563EB]" onClick={() => setFilters({ brand: null })} />
+                <X className="w-3 h-3 cursor-pointer text-[#C5A880]" onClick={() => setFilters({ brand: null })} />
               </span>
             )}
             <button onClick={resetFilters} className="text-rose-600 hover:text-rose-700 text-[10px] font-extrabold px-2 py-1">
@@ -213,11 +213,11 @@ export default function Catalog() {
       {/* 2. Сетка или список автомобилей */}
       <div className="px-4 mt-4">
         {sortedCars.length === 0 ? (
-          <div className="bg-white rounded-3xl p-8 border border-[#E5E7EB] text-center flex flex-col items-center justify-center space-y-4 shadow-md my-6">
-            <Sparkles className="w-10 h-10 text-[#2563EB]/40" />
+          <div className="bg-white rounded-3xl p-8 border border-[#EFEBE4] text-center flex flex-col items-center justify-center space-y-4 shadow-md my-6">
+            <Sparkles className="w-10 h-10 text-[#C5A880]/60" />
             <div>
-              <h4 className="font-display font-bold text-base text-[#111827]">Машины не найдены</h4>
-              <p className="text-xs text-[#64748B] mt-1.5 leading-relaxed">
+              <h4 className="font-display font-bold text-base text-[#1C1917]">Машины не найдены</h4>
+              <p className="text-xs text-[#78716C] mt-1.5 leading-relaxed">
                 Попробуйте изменить критерии поиска или сбросить фильтры. Мы можем привезти любой автомобиль под ваш индивидуальный заказ!
               </p>
             </div>
@@ -226,7 +226,7 @@ export default function Catalog() {
                 triggerHaptic('medium');
                 resetFilters();
               }}
-              className="px-6 py-3 bg-[#2563EB] text-white rounded-xl text-xs font-bold cursor-pointer active:scale-95 transition-bezier shadow-md"
+              className="px-6 py-3 bg-[#C5A880] text-[#1C1917] rounded-xl text-xs font-black cursor-pointer active:scale-95 transition-bezier shadow-md"
             >
               Сбросить фильтры
             </button>
@@ -247,7 +247,7 @@ export default function Catalog() {
                     triggerHaptic('light');
                     setActiveCarId(car.id);
                   }}
-                  className="bg-white border border-[#E5E7EB] hover:border-[#2563EB]/25 rounded-3xl overflow-hidden flex flex-col shadow-md cursor-pointer group relative"
+                  className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/25 rounded-3xl overflow-hidden flex flex-col shadow-md cursor-pointer group relative"
                 >
                   <div 
                     onClick={(e) => {
@@ -265,34 +265,34 @@ export default function Catalog() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     {/* Кнопка "Сторис" */}
-                    <div className="absolute top-2 left-2 bg-[#2563EB] text-white text-[7px] font-black px-1.5 py-0.5 rounded shadow-md flex items-center space-x-1 z-10">
+                    <div className="absolute top-2 left-2 bg-[#C5A880] text-[#1C1917] text-[7px] font-black px-1.5 py-0.5 rounded shadow-md flex items-center space-x-1 z-10">
                       <span className="w-1 h-1 bg-white rounded-full animate-ping"></span>
                       <span>STORIES</span>
                     </div>
 
                     <button
                       onClick={(e) => handleToggleFav(e, car.id)}
-                      className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white text-[#111827] transition active:scale-90 z-10 shadow-sm border border-black/[0.03]"
+                      className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white text-[#1C1917] transition active:scale-90 z-10 shadow-sm border border-black/[0.03]"
                     >
-                      <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-red-500 text-red-500' : 'text-[#64748B]'}`} />
+                      <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-red-500 text-red-500' : 'text-[#78716C]'}`} />
                     </button>
-                    <span className="absolute bottom-1.5 left-2 bg-white/90 backdrop-blur-md text-[#111827] text-[8px] font-bold px-1.5 py-0.5 rounded uppercase z-10 border border-black/[0.03]">
+                    <span className="absolute bottom-1.5 left-2 bg-white/90 backdrop-blur-md text-[#1C1917] text-[8px] font-bold px-1.5 py-0.5 rounded uppercase z-10 border border-black/[0.03]">
                       {car.country === 'China' ? 'КНР 🇨🇳' : car.country === 'South Korea' ? 'Корея 🇰🇷' : 'КР 🇰🇬'}
                     </span>
                   </div>
 
                   <div className="p-3 flex flex-col flex-1 justify-between bg-white">
                     <div>
-                      <h4 className="font-display font-bold text-xs text-[#111827] group-hover:text-[#2563EB] transition-colors truncate">
+                      <h4 className="font-display font-bold text-xs text-[#1C1917] group-hover:text-[#C5A880] transition-colors truncate">
                         {car.brand} {car.model}
                       </h4>
-                      <p className="text-[10px] text-[#64748B] mt-0.5">
+                      <p className="text-[10px] text-[#78716C] mt-0.5">
                         {car.year} г. • {car.power} л.с.
                       </p>
                     </div>
-                    <div className="mt-3.5 pt-2 border-t border-[#E5E7EB]/40 flex flex-col">
-                      <span className="text-[8px] text-[#64748B] uppercase tracking-widest block font-mono">Итого под ключ</span>
-                      <span className="font-display font-bold text-[#2563EB] text-xs mt-0.5">
+                    <div className="mt-3.5 pt-2 border-t border-[#EFEBE4]/40 flex flex-col">
+                      <span className="text-[8px] text-[#78716C] uppercase tracking-widest block font-mono">Итого под ключ</span>
+                      <span className="font-display font-bold text-[#C5A880] text-xs mt-0.5">
                         {formatCurrency(calculated.finalPriceRUB)}
                       </span>
                     </div>
@@ -317,7 +317,7 @@ export default function Catalog() {
                     triggerHaptic('light');
                     setActiveCarId(car.id);
                   }}
-                  className="bg-white border border-[#E5E7EB] hover:border-[#2563EB]/25 rounded-3xl overflow-hidden flex shadow-md cursor-pointer group relative"
+                  className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/25 rounded-3xl overflow-hidden flex shadow-md cursor-pointer group relative"
                 >
                   <div 
                     onClick={(e) => {
@@ -335,41 +335,41 @@ export default function Catalog() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     {/* Кнопка "Сторис" */}
-                    <div className="absolute top-2 left-2 bg-[#2563EB] text-white text-[7px] font-black px-1.5 py-0.5 rounded shadow-md flex items-center space-x-1 z-10">
+                    <div className="absolute top-2 left-2 bg-[#C5A880] text-[#1C1917] text-[7px] font-black px-1.5 py-0.5 rounded shadow-md flex items-center space-x-1 z-10">
                       <span className="w-1 h-1 bg-white rounded-full animate-ping"></span>
                       <span>STORIES</span>
                     </div>
 
                     <button
                       onClick={(e) => handleToggleFav(e, car.id)}
-                      className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white text-[#111827] transition active:scale-90 z-10 shadow-sm border border-black/[0.03]"
+                      className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white text-[#1C1917] transition active:scale-90 z-10 shadow-sm border border-black/[0.03]"
                     >
-                      <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-red-500 text-red-500' : 'text-[#64748B]'}`} />
+                      <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-red-500 text-red-500' : 'text-[#78716C]'}`} />
                     </button>
                   </div>
 
                   <div className="p-3.5 flex-1 flex flex-col justify-between min-w-0 bg-white">
                     <div className="flex justify-between items-start">
                       <div className="min-w-0">
-                        <h4 className="font-display font-bold text-xs text-[#111827] group-hover:text-[#2563EB] transition-colors truncate">
+                        <h4 className="font-display font-bold text-xs text-[#1C1917] group-hover:text-[#C5A880] transition-colors truncate">
                           {car.brand} {car.model}
                         </h4>
-                        <p className="text-[10px] text-[#64748B] mt-0.5">
+                        <p className="text-[10px] text-[#78716C] mt-0.5">
                           {car.year} г. • {car.engineVolume} • {car.power} л.с.
                         </p>
                       </div>
-                      <span className="bg-[#F5F7FA] border border-[#E5E7EB] text-[#111827] text-[8px] font-bold px-2 py-0.5 rounded-md shrink-0 uppercase tracking-wider ml-1">
+                      <span className="bg-[#FAF8F5] border border-[#EFEBE4] text-[#1C1917] text-[8px] font-bold px-2 py-0.5 rounded-md shrink-0 uppercase tracking-wider ml-1">
                         {car.country === 'China' ? 'КНР 🇨🇳' : car.country === 'South Korea' ? 'Корея 🇰🇷' : 'КР 🇰🇬'}
                       </span>
                     </div>
 
-                    <div className="flex justify-between items-end border-t border-[#E5E7EB]/40 pt-2 mt-1.5">
-                      <span className="text-[9px] text-[#2563EB] font-bold flex items-center space-x-0.5">
-                        <CheckCircle className="w-3.5 h-3.5 shrink-0" />
+                    <div className="flex justify-between items-end border-t border-[#EFEBE4]/40 pt-2 mt-1.5">
+                      <span className="text-[9px] text-[#C5A880] font-bold flex items-center space-x-0.5">
+                        <CheckCircle className="w-3.5 h-3.5 shrink-0 animate-pulse" />
                         <span>~{car.deliveryDays} дней</span>
                       </span>
                       <div className="text-right">
-                        <span className="font-display font-black text-[#2563EB] text-xs">
+                        <span className="font-display font-black text-[#C5A880] text-xs">
                           {formatCurrency(calculated.finalPriceRUB)}
                         </span>
                       </div>
@@ -401,24 +401,24 @@ export default function Catalog() {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-              className="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-[#F5F7FA] rounded-t-[32px] z-50 p-6 flex flex-col max-h-[85%] overflow-y-auto shadow-2xl border-t border-[#E5E7EB] select-none"
+              className="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-[#FAF8F5] rounded-t-[32px] z-50 p-6 flex flex-col max-h-[85%] overflow-y-auto shadow-2xl border-t border-[#EFEBE4] select-none"
             >
-              <div className="w-12 h-1 bg-[#E5E7EB] rounded-full mx-auto mb-6 shrink-0"></div>
+              <div className="w-12 h-1 bg-[#EFEBE4] rounded-full mx-auto mb-6 shrink-0"></div>
 
               <div className="flex justify-between items-center mb-6 shrink-0">
-                <h3 className="font-display font-bold text-base text-[#111827]">Фильтры подбора</h3>
+                <h3 className="font-display font-bold text-base text-[#1C1917]">Фильтры подбора</h3>
                 <button
                   onClick={handleCloseFilters}
-                  className="p-1 hover:bg-[#E5E7EB]/40 rounded-full transition"
+                  className="p-1 hover:bg-[#EFEBE4]/50 rounded-full transition"
                 >
-                  <X className="w-5 h-5 text-[#64748B]" />
+                  <X className="w-5 h-5 text-[#78716C]" />
                 </button>
               </div>
 
               <div className="space-y-6 overflow-y-auto pr-1">
                 {/* 1. Выбор бренда */}
                 <div>
-                  <h4 className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] mb-2.5">Марка авто</h4>
+                  <h4 className="text-[10px] font-bold uppercase tracking-wider text-[#78716C] mb-2.5">Марка авто</h4>
                   <div className="flex flex-wrap gap-1.5">
                     {allBrands.map((brand) => (
                       <button
@@ -429,8 +429,8 @@ export default function Catalog() {
                         }}
                         className={`text-xs px-3.5 py-1.5 rounded-xl border font-semibold transition cursor-pointer ${
                           filters.brand === brand
-                            ? 'bg-[#2563EB] border-[#2563EB] text-white shadow-md'
-                            : 'bg-white border-[#E5E7EB] text-[#111827] hover:border-[#2563EB]/40'
+                            ? 'bg-[#C5A880] border-[#C5A880] text-[#1C1917] shadow-md'
+                            : 'bg-white border-[#EFEBE4] text-[#1C1917] hover:border-[#C5A880]/40'
                         }`}
                       >
                         {brand}
@@ -441,7 +441,7 @@ export default function Catalog() {
 
                 {/* 2. Выбор страны */}
                 <div>
-                  <h4 className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] mb-2.5">Страна импорта</h4>
+                  <h4 className="text-[10px] font-bold uppercase tracking-wider text-[#78716C] mb-2.5">Страна импорта</h4>
                   <div className="grid grid-cols-3 gap-2">
                     {[
                       { id: 'China', label: 'Китай 🇨🇳' },
@@ -456,8 +456,8 @@ export default function Catalog() {
                         }}
                         className={`text-xs py-2 rounded-xl border font-semibold transition text-center cursor-pointer ${
                           filters.country === c.id
-                            ? 'bg-[#2563EB] border-[#2563EB] text-white shadow-md'
-                            : 'bg-white border-[#E5E7EB] text-[#111827]'
+                            ? 'bg-[#C5A880] border-[#C5A880] text-[#1C1917] shadow-md'
+                            : 'bg-white border-[#EFEBE4] text-[#1C1917]'
                         }`}
                       >
                         {c.label}
@@ -468,7 +468,7 @@ export default function Catalog() {
 
                 {/* 3. Тип топлива */}
                 <div>
-                  <h4 className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] mb-2.5">Двигатель</h4>
+                  <h4 className="text-[10px] font-bold uppercase tracking-wider text-[#78716C] mb-2.5">Двигатель</h4>
                   <div className="grid grid-cols-2 gap-2">
                     {[
                       { id: 'gasoline', label: 'Бензиновый ⛽' },
@@ -484,8 +484,8 @@ export default function Catalog() {
                         }}
                         className={`text-xs py-2 rounded-xl border font-semibold transition cursor-pointer ${
                           filters.fuel === fuel.id
-                            ? 'bg-[#2563EB] border-[#2563EB] text-white shadow-md'
-                            : 'bg-white border-[#E5E7EB] text-[#111827]'
+                            ? 'bg-[#C5A880] border-[#C5A880] text-[#1C1917] shadow-md'
+                            : 'bg-white border-[#EFEBE4] text-[#1C1917]'
                         }`}
                       >
                         {fuel.label}
@@ -496,7 +496,7 @@ export default function Catalog() {
 
                 {/* 4. Состояние */}
                 <div>
-                  <h4 className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] mb-2.5">Состояние</h4>
+                  <h4 className="text-[10px] font-bold uppercase tracking-wider text-[#78716C] mb-2.5">Состояние</h4>
                   <div className="grid grid-cols-2 gap-2">
                     {[
                       { id: 'new', label: 'Новый автомобиль' },
@@ -510,8 +510,8 @@ export default function Catalog() {
                         }}
                         className={`text-xs py-2.5 rounded-xl border font-semibold transition cursor-pointer ${
                           filters.condition === cond.id
-                            ? 'bg-[#2563EB] border-[#2563EB] text-white shadow-md'
-                            : 'bg-white border-[#E5E7EB] text-[#111827]'
+                            ? 'bg-[#C5A880] border-[#C5A880] text-[#1C1917] shadow-md'
+                            : 'bg-white border-[#EFEBE4] text-[#1C1917]'
                         }`}
                       >
                         {cond.label}
@@ -522,7 +522,7 @@ export default function Catalog() {
 
                 {/* 5. Максимальный бюджет (USD) */}
                 <div>
-                  <h4 className="text-[10px] font-bold uppercase tracking-wider text-[#64748B] mb-2.5">Максимальный бюджет</h4>
+                  <h4 className="text-[10px] font-bold uppercase tracking-wider text-[#78716C] mb-2.5">Максимальный бюджет</h4>
                   <div className="grid grid-cols-3 gap-2">
                     {[25000, 35000, 50000].map((budget) => (
                       <button
@@ -533,15 +533,15 @@ export default function Catalog() {
                         }}
                         className={`text-xs py-2 rounded-xl border font-semibold transition cursor-pointer ${
                           filters.priceMax === budget
-                            ? 'bg-[#2563EB] border-[#2563EB] text-white shadow-md'
-                            : 'bg-white border-[#E5E7EB] text-[#111827]'
+                            ? 'bg-[#C5A880] border-[#C5A880] text-[#1C1917] shadow-md'
+                            : 'bg-white border-[#EFEBE4] text-[#1C1917]'
                         }`}
                       >
                         до ${budget.toLocaleString()}
                       </button>
                     ))}
                   </div>
-                  <p className="text-[10px] text-[#64748B] mt-2 font-mono text-center">
+                  <p className="text-[10px] text-[#78716C] mt-2 font-mono text-center">
                     Курс ЦБ РФ: $1 = {EXCHANGE_RATES.USD_to_RUB} ₽
                   </p>
                 </div>
@@ -554,13 +554,13 @@ export default function Catalog() {
                     triggerHaptic('medium');
                     resetFilters();
                   }}
-                  className="flex-1 py-3 border border-[#E5E7EB] hover:bg-[#F5F7FA] font-semibold text-xs rounded-xl text-[#64748B] cursor-pointer active:scale-95 transition-bezier"
+                  className="flex-1 py-3 border border-[#EFEBE4] hover:bg-[#FAF8F5] font-semibold text-xs rounded-xl text-[#78716C] cursor-pointer active:scale-95 transition-bezier"
                 >
                   Сбросить все
                 </button>
                 <button
                   onClick={handleCloseFilters}
-                  className="flex-1 py-3 bg-[#2563EB] hover:bg-[#1D4ED8] font-bold text-xs rounded-xl text-white cursor-pointer active:scale-95 transition-bezier shadow-md"
+                  className="flex-1 py-3 bg-[#C5A880] hover:bg-[#B0936B] font-bold text-xs rounded-xl text-[#1C1917] cursor-pointer active:scale-95 transition-bezier shadow-md"
                 >
                   Применить ({filteredCars.length})
                 </button>

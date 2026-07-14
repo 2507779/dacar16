@@ -1,29 +1,29 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Space Grotesk", sans-serif;
+  --font-display: "Cormorant Garamond", serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 :root {
-  --bg-primary: #F5F7FA; /* Premium Slate/Alabaster Light Background */
+  --bg-primary: #FAF8F5; /* Luxurious Warm Alabaster/Pearl Background */
   --bg-secondary: #FFFFFF; /* Crisp White Cards */
-  --bg-tertiary: #E5E7EB; /* Refined Border/Lighter Grey */
-  --text-primary: #111827; /* Deep Charcoal/Graphite */
-  --text-secondary: #64748B; /* Slate Blue-Grey Muted */
-  --accent-primary: #2563EB; /* Porsche/BMW Electric Tech Blue */
-  --accent-primary-hover: #1D4ED8;
-  --border-light: #E5E7EB;
-  --border-primary: rgba(37, 99, 235, 0.15);
+  --bg-tertiary: #EFEBE4; /* Warm Muted Ivory/Cashmere Line */
+  --text-primary: #1C1917; /* Luxurious Warm Charcoal */
+  --text-secondary: #78716C; /* Elegant Warm Muted Taupe */
+  --accent-primary: #C5A880; /* Premium Champagne Gold */
+  --accent-primary-hover: #B0936B; /* Muted Cashmere Bronze */
+  --border-light: #EFEBE4;
+  --border-primary: rgba(197, 168, 128, 0.2);
 }
 
 /* Стили для Telegram Mini App */
 body {
   font-family: var(--font-sans);
-  background-color: #F5F7FA; /* Элегантный светлый премиальный фон 2026 года */
-  color: #111827;
+  background-color: #FAF8F5; /* Элегантный светлый премиальный теплый фон */
+  color: #1C1917;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
@@ -39,27 +39,27 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(37, 99, 235, 0.25); /* Тонкий синий акцент скроллбара */
+  background: rgba(197, 168, 128, 0.3); /* Тонкий золотой акцент скроллбара */
   border-radius: 99px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(37, 99, 235, 0.45);
+  background: rgba(197, 168, 128, 0.5);
 }
 
-/* Элитное стекло в светлых тонах */
+/* Элитное стекло в теплых тонах */
 .glass-premium {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(37, 99, 235, 0.12);
+  border: 1px solid rgba(197, 168, 128, 0.15);
 }
 
 .glass-premium-accent {
-  background: rgba(37, 99, 235, 0.04);
+  background: rgba(197, 168, 128, 0.05);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(37, 99, 235, 0.18);
+  border: 1px solid rgba(197, 168, 128, 0.25);
 }
 
 /* Кастомные плавные переходы */
