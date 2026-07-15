@@ -7,7 +7,8 @@
 export function triggerHaptic(type: 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error' = 'light') {
   // 1. Попытка вызвать оригинальный Telegram SDK haptic
   const tg = (window as any).Telegram?.WebApp;
-  if (tg?.HapticFeedback) {
+  // HapticFeedback is supported in Telegram WebApp API 6.1+
+  if (tg?.isVersionAtLeast?.('6.1') && tg?.HapticFeedback) {
     switch (type) {
       case 'light':
         tg.HapticFeedback.impactOccurred('light');

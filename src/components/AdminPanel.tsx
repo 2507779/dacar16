@@ -17,6 +17,19 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { CARS_DATA, calculateFullCarPrice, formatCurrency } from '../data/cars';
 
+// Помощник авто-исправления путей (для удобной работы с файлами из репозитория GitHub или Base64)
+export const getAutoCorrectedPath = (input: string) => {
+  let url = input.trim();
+  if (!url) return '';
+  const isUrl = url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:');
+  const isRelative = url.startsWith('/');
+  // Если ввели просто имя файла (например, my_car.jpg), автоматически подставляем путь к папке /cars/
+  if (!isUrl && !isRelative && url.includes('.') && !url.includes('/')) {
+    return '/cars/' + url;
+  }
+  return url;
+};
+
 export function AdminPanel() {
   const { 
     cars, 
@@ -433,11 +446,11 @@ export function AdminPanel() {
       'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=800&q=80'
     ];
 
-    // Разделяем ссылки на картинки по переносу строки
+    // Разделяем ссылки на картинки по переносу строки и исправляем пути
     const parsedImages = newImgUrl
       .split('\n')
-      .map(url => url.trim())
-      .filter(url => url.length > 0 && (url.startsWith('http') || url.startsWith('https') || url.includes('file')));
+      .map(url => getAutoCorrectedPath(url))
+      .filter(url => url.length > 0);
 
     const finalImgList = parsedImages.length > 0 ? parsedImages : defaultImages;
     const finalCarId = `${newBrand.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${newModel.toLowerCase().replace(/[^a-z0-9]/g, '-')}-${newYear}`;
@@ -549,11 +562,13 @@ export const CARS_DATA: Car[] = ${formattedCars};
 
   // Управление изображениями в галерее автомобиля
   const handleAddPhotoToCar = (carId: string) => {
-    if (!newPhotoUrl.trim()) return;
+    const rawUrl = newPhotoUrl.trim();
+    if (!rawUrl) return;
+    const correctedUrl = getAutoCorrectedPath(rawUrl);
     const targetCar = cars.find(c => c.id === carId);
     if (targetCar) {
       triggerHaptic('medium');
-      const updatedGallery = [...targetCar.images, newPhotoUrl.trim()];
+      const updatedGallery = [...targetCar.images, correctedUrl];
       editCar(carId, { ...targetCar, images: updatedGallery });
       setNewPhotoUrl('');
     }
@@ -1780,14 +1795,14 @@ export const CARS_DATA: Car[] = ${formattedCars};
                     {adminTab === 'add' && (
                       <form onSubmit={handleFormSubmit} className="space-y-3.5">
                         <div className="flex justify-between items-center">
-                          <h5 className="text-[11px] font-bold text-[#2563EB] uppercase tracking-wider font-mono font-black">
+                          <h5 className="text-[11px] font-bold text-[#C5A880] uppercase tracking-wider font-mono font-black">
                             {editingCarId ? 'Редактирование характеристик' : 'Новая карточка автомобиля'}
                           </h5>
                           {editingCarId && (
                             <button
                               type="button"
                               onClick={resetForm}
-                              className="text-[9px] text-[#2563EB] hover:underline"
+                              className="text-[9px] text-[#C5A880] hover:underline"
                             >
                               Отменить
                             </button>
@@ -1800,7 +1815,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                             type="button"
                             onClick={() => { triggerHaptic('light'); setFormSection('basic'); }}
                             className={`flex-1 py-2 px-2 text-center text-[10px] font-bold rounded-lg transition whitespace-nowrap ${
-                              formSection === 'basic' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#64748B] hover:text-[#111827]'
+                              formSection === 'basic' ? 'bg-[#C5A880] text-white shadow-sm' : 'text-[#64748B] hover:text-[#111827]'
                             }`}
                           >
                             📝 Основное
@@ -1809,7 +1824,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                             type="button"
                             onClick={() => { triggerHaptic('light'); setFormSection('tech'); }}
                             className={`flex-1 py-2 px-2 text-center text-[10px] font-bold rounded-lg transition whitespace-nowrap ${
-                              formSection === 'tech' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#64748B] hover:text-[#111827]'
+                              formSection === 'tech' ? 'bg-[#C5A880] text-white shadow-sm' : 'text-[#64748B] hover:text-[#111827]'
                             }`}
                           >
                             ⚙️ Техданные
@@ -1818,7 +1833,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                             type="button"
                             onClick={() => { triggerHaptic('light'); setFormSection('pricing'); }}
                             className={`flex-1 py-2 px-2 text-center text-[10px] font-bold rounded-lg transition whitespace-nowrap ${
-                              formSection === 'pricing' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#64748B] hover:text-[#111827]'
+                              formSection === 'pricing' ? 'bg-[#C5A880] text-white shadow-sm' : 'text-[#64748B] hover:text-[#111827]'
                             }`}
                           >
                             💰 Цена (₽)
@@ -1827,7 +1842,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                             type="button"
                             onClick={() => { triggerHaptic('light'); setFormSection('media'); }}
                             className={`flex-1 py-2 px-2 text-center text-[10px] font-bold rounded-lg transition whitespace-nowrap ${
-                              formSection === 'media' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#64748B] hover:text-[#111827]'
+                              formSection === 'media' ? 'bg-[#C5A880] text-white shadow-sm' : 'text-[#64748B] hover:text-[#111827]'
                             }`}
                           >
                             🖼️ Медиа & ИИ
@@ -2438,21 +2453,61 @@ export const CARS_DATA: Car[] = ${formattedCars};
                                           </div>
 
                                           {/* Способ 2: Ввод по URL */}
-                                          <div className="flex-1 flex space-x-1">
-                                            <input
-                                              type="text"
-                                              placeholder="Вставьте ссылку на фото автомобиля (https://...)"
-                                              value={newPhotoUrl}
-                                              onChange={(e) => setNewPhotoUrl(e.target.value)}
-                                              className="flex-1 bg-white border border-[#E5E7EB] rounded-lg px-2 py-1 text-[9.5px] text-[#111827] outline-none font-mono"
-                                            />
-                                            <button
-                                              onClick={() => handleAddPhotoToCar(c.id)}
-                                              className="px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[9px] font-extrabold transition flex items-center space-x-1"
-                                            >
-                                              <Plus className="w-3.5 h-3.5" />
-                                              <span>Добавить URL</span>
-                                            </button>
+                                          <div className="flex-1 flex flex-col space-y-1.5">
+                                            <div className="flex space-x-1">
+                                              <input
+                                                type="text"
+                                                placeholder="Имя файла (например, bmw.jpg) или полная ссылка"
+                                                value={newPhotoUrl}
+                                                onChange={(e) => setNewPhotoUrl(e.target.value)}
+                                                className="flex-1 bg-white border border-[#E5E7EB] rounded-lg px-2.5 py-1 text-[9.5px] text-[#111827] outline-none font-mono focus:border-blue-500 transition-all shadow-inner"
+                                              />
+                                              <button
+                                                onClick={() => handleAddPhotoToCar(c.id)}
+                                                className="px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[9px] font-extrabold transition flex items-center space-x-1 shrink-0 shadow active:scale-95 cursor-pointer"
+                                              >
+                                                <Plus className="w-3.5 h-3.5" />
+                                                <span>Добавить</span>
+                                              </button>
+                                            </div>
+
+                                            {/* ДИНАМИЧЕСКИЙ УМНЫЙ ПРЕВЬЮЕР С АВТО-КОРРЕКЦИЕЙ */}
+                                            {newPhotoUrl.trim() && (() => {
+                                              const corrected = getAutoCorrectedPath(newPhotoUrl);
+                                              const isCorrected = corrected !== newPhotoUrl.trim();
+                                              return (
+                                                <div className="bg-white border border-blue-100 p-1.5 rounded-lg flex items-center space-x-2 animate-fade-in shadow-sm">
+                                                  <div className="relative w-8 h-8 rounded overflow-hidden border border-stone-200 bg-stone-50 flex-shrink-0 flex items-center justify-center">
+                                                    <img 
+                                                      src={corrected} 
+                                                      alt="Предпросмотр" 
+                                                      className="w-full h-full object-cover"
+                                                      onError={(e) => {
+                                                        (e.target as HTMLImageElement).src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23EF4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>';
+                                                      }}
+                                                    />
+                                                  </div>
+                                                  <div className="flex-1 min-w-0">
+                                                    <div className="text-[7.5px] font-black text-blue-600 uppercase font-mono tracking-wider flex items-center space-x-1">
+                                                      <span>🔍 ЖИВОЙ ПРЕДПРОСМОТР</span>
+                                                      {isCorrected && (
+                                                        <span className="bg-amber-100 text-amber-800 text-[6.5px] px-1 py-0.2 rounded font-mono font-bold uppercase">
+                                                          Авто-путь
+                                                        </span>
+                                                      )}
+                                                    </div>
+                                                    <div className="text-[8px] font-mono text-stone-600 truncate">
+                                                      {corrected}
+                                                    </div>
+                                                    {isCorrected && (
+                                                      <div className="text-[6.5px] text-amber-600 font-semibold leading-tight">
+                                                        Превращено из «{newPhotoUrl.trim()}» (авто-префикс /cars/)
+                                                      </div>
+                                                    )}
+                                                  </div>
+                                                </div>
+                                              );
+                                            })()}
                                           </div>
                                         </div>
                                       </div>

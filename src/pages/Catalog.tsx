@@ -123,19 +123,19 @@ export default function Catalog() {
               </button>
             )}
           </div>
-
+  
           <button
             onClick={handleOpenFilters}
             className={`p-3 rounded-2xl border flex items-center justify-center cursor-pointer transition-bezier shadow-sm ${
               Object.values(filters).some(v => v !== null)
-                ? 'bg-[#C5A880] border-[#C5A880] text-[#1C1917] font-bold'
+                ? 'bg-[#C5A880] border-[#C5A880] text-white font-bold'
                 : 'bg-white border-[#EFEBE4] text-[#78716C] hover:border-[#C5A880]/40'
             }`}
           >
             <SlidersHorizontal className="w-5 h-5" />
           </button>
         </div>
-
+  
         {/* Сортировка и вид */}
         <div className="flex justify-between items-center text-[11px]">
           <div className="flex items-center space-x-2 text-[#78716C]">
@@ -153,14 +153,14 @@ export default function Catalog() {
               </span>
             </button>
           </div>
-
+  
           <div className="flex bg-white border border-[#EFEBE4] rounded-xl p-0.5 shadow-sm">
             <button
               onClick={() => {
                 triggerHaptic('light');
                 setViewMode('grid');
               }}
-              className={`p-1.5 rounded-lg transition-bezier ${viewMode === 'grid' ? 'bg-[#C5A880] text-[#1C1917] font-black shadow-sm' : 'text-[#78716C]/70'}`}
+              className={`p-1.5 rounded-lg transition-bezier ${viewMode === 'grid' ? 'bg-[#C5A880] text-white font-black shadow-sm' : 'text-[#78716C]/70'}`}
             >
               <Grid className="w-3.5 h-3.5" />
             </button>
@@ -169,13 +169,13 @@ export default function Catalog() {
                 triggerHaptic('light');
                 setViewMode('list');
               }}
-              className={`p-1.5 rounded-lg transition-bezier ${viewMode === 'list' ? 'bg-[#C5A880] text-[#1C1917] font-black shadow-sm' : 'text-[#78716C]/70'}`}
+              className={`p-1.5 rounded-lg transition-bezier ${viewMode === 'list' ? 'bg-[#C5A880] text-white font-black shadow-sm' : 'text-[#78716C]/70'}`}
             >
               <List className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
-
+  
         {/* Быстрые выбранные фильтры */}
         {Object.values(filters).some(v => v !== null) && (
           <div className="flex space-x-1.5 overflow-x-auto py-1 scrollbar-none">
@@ -203,7 +203,7 @@ export default function Catalog() {
                 <X className="w-3 h-3 cursor-pointer text-[#C5A880]" onClick={() => setFilters({ brand: null })} />
               </span>
             )}
-            <button onClick={resetFilters} className="text-rose-600 hover:text-rose-700 text-[10px] font-extrabold px-2 py-1">
+            <button onClick={resetFilters} className="text-amber-700 hover:text-amber-800 text-[10px] font-extrabold px-2 py-1">
               Сбросить все
             </button>
           </div>
@@ -226,7 +226,7 @@ export default function Catalog() {
                 triggerHaptic('medium');
                 resetFilters();
               }}
-              className="px-6 py-3 bg-[#C5A880] text-[#1C1917] rounded-xl text-xs font-black cursor-pointer active:scale-95 transition-bezier shadow-md"
+              className="px-6 py-3 bg-[#C5A880] text-white rounded-xl text-xs font-black cursor-pointer active:scale-95 transition-bezier shadow-md"
             >
               Сбросить фильтры
             </button>
@@ -265,7 +265,7 @@ export default function Catalog() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     {/* Кнопка "Сторис" */}
-                    <div className="absolute top-2 left-2 bg-[#C5A880] text-[#1C1917] text-[7px] font-black px-1.5 py-0.5 rounded shadow-md flex items-center space-x-1 z-10">
+                    <div className="absolute top-2 left-2 bg-[#C5A880] text-white text-[7px] font-black px-1.5 py-0.5 rounded shadow-md flex items-center space-x-1 z-10">
                       <span className="w-1 h-1 bg-white rounded-full animate-ping"></span>
                       <span>STORIES</span>
                     </div>
@@ -335,7 +335,7 @@ export default function Catalog() {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     {/* Кнопка "Сторис" */}
-                    <div className="absolute top-2 left-2 bg-[#C5A880] text-[#1C1917] text-[7px] font-black px-1.5 py-0.5 rounded shadow-md flex items-center space-x-1 z-10">
+                    <div className="absolute top-2 left-2 bg-[#C5A880] text-white text-[7px] font-black px-1.5 py-0.5 rounded shadow-md flex items-center space-x-1 z-10">
                       <span className="w-1 h-1 bg-white rounded-full animate-ping"></span>
                       <span>STORIES</span>
                     </div>
@@ -429,7 +429,7 @@ export default function Catalog() {
                         }}
                         className={`text-xs px-3.5 py-1.5 rounded-xl border font-semibold transition cursor-pointer ${
                           filters.brand === brand
-                            ? 'bg-[#C5A880] border-[#C5A880] text-[#1C1917] shadow-md'
+                            ? 'bg-[#C5A880] border-[#C5A880] text-white shadow-md'
                             : 'bg-white border-[#EFEBE4] text-[#1C1917] hover:border-[#C5A880]/40'
                         }`}
                       >
@@ -456,7 +456,7 @@ export default function Catalog() {
                         }}
                         className={`text-xs py-2 rounded-xl border font-semibold transition text-center cursor-pointer ${
                           filters.country === c.id
-                            ? 'bg-[#C5A880] border-[#C5A880] text-[#1C1917] shadow-md'
+                            ? 'bg-[#C5A880] border-[#C5A880] text-white shadow-md'
                             : 'bg-white border-[#EFEBE4] text-[#1C1917]'
                         }`}
                       >
@@ -484,7 +484,7 @@ export default function Catalog() {
                         }}
                         className={`text-xs py-2 rounded-xl border font-semibold transition cursor-pointer ${
                           filters.fuel === fuel.id
-                            ? 'bg-[#C5A880] border-[#C5A880] text-[#1C1917] shadow-md'
+                            ? 'bg-[#C5A880] border-[#C5A880] text-white shadow-md'
                             : 'bg-white border-[#EFEBE4] text-[#1C1917]'
                         }`}
                       >
@@ -510,7 +510,7 @@ export default function Catalog() {
                         }}
                         className={`text-xs py-2.5 rounded-xl border font-semibold transition cursor-pointer ${
                           filters.condition === cond.id
-                            ? 'bg-[#C5A880] border-[#C5A880] text-[#1C1917] shadow-md'
+                            ? 'bg-[#C5A880] border-[#C5A880] text-white shadow-md'
                             : 'bg-white border-[#EFEBE4] text-[#1C1917]'
                         }`}
                       >
@@ -533,7 +533,7 @@ export default function Catalog() {
                         }}
                         className={`text-xs py-2 rounded-xl border font-semibold transition cursor-pointer ${
                           filters.priceMax === budget
-                            ? 'bg-[#C5A880] border-[#C5A880] text-[#1C1917] shadow-md'
+                            ? 'bg-[#C5A880] border-[#C5A880] text-white shadow-md'
                             : 'bg-white border-[#EFEBE4] text-[#1C1917]'
                         }`}
                       >
@@ -560,7 +560,7 @@ export default function Catalog() {
                 </button>
                 <button
                   onClick={handleCloseFilters}
-                  className="flex-1 py-3 bg-[#C5A880] hover:bg-[#B0936B] font-bold text-xs rounded-xl text-[#1C1917] cursor-pointer active:scale-95 transition-bezier shadow-md"
+                  className="flex-1 py-3 bg-[#C5A880] hover:bg-[#B0936B] font-bold text-xs rounded-xl text-white cursor-pointer active:scale-95 transition-bezier shadow-md"
                 >
                   Применить ({filteredCars.length})
                 </button>

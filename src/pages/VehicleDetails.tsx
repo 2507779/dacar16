@@ -102,11 +102,13 @@ export default function VehicleDetails() {
 
         {/* Страна и состояние */}
         <div className="absolute top-4 left-4 flex space-x-2 z-10">
-          <span className="bg-white/95 border border-black/[0.03] backdrop-blur-md text-[#1C1917] text-[10px] font-bold px-3 py-1 rounded-lg uppercase tracking-wider shadow-sm">
+          <span className="bg-white/95 border border-[#EFEBE4] backdrop-blur-md text-[#1C1917] text-[10px] font-bold px-3 py-1 rounded-lg uppercase tracking-wider shadow-sm">
             {car.country === 'China' ? 'Китай 🇨🇳' : car.country === 'South Korea' ? 'Корея 🇰🇷' : 'Киргизия 🇰🇬'}
           </span>
-          <span className={`text-[10px] font-bold px-3 py-1 rounded-lg uppercase tracking-wider border ${
-            car.condition === 'new' ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-[#C5A880] text-[#1C1917] border-[#C5A880] shadow-sm'
+          <span className={`text-[10px] font-bold px-3 py-1 rounded-lg uppercase tracking-wider border shadow-sm ${
+            car.condition === 'new' 
+              ? 'bg-[#C5A880] text-white border-[#C5A880]' 
+              : 'bg-[#1C1917] text-white border-[#1C1917]'
           }`}>
             {car.condition === 'new' ? 'Новый' : 'С пробегом'}
           </span>
@@ -140,7 +142,7 @@ export default function VehicleDetails() {
           </div>
 
           <div className="bg-white border border-[#EFEBE4] rounded-2xl p-3 flex flex-col justify-between shadow-sm text-center">
-            <Award className="w-4 h-4 text-emerald-600 mx-auto" />
+            <Award className="w-4 h-4 text-[#C5A880] mx-auto" />
             <span className="text-[9px] text-[#78716C] uppercase tracking-wider mt-1.5 font-mono">Мощность</span>
             <span className="text-xs font-bold text-[#1C1917] mt-0.5">
               {car.power} л.с.
@@ -268,9 +270,9 @@ export default function VehicleDetails() {
       <div className="px-4 mt-6">
         <button
           onClick={handleOpenOrderSheet}
-          className="w-full py-4 bg-[#C5A880] hover:bg-[#B0936B] active:scale-[0.98] transition-bezier text-[#1C1917] font-black text-xs uppercase tracking-widest rounded-2xl flex items-center justify-center space-x-2 shadow-md cursor-pointer"
+          className="w-full py-4 bg-[#C5A880] hover:bg-[#B0936B] active:scale-[0.98] transition-bezier text-white font-black text-xs uppercase tracking-widest rounded-2xl flex items-center justify-center space-x-2 shadow-md cursor-pointer"
         >
-          <Send className="w-4 h-4 fill-[#1C1917]" />
+          <Send className="w-4 h-4 fill-white text-white" />
           <span>Заказать этот авто под ключ</span>
         </button>
         <p className="text-[9px] text-[#78716C] text-center mt-2 font-mono">
@@ -354,10 +356,10 @@ export default function VehicleDetails() {
                 <div>
                   <label className="text-[10px] font-bold uppercase text-[#78716C] block mb-1.5 font-mono">Город получения</label>
                   <input
-                    type="text"
-                    disabled
-                    value={selectedCity}
-                    className="w-full bg-[#FAF8F5] border border-[#EFEBE4]/60 text-xs font-bold text-[#78716C]/70 rounded-xl px-4 py-3.5 outline-none cursor-not-allowed"
+                     type="text"
+                     disabled
+                     value={selectedCity}
+                     className="w-full bg-[#FAF8F5] border border-[#EFEBE4]/60 text-xs font-bold text-[#78716C]/70 rounded-xl px-4 py-3.5 outline-none cursor-not-allowed"
                   />
                 </div>
 
@@ -366,7 +368,7 @@ export default function VehicleDetails() {
                   disabled={!isFormValid}
                   className={`w-full py-4 rounded-xl text-xs font-black uppercase tracking-wider transition-bezier mt-6 cursor-pointer shadow-md ${
                     isFormValid
-                      ? 'bg-[#C5A880] text-[#1C1917] hover:bg-[#B0936B] active:scale-95'
+                      ? 'bg-[#C5A880] text-white hover:bg-[#B0936B] active:scale-95'
                       : 'bg-[#EFEBE4]/40 text-[#78716C]/50 border border-[#EFEBE4]/50 cursor-not-allowed'
                   }`}
                 >
@@ -387,7 +389,7 @@ export default function VehicleDetails() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-[#FAF8F5] z-50 flex flex-col justify-center items-center text-center p-6 select-none"
           >
-            <div className="w-20 h-20 bg-[#C5A880] rounded-full flex items-center justify-center text-[#1C1917] shadow-lg mb-6 animate-bounce">
+            <div className="w-20 h-20 bg-[#C5A880] rounded-full flex items-center justify-center text-white shadow-lg mb-6 animate-bounce">
               <Check className="w-10 h-10 stroke-[3]" />
             </div>
             

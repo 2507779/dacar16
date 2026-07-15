@@ -52,9 +52,9 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-[#FAF8F5] p-0 sm:p-4 font-sans selection:bg-[#C5A880] selection:text-white">
+    <div className="flex justify-center items-center min-h-screen bg-[#FAF8F5] p-0 sm:p-4 font-sans selection:bg-[#C5A880]/20 selection:text-[#1C1917]">
       {/* Контейнер смартфона/Mini App */}
-      <div className="w-full max-w-[440px] h-[100dvh] sm:h-[880px] bg-[#FAF8F5] sm:rounded-[40px] shadow-[0_24px_64px_rgba(197,168,128,0.06)] overflow-hidden flex flex-col border border-[#EFEBE4] relative">
+      <div className="w-full max-w-[440px] h-[100dvh] sm:h-[880px] bg-[#FAF8F5] sm:rounded-[40px] shadow-[0_24px_64px_rgba(197,168,128,0.04)] overflow-hidden flex flex-col border border-[#EFEBE4] relative">
         
         {/* Анимация закрытого приложения (эмуляция чата Telegram) */}
         <AnimatePresence>
@@ -63,23 +63,23 @@ export default function Layout({ children }: LayoutProps) {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="absolute inset-0 z-50 bg-[#F8FAFC] flex flex-col text-[#0F172A]"
+              className="absolute inset-0 z-50 bg-[#FAF8F5] flex flex-col text-[#1C1917]"
             >
               {/* Шапка чата Telegram */}
-              <div className="bg-white p-3 flex items-center justify-between border-b border-[#E2E8F0]/40 shadow-sm">
+              <div className="bg-white p-3 flex items-center justify-between border-b border-[#EFEBE4]/40 shadow-sm">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-[#2563EB] rounded-full flex items-center justify-center font-display font-black text-white shadow-md">
+                  <div className="w-10 h-10 bg-[#C5A880] rounded-full flex items-center justify-center font-display font-black text-white shadow-md">
                     DC
                   </div>
                   <div>
-                    <div className="font-semibold flex items-center text-sm font-display tracking-wide text-[#0F172A]">
+                    <div className="font-semibold flex items-center text-sm font-display tracking-wide text-[#1C1917]">
                       DA!CAR | Импорт Авто 🚘
-                      <span className="ml-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-[8px] text-white">✓</span>
+                      <span className="ml-1 w-4 h-4 bg-[#C5A880] rounded-full flex items-center justify-center text-[8px] text-white">✓</span>
                     </div>
-                    <div className="text-xs text-[#2563EB] font-semibold">бот</div>
+                    <div className="text-xs text-[#C5A880] font-semibold">бот</div>
                   </div>
                 </div>
-                <div className="flex items-center space-x-3 text-[#64748B]">
+                <div className="flex items-center space-x-3 text-[#78716C]">
                   <MoreVertical className="w-5 h-5 cursor-pointer" />
                 </div>
               </div>
@@ -112,7 +112,7 @@ export default function Layout({ children }: LayoutProps) {
                     triggerHaptic('success');
                     setIsAppClosed(false);
                   }}
-                  className="w-full py-3.5 bg-[#1C1917] hover:bg-stone-850 active:scale-[0.98] transition duration-200 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl flex items-center justify-center space-x-2 shadow-md cursor-pointer"
+                  className="w-full py-3.5 bg-[#C5A880] hover:bg-[#B0936B] active:scale-[0.98] transition duration-200 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl flex items-center justify-center space-x-2 shadow-md cursor-pointer"
                 >
                   <Car className="w-4 h-4 text-white fill-white" />
                   <span>Открыть Салон DA!CAR</span>
@@ -127,7 +127,7 @@ export default function Layout({ children }: LayoutProps) {
                     placeholder="Написать боту..."
                     className="flex-1 bg-transparent text-[#1C1917] outline-none placeholder-gray-400 text-sm"
                   />
-                  <button onClick={handleSendMessage} className="text-[#1C1917] hover:opacity-85">
+                  <button onClick={handleSendMessage} className="text-[#C5A880] hover:opacity-85">
                     <Send className="w-5 h-5" />
                   </button>
                 </div>
@@ -145,7 +145,7 @@ export default function Layout({ children }: LayoutProps) {
                   triggerHaptic('light');
                   setActiveCarId(null);
                 }}
-                className="p-1.5 hover:bg-[#EFEBE4]/60 rounded-full transition"
+                className="p-1.5 hover:bg-[#EFEBE4] rounded-full transition"
               >
                 <ArrowLeft className="w-4 h-4 text-[#1C1917]" />
               </button>
@@ -157,7 +157,7 @@ export default function Layout({ children }: LayoutProps) {
             <div>
               <div className="font-display font-bold text-xs tracking-wide flex items-center text-[#1C1917]">
                 DA!CAR — Салон Премиум Импорта
-                <span className="ml-1 w-3.5 h-3.5 bg-[#1C1917] rounded-full flex items-center justify-center text-[7px] text-[#C5A880] font-black">
+                <span className="ml-1 w-3.5 h-3.5 bg-[#C5A880] rounded-full flex items-center justify-center text-[7px] text-white font-black">
                   ✓
                 </span>
               </div>
@@ -171,7 +171,7 @@ export default function Layout({ children }: LayoutProps) {
                 triggerHaptic('heavy');
                 setIsAppClosed(true);
               }}
-              className="p-1.5 bg-[#EFEBE4]/40 hover:bg-[#EFEBE4]/70 active:scale-95 rounded-full transition cursor-pointer border border-black/[0.03]"
+              className="p-1.5 bg-[#EFEBE4]/60 hover:bg-[#EFEBE4]/90 active:scale-95 rounded-full transition cursor-pointer border border-black/[0.03]"
               title="Закрыть Mini App"
             >
               <X className="w-3.5 h-3.5 text-red-500 font-bold" />
@@ -232,7 +232,7 @@ export default function Layout({ children }: LayoutProps) {
             <div className="relative">
               <Package className={`w-4 h-4 transition-transform duration-250 ${currentTab === 'orders' ? 'scale-115 text-[#C5A880]' : ''}`} />
               {orders.length > 0 && (
-                <span className="absolute -top-1.5 -right-2 bg-[#C5A880] text-[#1C1917] text-[8px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center shadow-md border border-white">
+                <span className="absolute -top-1.5 -right-2 bg-[#C5A880] text-white text-[8px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center shadow-md border border-white">
                   {orders.length}
                 </span>
               )}

@@ -69,17 +69,17 @@ export default function Home() {
         >
           {/* Overlay to ensure ultra-premium look */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#1C1917] via-[#1C1917]/40 to-black/20 z-0" />
-          {/* Warm gold glow background effect if no image */}
+          {/* Premium blue glow background effect if no image */}
           {!homepageBannerUrl && (
             <>
-              <div className="absolute inset-0 bg-gradient-to-br from-[#2E2A25] via-[#1C1917] to-stone-900 z-0" />
+              <div className="absolute inset-0 bg-gradient-to-br from-[#2D2A26] via-[#1C1917] to-[#0E0C0A] z-0" />
               <div className="absolute -top-12 -right-12 w-60 h-60 bg-[#C5A880]/15 rounded-full blur-[80px] z-0" />
             </>
           )}
 
           <div className="flex justify-between items-start z-10">
             <div>
-              <span className="bg-[#C5A880] text-[#1C1917] text-[8px] font-black uppercase px-2 py-0.5 rounded tracking-wider shadow-sm">
+              <span className="bg-[#C5A880] text-white text-[8px] font-black uppercase px-2 py-0.5 rounded tracking-wider shadow-sm">
                 Luxury Concierge
               </span>
               <h2 className="font-display text-xl font-black mt-2 leading-tight tracking-tight text-white uppercase">
@@ -96,7 +96,7 @@ export default function Home() {
 
           <div className="flex justify-between items-end z-10 border-t border-white/10 pt-3 mt-2">
             <div>
-              <p className="text-[8px] text-stone-400 uppercase tracking-widest font-mono">Главный шоурум</p>
+              <p className="text-[8px] text-slate-400 uppercase tracking-widest font-mono">Главный шоурум</p>
               <p className="text-[11px] font-bold text-white mt-0.5">г. Казань, ул. Серова, 48 к2</p>
             </div>
             <button
@@ -208,7 +208,7 @@ export default function Home() {
                 viewport={{ once: true, margin: '-10px' }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
                 onClick={() => handleOpenCar(car.id)}
-                className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/25 rounded-3xl overflow-hidden flex flex-col shadow-sm cursor-pointer group"
+                className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/25 rounded-3xl overflow-hidden flex flex-col shadow-sm cursor-pointer group animate-fade-in"
               >
                 <div 
                   onClick={(e) => {
@@ -226,7 +226,7 @@ export default function Home() {
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   {/* Stories badge */}
-                  <div className="absolute top-3 left-3 bg-[#C5A880] text-[#1C1917] text-[8px] font-black px-1.5 py-0.5 rounded shadow-lg flex items-center space-x-0.5 z-10">
+                  <div className="absolute top-3 left-3 bg-[#C5A880] text-white text-[8px] font-black px-1.5 py-0.5 rounded shadow-lg flex items-center space-x-0.5 z-10">
                     <span className="w-1 h-1 bg-white rounded-full animate-ping"></span>
                     <span>STORIES</span>
                   </div>
@@ -304,7 +304,7 @@ export default function Home() {
           <div className="grid grid-cols-2 gap-4 text-left border-y border-[#EFEBE4] py-3 mb-3">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 rounded-full bg-white border border-[#EFEBE4] flex items-center justify-center text-stone-700 shrink-0">
-                <Globe className="w-3.5 h-3.5" />
+                <Globe className="w-3.5 h-3.5 text-[#C5A880]" />
               </div>
               <div>
                 <p className="text-[7.5px] text-[#78716C] font-mono uppercase tracking-wider">Сайт</p>
@@ -314,7 +314,7 @@ export default function Home() {
 
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 rounded-full bg-white border border-[#EFEBE4] flex items-center justify-center text-stone-700 shrink-0">
-                <MapPin className="w-3.5 h-3.5" />
+                <MapPin className="w-3.5 h-3.5 text-[#C5A880]" />
               </div>
               <div>
                 <p className="text-[7.5px] text-[#78716C] font-mono uppercase tracking-wider">Адрес</p>
@@ -331,13 +331,13 @@ export default function Home() {
 
       {/* Кнопка заказа особого подбора */}
       <div className="px-4 mt-6">
-        <div className="bg-[#1C1917] rounded-3xl p-5 flex items-center justify-between shadow-lg relative overflow-hidden">
+        <div className="bg-[#1C1917] rounded-3xl p-5 flex items-center justify-between shadow-lg relative overflow-hidden border border-[#EFEBE4]/20">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,rgba(197,168,128,0.15),transparent)] pointer-events-none" />
           <div className="max-w-[70%] z-10">
             <h4 className="font-display font-black text-[11px] text-white uppercase tracking-wider">
               Индивидуальный консьерж-подбор
             </h4>
-            <p className="text-[10px] text-stone-300 font-bold mt-1 leading-tight">
+            <p className="text-[10px] text-slate-300 font-bold mt-1 leading-tight">
               Оставьте заявку — куратор свяжется с вами для детального согласования
             </p>
           </div>
@@ -348,7 +348,7 @@ export default function Home() {
             }}
             className="w-10 h-10 bg-[#C5A880] hover:bg-[#B0936B] transition active:scale-95 rounded-full flex items-center justify-center text-white cursor-pointer shadow-md z-10"
           >
-            <MessageSquare className="w-4 h-4 text-[#1C1917] fill-[#1C1917]" />
+            <MessageSquare className="w-4 h-4 text-white fill-white" />
           </button>
         </div>
       </div>

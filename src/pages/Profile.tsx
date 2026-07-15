@@ -113,7 +113,7 @@ export default function Profile() {
       <div className="px-4 pt-6 pb-4 bg-[#FAF8F5] border-b border-[#EFEBE4]/40 flex items-center space-x-4">
         <div 
           onClick={handleAvatarClick}
-          className="w-16 h-16 bg-[#C5A880] rounded-full flex items-center justify-center font-display font-black text-[#1C1917] text-xl shadow-md relative shrink-0 cursor-pointer active:scale-95 transition-transform"
+          className="w-16 h-16 bg-[#C5A880] rounded-full flex items-center justify-center font-display font-black text-white text-xl shadow-md relative shrink-0 cursor-pointer active:scale-95 transition-transform"
         >
           U
           <span className="absolute bottom-0 right-0 w-5 h-5 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center text-[8px] text-white font-black">✓</span>
@@ -124,7 +124,7 @@ export default function Profile() {
           </h2>
           <p className="text-xs text-[#78716C] truncate font-mono">tg_user_id: 841b57fe</p>
           <div className="flex space-x-2 mt-1.5">
-            <span className="bg-[#C5A880]/15 text-[#1C1917] text-[9px] font-black px-3 py-0.5 rounded-full uppercase tracking-wider border border-[#C5A880]/20 font-mono">
+            <span className="bg-[#C5A880]/15 text-[#C5A880] text-[9px] font-black px-3 py-0.5 rounded-full uppercase tracking-wider border border-[#C5A880]/20 font-mono">
               Активных заказов: {orders.length}
             </span>
           </div>
@@ -191,7 +191,7 @@ export default function Profile() {
             <MapPin className="w-5 h-5 text-[#C5A880] shrink-0 mt-0.5" />
             <div>
               <h4 className="font-bold text-[#1C1917]">Шоурум в Казани</h4>
-              <p className="text-[10px] text-[#64748B] leading-normal mt-0.5 font-sans font-medium">
+              <p className="text-[10px] text-[#78716C] leading-normal mt-0.5 font-sans font-medium">
                 Приезжайте знакомиться лично! г. Казань, ул. Серова, д. 48, к. 2. Рады видеть вас каждый день с 10:00 до 20:00.
               </p>
             </div>
@@ -260,7 +260,7 @@ export default function Profile() {
               {/* Шапка чата */}
               <div className="flex justify-between items-center pb-3 border-b border-[#EFEBE4]/65 shrink-0 text-[#1C1917]">
                 <div className="flex items-center space-x-3.5">
-                  <div className="w-9 h-9 bg-[#C5A880] rounded-full flex items-center justify-center font-black text-[#1C1917] text-xs shadow-md">
+                  <div className="w-9 h-9 bg-[#C5A880] rounded-full flex items-center justify-center font-black text-white text-xs shadow-md">
                     DA
                   </div>
                   <div>
@@ -286,7 +286,7 @@ export default function Profile() {
                     key={index}
                     className={`max-w-[85%] rounded-2xl p-3 flex flex-col shadow-md ${
                       msg.sender === 'user'
-                        ? 'bg-[#C5A880] text-[#1C1917] self-end rounded-tr-none font-black'
+                        ? 'bg-[#C5A880] text-white self-end rounded-tr-none font-black'
                         : 'bg-white border border-[#EFEBE4]/60 text-[#1C1917] self-start rounded-tl-none font-medium'
                     }`}
                   >

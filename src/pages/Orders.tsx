@@ -54,7 +54,7 @@ export default function Orders() {
                 triggerHaptic('medium');
                 setCurrentTab('catalog');
               }}
-              className="px-6 py-3 bg-[#C5A880] hover:bg-[#B0936B] text-[#1C1917] rounded-xl text-xs font-black cursor-pointer active:scale-95 transition-bezier shadow-md"
+              className="px-6 py-3 bg-[#C5A880] hover:bg-[#B0936B] text-white rounded-xl text-xs font-black cursor-pointer active:scale-95 transition-bezier shadow-md"
             >
               Открыть каталог
             </button>
@@ -92,7 +92,7 @@ export default function Orders() {
                     <div className="flex-1 min-w-0">
                       <div className="flex justify-between items-start">
                         <span className="text-[9px] text-[#78716C] uppercase font-mono">ID: {order.id.slice(-8).toUpperCase()}</span>
-                        <span className="text-[9px] bg-[#C5A880] text-[#1C1917] font-black px-2 py-0.5 rounded-md uppercase tracking-wider shadow-sm">
+                        <span className="text-[9px] bg-[#C5A880] text-white font-black px-2 py-0.5 rounded-md uppercase tracking-wider shadow-sm">
                           {currentStatusObj?.label}
                         </span>
                       </div>
@@ -158,9 +158,9 @@ export default function Orders() {
                             {order.status !== 'completed' ? (
                               <button
                                 onClick={(e) => handleAdvanceProgress(e, order.id)}
-                                className="mt-3.5 px-4 py-2 bg-[#C5A880] hover:bg-[#B0936B] transition text-[#1C1917] rounded-xl text-[10px] font-black flex items-center space-x-1.5 cursor-pointer active:scale-95 transition-bezier shadow-sm"
+                                className="mt-3.5 px-4 py-2 bg-[#C5A880] hover:bg-[#B0936B] transition text-white rounded-xl text-[10px] font-black flex items-center space-x-1.5 cursor-pointer active:scale-95 transition-bezier shadow-sm"
                               >
-                                <Play className="w-3.5 h-3.5 text-[#1C1917] fill-[#1C1917]" />
+                                <Play className="w-3.5 h-3.5 text-white fill-white" />
                                 <span>Продвинуть на этап: {ORDER_STATUSES[currentStatusIndex + 1]?.label}</span>
                               </button>
                             ) : (
@@ -189,7 +189,7 @@ export default function Orders() {
                                 {/* Иконка точки на линии */}
                                 <span className={`absolute -left-[30.5px] top-0.5 rounded-full w-4 h-4 flex items-center justify-center border-2 transition-all duration-300 ${
                                   isStepCompleted
-                                    ? 'bg-[#C5A880] border-[#C5A880] text-[#1C1917] text-[8px] font-black shadow-sm'
+                                    ? 'bg-[#C5A880] border-[#C5A880] text-white text-[8px] font-black shadow-sm'
                                     : isStepActive
                                       ? 'bg-white border-[#C5A880] text-[#C5A880] shadow-[0_0_8px_rgba(197,168,128,0.22)] animate-pulse'
                                       : 'bg-white border-[#EFEBE4] text-[#78716C]'

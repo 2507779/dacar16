@@ -46,7 +46,7 @@ export default function Favorites() {
             }}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition active:scale-95 cursor-pointer border shadow-sm ${
               isCompareMode
-                ? 'bg-[#C5A880] border-[#C5A880] text-[#1C1917]'
+                ? 'bg-[#C5A880] border-[#C5A880] text-white shadow-md'
                 : 'bg-white border-[#EFEBE4] text-[#1C1917] hover:border-[#C5A880]/40 hover:bg-[#FAF8F5]'
             }`}
           >
@@ -75,7 +75,7 @@ export default function Favorites() {
                 triggerHaptic('medium');
                 setCurrentTab('catalog');
               }}
-              className="px-5 py-2.5 bg-[#C5A880] hover:bg-[#B0936B] text-[#1C1917] rounded-xl text-xs font-black cursor-pointer active:scale-95 transition flex items-center space-x-1.5 shadow-md"
+              className="px-5 py-2.5 bg-[#C5A880] hover:bg-[#B0936B] text-white rounded-xl text-xs font-black cursor-pointer active:scale-95 transition flex items-center space-x-1.5 shadow-md"
             >
               <span>Открыть каталог</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -147,7 +147,9 @@ export default function Favorites() {
                     {favoriteCars.map(car => (
                       <td key={car.id} className="py-2.5 px-3 text-center font-semibold">
                         <span className={`text-[9px] px-1.5 py-0.5 rounded-md border ${
-                          car.condition === 'new' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-[#C5A880]/10 text-[#C5A880] border-[#C5A880]/20'
+                          car.condition === 'new' 
+                            ? 'bg-[#C5A880]/10 text-[#C5A880] border-[#C5A880]/20' 
+                            : 'bg-[#1C1917]/10 text-[#1C1917] border-[#1C1917]/20'
                         }`}>
                           {car.condition === 'new' ? 'Новый' : `${car.mileage.toLocaleString()} км`}
                         </span>
@@ -182,7 +184,7 @@ export default function Favorites() {
                       <td key={car.id} className="py-3 px-3 text-center">
                         <button
                           onClick={() => handleOpenCar(car.id)}
-                          className="bg-[#C5A880] hover:bg-[#B0936B] text-[#1C1917] px-3 py-1.5 rounded-lg text-[9px] font-bold active:scale-95 transition-bezier cursor-pointer shadow-sm"
+                          className="bg-[#C5A880] hover:bg-[#B0936B] text-white px-3 py-1.5 rounded-lg text-[9px] font-bold active:scale-95 transition-bezier cursor-pointer shadow-sm"
                         >
                           Открыть карточку
                         </button>

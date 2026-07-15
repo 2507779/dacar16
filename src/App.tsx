@@ -26,12 +26,17 @@ export default function App() {
     if (tg) {
       tg.ready();
       tg.expand();
-      if (tg.enableClosingConfirmation) {
+      
+      // Closing confirmation is supported in Telegram WebApp API 6.2+
+      if (tg.isVersionAtLeast?.('6.2') && tg.enableClosingConfirmation) {
         tg.enableClosingConfirmation();
       }
-      // Установим премиальные светлые цвета шапки и фона для соответствия дизайну 2026 года
-      tg.setHeaderColor?.('#FAF8F5'); // Alabaster/Pearl
-      tg.setBackgroundColor?.('#FAF8F5');
+      
+      // Header and Background colors are supported in Telegram WebApp API 6.1+
+      if (tg.isVersionAtLeast?.('6.1')) {
+        tg.setHeaderColor?.('#FAF8F5'); // Warm Linen
+        tg.setBackgroundColor?.('#FAF8F5');
+      }
     }
 
     // Скрыть заставку через 2.8 секунды
@@ -136,7 +141,7 @@ export default function App() {
             className="fixed inset-0 bg-[#FAF8F5] z-50 flex flex-col items-center justify-between py-12 px-6 select-none overflow-hidden"
           >
             {/* Top glowing ambient background effect */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[300px] bg-[#C5A880]/12 blur-[120px] rounded-full pointer-events-none" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[300px] bg-[#C5A880]/8 blur-[120px] rounded-full pointer-events-none" />
 
             {/* Middle Logo & Title */}
             <div className="flex-1 flex flex-col items-center justify-center space-y-4">
@@ -149,7 +154,7 @@ export default function App() {
                 <img 
                   src="/logo.png" 
                   alt="DA!CAR Logo" 
-                  className="w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(28,25,23,0.12)]"
+                  className="w-full h-full object-contain filter drop-shadow-[0_12px_24px_rgba(28,25,23,0.08)]"
                 />
               </motion.div>
               
@@ -176,19 +181,19 @@ export default function App() {
 
             {/* Bottom Elegant Progress Loader */}
             <div className="w-full max-w-[200px] flex flex-col items-center space-y-4 relative z-10">
-              <div className="w-full h-[2px] bg-[#1A1A1E]/10 rounded-full overflow-hidden">
+              <div className="w-full h-[2px] bg-[#C5A880]/10 rounded-full overflow-hidden">
                 <motion.div
                   initial={{ width: "0%" }}
                   animate={{ width: "100%" }}
                   transition={{ duration: 2.6, ease: "easeInOut" }}
-                  className="h-full bg-gradient-to-r from-[#C2A265] via-[#D4B880] to-[#C2A265] rounded-full"
+                  className="h-full bg-gradient-to-r from-[#C5A880] via-[#EFEBE4] to-[#C5A880] rounded-full"
                 />
               </div>
               <motion.span
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.4 }}
                 transition={{ delay: 0.8 }}
-                className="text-[9px] font-mono tracking-wider text-[#1A1A1E] uppercase"
+                className="text-[9px] font-mono tracking-wider text-[#1C1917] uppercase"
               >
                 Загрузка каталога...
               </motion.span>
