@@ -96,7 +96,7 @@ export default function Home() {
 
           <div className="flex justify-between items-end z-10 border-t border-white/10 pt-3 mt-2">
             <div>
-              <p className="text-[8px] text-stone-400 uppercase tracking-widest font-mono">Главный офис</p>
+              <p className="text-[8px] text-stone-400 uppercase tracking-widest font-mono">Главный шоурум</p>
               <p className="text-[11px] font-bold text-white mt-0.5">г. Казань, ул. Серова, 48 к2</p>
             </div>
             <button
@@ -122,8 +122,8 @@ export default function Home() {
         <div className="grid grid-cols-3 gap-2 mt-2">
           {[
             { id: 'China', label: 'Китай 🇨🇳', desc: 'Электро / Гибриды' },
-            { id: 'South Korea', label: 'Корея 🇰🇷', desc: 'Бензин / Газ' },
-            { id: 'Kyrgyzstan', label: 'Киргизия 🇰🇬', desc: 'Быстрая доставка' }
+            { id: 'South Korea', label: 'Корея 🇰🇷', desc: 'Дизель / Бензин' },
+            { id: 'Kyrgyzstan', label: 'Киргизия 🇰🇬', desc: 'Мгновенный транзит' }
           ].map((c) => (
             <button
               key={c.id}
@@ -178,12 +178,12 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Лидеры продаж */}
+      {/* Горячие предложения */}
       <div className="px-4 mt-6">
         <div className="flex justify-between items-center mb-2.5">
           <h3 className="font-display text-[9px] font-black uppercase tracking-widest text-[#78716C] flex items-center space-x-1">
             <Flame className="w-3 h-3 text-[#C5A880] fill-[#C5A880]" />
-            <span>Популярные модели</span>
+            <span>Горячие предложения каталога</span>
           </h3>
           <button
             onClick={() => {
@@ -282,8 +282,8 @@ export default function Home() {
           {[
             { id: 'electric', label: 'Электрокары ⚡', key: 'engineType' },
             { id: 'hybrid', label: 'Гибриды 🔋', key: 'engineType' },
-            { id: 'gasoline', label: 'Бензиновые ⛽', key: 'engineType' },
             { id: 'diesel', label: 'Дизельные ⚙️', key: 'engineType' },
+            { id: 'gasoline', label: 'Бензиновые ⛽', key: 'engineType' },
           ].map((cat) => (
             <button
               key={cat.id}
@@ -324,7 +324,7 @@ export default function Home() {
           </div>
 
           <p className="text-[7.5px] text-[#78716C] font-black uppercase tracking-wider">
-            Опыт с 2022 года • Местное доверие • Индивидуальный подход
+            Мировой опыт • Местное доверие • Индивидуальный подход
           </p>
         </div>
       </div>
@@ -338,7 +338,7 @@ export default function Home() {
               Индивидуальный консьерж-подбор
             </h4>
             <p className="text-[10px] text-stone-300 font-bold mt-1 leading-tight">
-              Оставьте заявку — менеджер свяжется с вами для детального согласования
+              Оставьте заявку — куратор свяжется с вами для детального согласования
             </p>
           </div>
           <button

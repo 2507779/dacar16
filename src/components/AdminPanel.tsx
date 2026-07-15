@@ -572,6 +572,85 @@ export const CARS_DATA: Car[] = ${formattedCars};
     }
   };
 
+  const handleReplacePhoto = (carId: string, index: number, file: File | null) => {
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Файл слишком большой! Пожалуйста, выберите изображение до 5 МБ.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') {
+        const targetCar = cars.find(c => c.id === carId);
+        if (targetCar) {
+          triggerHaptic('medium');
+          const updatedImages = [...targetCar.images];
+          updatedImages[index] = reader.result;
+          editCar(carId, { ...targetCar, images: updatedImages });
+        }
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleUploadNewPhoto = (carId: string, file: File | null) => {
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Файл слишком большой! Пожалуйста, выберите изображение до 5 МБ.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') {
+        const targetCar = cars.find(c => c.id === carId);
+        if (targetCar) {
+          triggerHaptic('medium');
+          const updatedGallery = [...targetCar.images, reader.result];
+          editCar(carId, { ...targetCar, images: updatedGallery });
+        }
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleAddPresetToCar = (carId: string, presetPath: string) => {
+    const targetCar = cars.find(c => c.id === carId);
+    if (targetCar) {
+      triggerHaptic('medium');
+      const updatedGallery = [...targetCar.images, presetPath];
+      editCar(carId, { ...targetCar, images: updatedGallery });
+    }
+  };
+
+  const handleUploadForNewCar = (file: File | null) => {
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Файл слишком большой! Пожалуйста, выберите изображение до 5 МБ.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') {
+        triggerHaptic('medium');
+        setNewImgUrl(prev => {
+          const lines = prev.split('\n').map(l => l.trim()).filter(Boolean);
+          lines.push(reader.result as string);
+          return lines.join('\n');
+        });
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleAddPresetForNewCar = (presetPath: string) => {
+    triggerHaptic('medium');
+    setNewImgUrl(prev => {
+      const lines = prev.split('\n').map(l => l.trim()).filter(Boolean);
+      lines.push(presetPath);
+      return lines.join('\n');
+    });
+  };
+
   // Автопостинг в Telegram симуляция
   const handleAutopostSimulate = () => {
     const targetCar = cars.find(c => c.id === autopostCarId);
@@ -1984,27 +2063,76 @@ export const CARS_DATA: Car[] = ${formattedCars};
 
                         {/* ШАГ 4: ФОТОГРАФИИ, ОПИСАНИЕ И ОПЦИИ */}
                         {formSection === 'media' && (
-                          <div className="space-y-3">
-                            <div className="space-y-1">
-                              <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">
-                                Ссылки на фото (каждая с новой строки) *
-                              </label>
-                              <textarea
-                                value={newImgUrl}
-                                onChange={(e) => setNewImgUrl(e.target.value)}
-                                rows={3}
-                                placeholder="https://t.me/your_channel/123&#10;https://t.me/your_channel/124"
-                                className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-xs outline-none text-[#111827] font-mono text-[9.5px] resize-y"
-                              />
-                              <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-1.5 gap-1.5">
-                                <p className="text-[7.5px] text-[#64748B] leading-normal font-medium max-w-full sm:max-w-[70%]">
-                                  💡 Вставьте ссылки на посты в Telegram и нажмите кнопку справа для конвертации в фото!
-                                </p>
+                          <div className="space-y-3.5">
+                            {/* СЕКЦИЯ УПРАВЛЕНИЯ ФОТОГРАФИЯМИ */}
+                            <div className="bg-[#FAF8F5] border border-[#E5E7EB] p-3 rounded-2xl space-y-3 shadow-inner">
+                              <div className="flex justify-between items-center">
+                                <label className="block text-[9px] text-[#111827] uppercase font-black font-mono">
+                                  📸 ФОТОГАЛЕРЕЯ АВТОМОБИЛЯ
+                                </label>
+                                <span className="text-[8px] font-bold text-[#64748B] font-mono">
+                                  Добавлено: {newImgUrl.split('\n').map(u => u.trim()).filter(Boolean).length}
+                                </span>
+                              </div>
+
+                              {/* СЕТКА ПРЕВЬЮ УЖЕ ДОБАВЛЕННЫХ ФОТО */}
+                              {(() => {
+                                const currentAdded = newImgUrl.split('\n').map(u => u.trim()).filter(Boolean);
+                                if (currentAdded.length === 0) return null;
+                                return (
+                                  <div className="grid grid-cols-4 gap-1.5 border border-dashed border-[#E5E7EB] p-1.5 rounded-xl bg-white max-h-[140px] overflow-y-auto">
+                                    {currentAdded.map((img, idx) => (
+                                      <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border border-[#E5E7EB] group">
+                                        <img src={img} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
+                                        <button
+                                          type="button"
+                                          onClick={() => {
+                                            triggerHaptic('medium');
+                                            setNewImgUrl(prev => {
+                                              const lines = prev.split('\n').map(l => l.trim()).filter(Boolean);
+                                              lines.splice(idx, 1);
+                                              return lines.join('\n');
+                                            });
+                                          }}
+                                          className="absolute top-0.5 right-0.5 p-1 bg-red-600/90 text-white rounded hover:bg-red-700 transition"
+                                          title="Удалить"
+                                        >
+                                          <Trash2 className="w-2 h-2" />
+                                        </button>
+                                        <div className="absolute bottom-0 inset-x-0 bg-black/60 text-[6.5px] text-white font-mono text-center py-0.5 truncate">
+                                          #{idx + 1}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                );
+                              })()}
+
+                              {/* КНОПКИ ЗАГРУЗКИ И ПРЕОБРАЗОВАНИЯ */}
+                              <div className="grid grid-cols-2 gap-2">
+                                {/* КНОПКА ЗАГРУЗКИ ФАЙЛА */}
+                                <label className="py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl text-[9.5px] transition flex items-center justify-center space-x-1 cursor-pointer shadow-sm">
+                                  <Upload className="w-3.5 h-3.5" />
+                                  <span>Загрузить с телефона/ПК</span>
+                                  <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={(e) => {
+                                      const file = e.target.files?.[0] || null;
+                                      handleUploadForNewCar(file);
+                                      // сбросить инпут, чтобы можно было загрузить тот же файл
+                                      e.target.value = '';
+                                    }}
+                                  />
+                                </label>
+
+                                {/* КНОПКА ИМПОРТА ИЗ TG */}
                                 <button
                                   type="button"
                                   onClick={resolveTelegramLinks}
                                   disabled={isResolvingTGLinks}
-                                  className="text-[8px] bg-[#C5A880]/10 text-[#C5A880] hover:bg-[#C5A880]/20 disabled:bg-stone-100 disabled:text-stone-400 font-extrabold uppercase px-2.5 py-1.5 rounded-lg border border-[#C5A880]/20 transition-all flex items-center justify-center space-x-1 shrink-0 self-end sm:self-auto cursor-pointer font-mono"
+                                  className="py-2 px-3 bg-[#C5A880]/15 text-[#C5A880] hover:bg-[#C5A880]/25 disabled:bg-stone-100 disabled:text-stone-400 font-extrabold rounded-xl text-[9.5px] transition flex items-center justify-center space-x-1 cursor-pointer border border-[#C5A880]/25 font-mono"
                                 >
                                   {isResolvingTGLinks ? (
                                     <>
@@ -2013,14 +2141,57 @@ export const CARS_DATA: Car[] = ${formattedCars};
                                     </>
                                   ) : (
                                     <>
-                                      <Sparkles className="w-2.5 h-2.5 mr-0.5 text-[#C5A880]" />
-                                      <span>Конвертировать TG-посты</span>
+                                      <Sparkles className="w-3 h-3 text-[#C5A880]" />
+                                      <span>Импорт TG-ссылок</span>
                                     </>
                                   )}
                                 </button>
                               </div>
+
+                              {/* БЫСТРЫЙ ВЫБОР ИЗ ПАПКИ GITHUB /PUBLIC/CARS/ */}
+                              <div className="bg-white border border-[#E5E7EB] p-2 rounded-xl space-y-1.5">
+                                <span className="text-[7.5px] font-black text-[#64748B] uppercase tracking-wide font-mono block">
+                                  📂 БЫСТРЫЙ ВЫБОР ИЗ ПАПКИ РЕПОЗИТОРИЯ (/public/cars/):
+                                </span>
+                                <div className="grid grid-cols-3 gap-1.5">
+                                  {[
+                                    { path: '/cars/zeekr_001.jpg', name: 'Zeekr 001' },
+                                    { path: '/cars/geely_monjaro.jpg', name: 'Monjaro' },
+                                    { path: '/cars/li_l9.jpg', name: 'Li L9' }
+                                  ].map((preset) => (
+                                    <button
+                                      key={preset.path}
+                                      type="button"
+                                      onClick={() => handleAddPresetForNewCar(preset.path)}
+                                      className="border border-[#E5E7EB] hover:border-blue-500 rounded-lg overflow-hidden transition text-left group bg-[#FAF8F5] active:scale-95"
+                                    >
+                                      <img src={preset.path} alt="" className="w-full h-8 object-cover" />
+                                      <div className="p-0.5 text-[6.5px] font-black text-center truncate text-stone-700 group-hover:text-blue-600">
+                                        + {preset.name}
+                                      </div>
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* ТЕКСТОВОЕ ПОЛЕ ССЫЛОК ДЛЯ СОВМЕСТИМОСТИ */}
+                              <div className="space-y-1">
+                                <div className="flex justify-between items-center">
+                                  <label className="block text-[7.5px] text-[#64748B] uppercase font-bold font-mono">
+                                    Или вставьте URL-ссылки вручную (каждая с новой строки):
+                                  </label>
+                                </div>
+                                <textarea
+                                  value={newImgUrl}
+                                  onChange={(e) => setNewImgUrl(e.target.value)}
+                                  rows={2}
+                                  placeholder="https://t.me/your_channel/123&#10;/cars/custom_photo.jpg"
+                                  className="w-full bg-white border border-[#E5E7EB] rounded-xl px-2 py-1 text-[9.5px] outline-none text-[#111827] font-mono resize-y shadow-inner"
+                                />
+                              </div>
                             </div>
 
+                            {/* ОПИСАНИЕ И ОПЦИИ */}
                             <div className="space-y-1">
                               <div className="flex justify-between items-center">
                                 <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono">Описание автомобиля</label>
@@ -2162,44 +2333,128 @@ export const CARS_DATA: Car[] = ${formattedCars};
                                       initial={{ height: 0, opacity: 0 }}
                                       animate={{ height: 'auto', opacity: 1 }}
                                       exit={{ height: 0, opacity: 0 }}
-                                      className="border-t border-[#E5E7EB] pt-2.5 space-y-2.5 overflow-hidden"
+                                      className="border-t border-[#E5E7EB] pt-2.5 space-y-3.5 overflow-hidden"
                                     >
-                                      <span className="text-[9px] font-bold text-[#64748B] uppercase tracking-wider font-mono">
-                                        Управление фотографиями ({c.images.length})
-                                      </span>
+                                      <div className="flex justify-between items-center">
+                                        <span className="text-[9px] font-black text-[#111827] uppercase tracking-wider font-mono">
+                                          📸 УПРАВЛЕНИЕ ФОТОГРАФИЯМИ ({c.images.length})
+                                        </span>
+                                        <span className="text-[7.5px] font-medium text-[#64748B] leading-none">
+                                          Для замены нажмите «Заменить» на фото
+                                        </span>
+                                      </div>
 
-                                      {/* Сетка фото с удалением */}
-                                      <div className="grid grid-cols-4 gap-1.5">
+                                      {/* Сетка фото с удалением и заменой */}
+                                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                                         {c.images.map((img, idx) => (
-                                          <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border border-[#E5E7EB] group">
+                                          <div key={idx} className="relative aspect-video rounded-xl overflow-hidden border border-[#E5E7EB] bg-stone-100 group shadow-sm">
                                             <img src={img} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
-                                            <button
-                                              onClick={() => handleRemovePhotoFromCar(c.id, idx)}
-                                              className="absolute top-1 right-1 p-1 bg-red-600/90 text-white rounded-md hover:bg-red-700 transition"
-                                              title="Удалить это фото"
-                                            >
-                                              <Trash2 className="w-2.5 h-2.5" />
-                                            </button>
+                                            
+                                            {/* Индикатор номера */}
+                                            <div className="absolute top-1 left-1 bg-black/60 text-[7px] text-white font-mono px-1 py-0.5 rounded font-black">
+                                              #{idx + 1}
+                                            </div>
+
+                                            {/* Панель управления на каждом фото */}
+                                            <div className="absolute bottom-1 inset-x-1 flex justify-between gap-1">
+                                              {/* Кнопка замены */}
+                                              <label className="flex-1 p-1 bg-blue-600/90 hover:bg-blue-600 text-white rounded-lg transition cursor-pointer flex items-center justify-center space-x-0.5 active:scale-95 shadow">
+                                                <Upload className="w-2.5 h-2.5" />
+                                                <span className="text-[7.5px] font-bold">Заменить</span>
+                                                <input
+                                                  type="file"
+                                                  accept="image/*"
+                                                  className="hidden"
+                                                  onChange={(e) => {
+                                                    const file = e.target.files?.[0] || null;
+                                                    handleReplacePhoto(c.id, idx, file);
+                                                    e.target.value = '';
+                                                  }}
+                                                />
+                                              </label>
+                                              {/* Кнопка удаления */}
+                                              <button
+                                                onClick={() => handleRemovePhotoFromCar(c.id, idx)}
+                                                className="p-1 bg-red-600/90 hover:bg-red-600 text-white rounded-lg transition active:scale-95 shadow"
+                                                title="Удалить это фото"
+                                              >
+                                                <Trash2 className="w-2.5 h-2.5" />
+                                              </button>
+                                            </div>
                                           </div>
                                         ))}
                                       </div>
 
-                                      {/* Форма добавления фотографии */}
-                                      <div className="flex space-x-1.5">
-                                        <input
-                                          type="text"
-                                          placeholder="Вставьте ссылку на фото автомобиля (https://...)"
-                                          value={newPhotoUrl}
-                                          onChange={(e) => setNewPhotoUrl(e.target.value)}
-                                          className="flex-1 bg-white border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-[10px] text-[#111827] outline-none font-mono"
-                                        />
-                                        <button
-                                          onClick={() => handleAddPhotoToCar(c.id)}
-                                          className="px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-bold transition flex items-center space-x-1"
-                                        >
-                                          <Plus className="w-3.5 h-3.5" />
-                                          <span>Добавить</span>
-                                        </button>
+                                      {/* Быстрый выбор из папки /public/cars/ */}
+                                      <div className="bg-white border border-[#E5E7EB] p-2.5 rounded-xl space-y-1.5 shadow-inner">
+                                        <span className="text-[7.5px] font-black text-[#64748B] uppercase tracking-wide font-mono block">
+                                          📂 Быстрый выбор из папки репозитория (/public/cars/):
+                                        </span>
+                                        <div className="grid grid-cols-3 gap-1.5">
+                                          {[
+                                            { path: '/cars/zeekr_001.jpg', name: 'Zeekr 001' },
+                                            { path: '/cars/geely_monjaro.jpg', name: 'Monjaro' },
+                                            { path: '/cars/li_l9.jpg', name: 'Li L9' }
+                                          ].map((preset) => (
+                                            <button
+                                              key={preset.path}
+                                              type="button"
+                                              onClick={() => handleAddPresetToCar(c.id, preset.path)}
+                                              className="border border-[#E5E7EB] hover:border-blue-500 rounded-lg overflow-hidden transition text-left group bg-[#FAF8F5] active:scale-95"
+                                            >
+                                              <img src={preset.path} alt="" className="w-full h-7 object-cover" />
+                                              <div className="p-0.5 text-[6.5px] font-black text-center truncate text-stone-700 group-hover:text-blue-600">
+                                                + {preset.name}
+                                              </div>
+                                            </button>
+                                          ))}
+                                        </div>
+                                      </div>
+
+                                      {/* Форма добавления новой фотографии */}
+                                      <div className="space-y-2 bg-[#FAF8F5] p-2.5 rounded-xl border border-[#E5E7EB]">
+                                        <span className="text-[7.5px] font-black text-[#64748B] uppercase tracking-wide font-mono block">
+                                          ➕ Добавить новое фото:
+                                        </span>
+                                        <div className="flex flex-col sm:flex-row gap-1.5">
+                                          {/* Способ 1: Загрузка файла */}
+                                          <label className="py-1.5 px-3 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-lg text-[9px] transition flex items-center justify-center space-x-1 cursor-pointer shadow shrink-0">
+                                            <Upload className="w-3 h-3" />
+                                            <span>Выбрать файл с устройства</span>
+                                            <input
+                                              type="file"
+                                              accept="image/*"
+                                              className="hidden"
+                                              onChange={(e) => {
+                                                const file = e.target.files?.[0] || null;
+                                                handleUploadNewPhoto(c.id, file);
+                                                e.target.value = '';
+                                              }}
+                                            />
+                                          </label>
+
+                                          <div className="text-[9px] text-[#64748B] flex items-center justify-center font-mono font-bold shrink-0">
+                                            или
+                                          </div>
+
+                                          {/* Способ 2: Ввод по URL */}
+                                          <div className="flex-1 flex space-x-1">
+                                            <input
+                                              type="text"
+                                              placeholder="Вставьте ссылку на фото автомобиля (https://...)"
+                                              value={newPhotoUrl}
+                                              onChange={(e) => setNewPhotoUrl(e.target.value)}
+                                              className="flex-1 bg-white border border-[#E5E7EB] rounded-lg px-2 py-1 text-[9.5px] text-[#111827] outline-none font-mono"
+                                            />
+                                            <button
+                                              onClick={() => handleAddPhotoToCar(c.id)}
+                                              className="px-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-[9px] font-extrabold transition flex items-center space-x-1"
+                                            >
+                                              <Plus className="w-3.5 h-3.5" />
+                                              <span>Добавить URL</span>
+                                            </button>
+                                          </div>
+                                        </div>
                                       </div>
                                     </motion.div>
                                   )}
