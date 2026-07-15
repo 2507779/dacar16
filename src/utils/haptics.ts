@@ -5,6 +5,10 @@
 
 // Симуляция Taptic Engine / Haptic Feedback Telegram WebApp
 export function triggerHaptic(type: 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error' = 'light') {
+  // Проверка пользовательских настроек вибрации
+  const enabled = localStorage.getItem('dacar_settings_haptics');
+  if (enabled === 'false') return;
+
   // 1. Попытка вызвать оригинальный Telegram SDK haptic
   const tg = (window as any).Telegram?.WebApp;
   // HapticFeedback is supported in Telegram WebApp API 6.1+

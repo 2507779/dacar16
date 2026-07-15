@@ -7,6 +7,7 @@ import React, { useState } from 'react';
 import { Home, Car, Heart, Package, User, X, MoreVertical, Send, ArrowLeft, Check } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { triggerHaptic } from '../utils/haptics';
+import { playInterfaceClickSound } from '../utils/engineSound';
 import { AnimatePresence, motion } from 'motion/react';
 
 interface LayoutProps {
@@ -24,6 +25,7 @@ export default function Layout({ children }: LayoutProps) {
 
   const handleTabChange = (tab: typeof currentTab) => {
     triggerHaptic('light');
+    playInterfaceClickSound();
     setCurrentTab(tab);
     // Если мы переключаем таб, сбрасываем открытую карточку авто
     setActiveCarId(null);

@@ -7,15 +7,24 @@ import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { formatCurrency, calculateFullCarPrice } from '../data/cars';
 import { triggerHaptic } from '../utils/haptics';
-import { Heart, Sparkles, Plus, Scale, Trash2, ArrowRight, Check, CheckCircle2 } from 'lucide-react';
+import { Heart, Sparkles, Plus, Scale, Trash2, ArrowRight, Check, CheckCircle2, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function Favorites() {
   const { cars, favorites, toggleFavorite, setCurrentTab, setActiveCarId } = useStore();
   const [isCompareMode, setIsCompareMode] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   // Получаем массив объектов Car, которые находятся в избранном
   const favoriteCars = cars.filter(car => favorites.includes(car.id));
+
+  // Вычисление лучших показателей для подсветки (Feature 8)
+  const maxPower = favoriteCars.length > 0 ? Math.max(...favoriteCars.map(c => c.power)) : 0;
+  const lowestPrice = favoriteCars.length > 0 ? Math.min(...favoriteCars.map(c => {
+    const calc = calculateFullCarPrice(c);
+    return calc.finalPriceRUB;
+  })) : 0;
 
   const handleRemoveFavorite = (e: React.MouseEvent, carId: string) => {
     e.stopPropagation();
@@ -28,6 +37,18 @@ export default function Favorites() {
     setActiveCarId(carId);
   };
 
+  const handleShareComparison = () => {
+    triggerHaptic('success');
+    setIsShareModalOpen(true);
+    setCopiedLink(false);
+  };
+
+  const handleCopyLink = () => {
+    triggerHaptic('success');
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
+  };
+
   return (
     <div className="flex flex-col text-[#1C1917] pb-12 select-none bg-[#FAF8F5]">
       
@@ -38,22 +59,34 @@ export default function Favorites() {
           <p className="text-[10px] text-[#78716C] mt-0.5 font-mono">В списке: {favoriteCars.length}</p>
         </div>
         
-        {favoriteCars.length >= 2 && (
-          <button
-            onClick={() => {
-              triggerHaptic('medium');
-              setIsCompareMode(!isCompareMode);
-            }}
-            className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition active:scale-95 cursor-pointer border shadow-sm ${
-              isCompareMode
-                ? 'bg-[#C5A880] border-[#C5A880] text-white shadow-md'
-                : 'bg-white border-[#EFEBE4] text-[#1C1917] hover:border-[#C5A880]/40 hover:bg-[#FAF8F5]'
-            }`}
-          >
-            <Scale className="w-4 h-4" />
-            <span>{isCompareMode ? 'Показать список' : 'Сравнить авто'}</span>
-          </button>
-        )}
+        <div className="flex space-x-2">
+          {isCompareMode && favoriteCars.length >= 2 && (
+            <button
+              onClick={handleShareComparison}
+              className="p-2.5 bg-white border border-[#EFEBE4] text-[#C5A880] rounded-xl active:scale-95 transition cursor-pointer shadow-sm"
+              title="Поделиться сравнением"
+            >
+              <Share2 className="w-4 h-4" />
+            </button>
+          )}
+
+          {favoriteCars.length >= 2 && (
+            <button
+              onClick={() => {
+                triggerHaptic('medium');
+                setIsCompareMode(!isCompareMode);
+              }}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition active:scale-95 cursor-pointer border shadow-sm ${
+                isCompareMode
+                  ? 'bg-[#C5A880] border-[#C5A880] text-white shadow-md'
+                  : 'bg-white border-[#EFEBE4] text-[#1C1917] hover:border-[#C5A880]/40 hover:bg-[#FAF8F5]'
+              }`}
+            >
+              <Scale className="w-4 h-4" />
+              <span>{isCompareMode ? 'Показать список' : 'Сравнить авто'}</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Контентная область */}
@@ -120,11 +153,18 @@ export default function Favorites() {
                   </tr>
                   <tr>
                     <td className="py-2.5 font-medium text-[#78716C]">Мощность</td>
-                    {favoriteCars.map(car => (
-                      <td key={car.id} className="py-2.5 px-3 text-center font-bold text-[#C5A880]">
-                        {car.power} л.с.
-                      </td>
-                    ))}
+                    {favoriteCars.map(car => {
+                      const isBest = car.power === maxPower && favoriteCars.length > 1;
+                      return (
+                        <td key={car.id} className="py-2.5 px-3 text-center">
+                          <span className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                            isBest ? 'bg-[#C5A880]/20 text-[#C5A880] border border-[#C5A880]/45 font-extrabold shadow-sm' : 'text-[#1C1917]'
+                          }`}>
+                            {car.power} л.с. {isBest && '🏆'}
+                          </span>
+                        </td>
+                      );
+                    })}
                   </tr>
                   <tr>
                     <td className="py-2.5 font-medium text-[#78716C]">Привод</td>
@@ -169,10 +209,13 @@ export default function Favorites() {
                     <td className="py-3 font-bold text-[#1C1917]">Цена под ключ</td>
                     {favoriteCars.map(car => {
                       const calculated = calculateFullCarPrice(car);
+                      const isBest = calculated.finalPriceRUB === lowestPrice && favoriteCars.length > 1;
                       return (
-                        <td key={car.id} className="py-3 px-3 text-center">
-                          <span className="font-display font-black text-[#C5A880] text-xs block">
-                            {formatCurrency(calculated.finalPriceRUB)}
+                        <td key={car.id} className="py-3 px-3 text-center animate-fade-in">
+                          <span className={`font-display font-black text-xs block ${
+                            isBest ? 'text-emerald-600 font-extrabold text-[12.5px]' : 'text-[#C5A880]'
+                          }`}>
+                            {formatCurrency(calculated.finalPriceRUB)} {isBest && '🔥'}
                           </span>
                         </td>
                       );
@@ -255,6 +298,108 @@ export default function Favorites() {
           </div>
         )}
       </div>
+
+      {/* Feature 8: Попап "Поделиться Сравнением" */}
+      <AnimatePresence>
+        {isShareModalOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsShareModalOpen(false)}
+              className="fixed inset-0 bg-black/70 z-50"
+            ></motion.div>
+
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] max-w-[380px] bg-white text-[#1C1917] border border-[#EFEBE4] rounded-3xl p-5 z-50 shadow-2xl select-none"
+            >
+              <div className="flex justify-between items-center border-b border-[#EFEBE4]/60 pb-3 mb-4">
+                <div className="flex items-center space-x-2">
+                  <Share2 className="w-5 h-5 text-[#C5A880]" />
+                  <h4 className="text-xs font-black uppercase tracking-wider text-[#1C1917]">Поделиться сравнением</h4>
+                </div>
+                <button
+                  onClick={() => setIsShareModalOpen(false)}
+                  className="text-stone-400 hover:text-stone-700 font-bold cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <p className="text-[10px] text-[#78716C] leading-relaxed">
+                  Мы создали уникальную сводную визитную карточку вашего сравнения. Вы можете отправить её менеджеру или близким в Telegram.
+                </p>
+
+                {/* Флайер-сводка */}
+                <div className="bg-[#FAF8F5] border border-[#C5A880]/30 rounded-2xl p-4 space-y-3 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-24 h-24 bg-[#C5A880]/5 rounded-full -mr-8 -mt-8 blur-md" />
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-[8px] font-black uppercase tracking-widest text-[#C5A880] bg-[#C5A880]/15 px-2 py-0.5 rounded font-mono">
+                      DA!CAR PREMIUM
+                    </span>
+                    <span className="text-[8.5px] text-[#78716C] font-mono">Сводка сравнения</span>
+                  </div>
+
+                  <div className="space-y-2 border-t border-[#EFEBE4] pt-2">
+                    {favoriteCars.map((car, idx) => {
+                      const calc = calculateFullCarPrice(car);
+                      return (
+                        <div key={car.id} className="flex justify-between items-center text-[10px] font-medium">
+                          <span className="text-[#1C1917]">
+                            {idx + 1}. {car.brand} {car.model} ({car.year})
+                          </span>
+                          <span className="text-[#C5A880] font-bold font-mono">
+                            {formatCurrency(calc.finalPriceRUB)}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  <p className="text-[8px] text-[#78716C] italic font-serif leading-tight pt-1">
+                    *Расчет цен включает утильсбор РФ, таможенную декларацию и доставку.
+                  </p>
+                </div>
+
+                <button
+                  onClick={handleCopyLink}
+                  className={`w-full py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all flex items-center justify-center space-x-2 cursor-pointer ${
+                    copiedLink
+                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-md'
+                      : 'bg-[#C5A880] hover:bg-[#B0936B] text-white shadow-md'
+                  }`}
+                >
+                  {copiedLink ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      <span>Скопировано в буфер!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Share2 className="w-4 h-4" />
+                      <span>Скопировать ссылку t.me</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <button
+                onClick={() => setIsShareModalOpen(false)}
+                className="w-full py-3 bg-[#1C1917] hover:bg-black text-stone-400 hover:text-white text-[10px] font-bold uppercase tracking-wider rounded-xl transition mt-3 cursor-pointer"
+              >
+                Закрыть
+              </button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }

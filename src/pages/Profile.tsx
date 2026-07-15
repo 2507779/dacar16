@@ -15,6 +15,12 @@ export default function Profile() {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const [activeConsultation, setActiveConsultation] = useState(false);
   const [avatarClicks, setAvatarClicks] = useState(0);
+
+  // Настройки комфорта интерфейса
+  const [engineSoundEnabled, setEngineSoundEnabled] = useState(() => localStorage.getItem('dacar_settings_engine_sound') !== 'false');
+  const [hapticsEnabled, setHapticsEnabled] = useState(() => localStorage.getItem('dacar_settings_haptics') !== 'false');
+  const [clicksEnabled, setClicksEnabled] = useState(() => localStorage.getItem('dacar_settings_clicks') !== 'false');
+
   const [isAdminPanelVisible, setIsAdminPanelVisible] = useState(() => {
     if (localStorage.getItem('dacar_admin_authorized') === 'true') return true;
     if (localStorage.getItem('dacar_admin_visible') === 'true') return true;
@@ -154,6 +160,74 @@ export default function Profile() {
           <span className="text-xs font-bold text-[#1C1917] mt-2">Позвонить в офис</span>
           <span className="text-[8px] text-[#78716C] mt-0.5 font-mono">+7 (843) 222-00-99</span>
         </a>
+      </div>
+
+      {/* Центр управления комфортом */}
+      <div className="px-4 mt-6">
+        <h3 className="font-display text-[11px] font-bold uppercase tracking-widest text-[#78716C] mb-2.5 font-mono">Центр управления комфортом</h3>
+        <div className="bg-white rounded-3xl border border-[#EFEBE4] p-4.5 space-y-4 shadow-md">
+          {/* Звук двигателя */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="text-xs font-bold text-[#1C1917]">Звук запуска двигателя</h4>
+              <p className="text-[10px] text-[#78716C] mt-0.5 font-medium leading-tight">Воспроизводит рев V12 при старте приложения</p>
+            </div>
+            <button
+              onClick={() => {
+                const newValue = engineSoundEnabled ? 'false' : 'true';
+                setEngineSoundEnabled(!engineSoundEnabled);
+                localStorage.setItem('dacar_settings_engine_sound', newValue);
+                triggerHaptic('medium');
+              }}
+              className={`w-11 h-6 rounded-full transition-colors relative shrink-0 ${engineSoundEnabled ? 'bg-[#C5A880]' : 'bg-[#EFEBE4]'}`}
+            >
+              <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform shadow-sm ${engineSoundEnabled ? 'right-1' : 'left-1'}`} />
+            </button>
+          </div>
+
+          {/* Тактильная отдача */}
+          <div className="flex items-center justify-between border-t border-[#EFEBE4]/50 pt-3.5">
+            <div>
+              <h4 className="text-xs font-bold text-[#1C1917]">Тактильная отдача (Haptic)</h4>
+              <p className="text-[10px] text-[#78716C] mt-0.5 font-medium leading-tight">Премиум-вибрация при кликах и действиях</p>
+            </div>
+            <button
+              onClick={() => {
+                const newValue = hapticsEnabled ? 'false' : 'true';
+                setHapticsEnabled(!hapticsEnabled);
+                localStorage.setItem('dacar_settings_haptics', newValue);
+                if (newValue === 'true') {
+                  setTimeout(() => {
+                    const tg = (window as any).Telegram?.WebApp;
+                    if (tg?.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+                  }, 100);
+                }
+              }}
+              className={`w-11 h-6 rounded-full transition-colors relative shrink-0 ${hapticsEnabled ? 'bg-[#C5A880]' : 'bg-[#EFEBE4]'}`}
+            >
+              <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform shadow-sm ${hapticsEnabled ? 'right-1' : 'left-1'}`} />
+            </button>
+          </div>
+
+          {/* Интерфейсные щелчки */}
+          <div className="flex items-center justify-between border-t border-[#EFEBE4]/50 pt-3.5">
+            <div>
+              <h4 className="text-xs font-bold text-[#1C1917]">Звуковые клики</h4>
+              <p className="text-[10px] text-[#78716C] mt-0.5 font-medium leading-tight">Приятный щелчок при переключении меню</p>
+            </div>
+            <button
+              onClick={() => {
+                const newValue = clicksEnabled ? 'false' : 'true';
+                setClicksEnabled(!clicksEnabled);
+                localStorage.setItem('dacar_settings_clicks', newValue);
+                triggerHaptic('light');
+              }}
+              className={`w-11 h-6 rounded-full transition-colors relative shrink-0 ${clicksEnabled ? 'bg-[#C5A880]' : 'bg-[#EFEBE4]'}`}
+            >
+              <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform shadow-sm ${clicksEnabled ? 'right-1' : 'left-1'}`} />
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* ПАНЕЛЬ УПРАВЛЕНИЯ / АДМИНКА (Добавление новых авто, изменение текстов) */}

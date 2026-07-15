@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { useStore, ORDER_STATUSES } from '../store/useStore';
 import { formatCurrency } from '../data/cars';
 import { triggerHaptic } from '../utils/haptics';
-import { Package, Truck, Calendar, MapPin, Play, CheckCircle2, ChevronRight, ChevronDown, Sparkles } from 'lucide-react';
+import { Package, Truck, Calendar, MapPin, Play, CheckCircle2, ChevronRight, ChevronDown, Sparkles, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function Orders() {
@@ -170,6 +170,57 @@ export default function Orders() {
                               </div>
                             )}
                           </div>
+                        </div>
+                      </div>
+
+                      {/* Feature 7: Детализация таможенной очистки */}
+                      <div className="mx-4 mb-4 bg-white border border-[#EFEBE4] rounded-2xl p-4 shadow-sm space-y-3">
+                        <div className="flex items-center space-x-2 border-b border-[#EFEBE4]/50 pb-2">
+                          <FileText className="w-4 h-4 text-[#C5A880]" />
+                          <h4 className="text-[10px] font-bold text-[#1C1917] uppercase tracking-wider font-mono">
+                            Таможенная очистка РФ и ЭПТС
+                          </h4>
+                        </div>
+                        
+                        <p className="text-[10px] text-[#78716C] leading-normal font-sans font-medium">
+                          Статус подготовки государственных документов и прохождения лабораторных испытаний вашего ТС брокером DA!CAR:
+                        </p>
+
+                        <div className="grid grid-cols-2 gap-2 text-[10px] font-medium pt-1">
+                          <div className="bg-[#FAF8F5] border border-[#EFEBE4] p-2 rounded-xl flex justify-between items-center">
+                            <span className="text-[#78716C]">1. СБКТС (Лаборатория)</span>
+                            <span className={`px-2 py-0.5 rounded text-[8px] font-black ${currentStatusIndex >= 8 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-[#FAF8F5] text-[#78716C] border border-[#EFEBE4]'}`}>
+                              {currentStatusIndex >= 8 ? 'Получен 🟢' : 'В очереди ⏳'}
+                            </span>
+                          </div>
+
+                          <div className="bg-[#FAF8F5] border border-[#EFEBE4] p-2 rounded-xl flex justify-between items-center">
+                            <span className="text-[#78716C]">2. Таможенный ордер</span>
+                            <span className={`px-2 py-0.5 rounded text-[8px] font-black ${currentStatusIndex >= 7 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-[#FAF8F5] text-[#78716C] border border-[#EFEBE4]'}`}>
+                              {currentStatusIndex >= 7 ? 'Оплачен 🟢' : 'Ожидание ⏳'}
+                            </span>
+                          </div>
+
+                          <div className="bg-[#FAF8F5] border border-[#EFEBE4] p-2 rounded-xl flex justify-between items-center">
+                            <span className="text-[#78716C]">3. Списание Утильсбора</span>
+                            <span className={`px-2 py-0.5 rounded text-[8px] font-black ${currentStatusIndex >= 8 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-[#FAF8F5] text-[#78716C] border border-[#EFEBE4]'}`}>
+                              {currentStatusIndex >= 8 ? 'Списан 🟢' : 'Ожидание ⏳'}
+                            </span>
+                          </div>
+
+                          <div className="bg-[#FAF8F5] border border-[#EFEBE4] p-2 rounded-xl flex justify-between items-center">
+                            <span className="text-[#78716C]">4. Активация ЭПТС</span>
+                            <span className={`px-2 py-0.5 rounded text-[8px] font-black ${currentStatusIndex >= 10 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600 animate-pulse'}`}>
+                              {currentStatusIndex >= 10 ? 'Активен 🟢' : 'В процессе ⏳'}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="text-[8.5px] font-mono text-[#78716C] bg-amber-500/5 border border-amber-500/10 p-2.5 rounded-xl flex items-start space-x-1.5">
+                          <span className="text-amber-600 font-bold shrink-0">ℹ️</span>
+                          <span>
+                            СБКТС и ЭПТС оформляются в строгом соответствии с Решением Коллегии ЕЭК. Списание утильсбора по льготной ставке фиксируется в личном кабинете на ELTS.
+                          </span>
                         </div>
                       </div>
 

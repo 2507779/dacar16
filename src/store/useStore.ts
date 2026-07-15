@@ -4,7 +4,7 @@
  */
 
 import { create } from 'zustand';
-import { Car, Order, OrderStatus, TrackingStep } from '../types';
+import { Car, Order, OrderStatus, TrackingStep, AppTexts, ManagerContact } from '../types';
 import { CARS_DATA, calculateFullCarPrice } from '../data/cars';
 
 // Список всех статусов логистики по порядку
@@ -78,6 +78,10 @@ interface AppStore {
   homepageBannerTitle: string;
   homepageBannerSubtitle: string;
   
+  // Editable App Texts & Contacts
+  appTexts: AppTexts;
+  managerContacts: ManagerContact[];
+  
   // Экшны
   setCurrentTab: (tab: 'home' | 'catalog' | 'favorites' | 'orders' | 'profile') => void;
   setActiveCarId: (id: string | null) => void;
@@ -103,6 +107,12 @@ interface AppStore {
   setHomepageBannerUrl: (url: string) => void;
   setHomepageBannerTitle: (title: string) => void;
   setHomepageBannerSubtitle: (sub: string) => void;
+  
+  // Custom setters for texts and contacts
+  setAppTexts: (texts: Partial<AppTexts>) => void;
+  addManagerContact: (contact: Omit<ManagerContact, 'id'>) => void;
+  deleteManagerContact: (id: string) => void;
+  updateManagerContact: (id: string, contact: Partial<ManagerContact>) => void;
 }
 
 const initialFilters: FilterState = {
@@ -178,6 +188,21 @@ export const useStore = create<AppStore>((set, get) => {
   const parsedFavorites = localFavorites ? JSON.parse(localFavorites) : [];
   const parsedOrders = localOrders ? JSON.parse(localOrders) : sampleOrders;
 
+  // Загрузка кастомизации текстов и контактов
+  const savedHomeTitle = localStorage.getItem('dacar_home_title') || 'Автомобили под заказ';
+  const savedHomeSubtitle = localStorage.getItem('dacar_home_subtitle') || 'без лишних хлопот';
+  const savedShowroomAddress = localStorage.getItem('dacar_showroom_address') || 'г. Казань, ул. Серова, 48 к2';
+  const savedOfficePhone = localStorage.getItem('dacar_office_phone') || '+7 (843) 222-00-99';
+  const savedWebsiteUrl = localStorage.getItem('dacar_website_url') || 'dacar16.ru';
+  const savedLegalInfo = localStorage.getItem('dacar_legal_info') || 'ООО «ДА!КАР ИМПОРТ» (ИНН 1655489022). Все платежи принимаются на расчетный счет в Альфа-Банке.';
+
+  const defaultContacts: ManagerContact[] = [
+    { id: 'mc-1', name: 'Менеджер Max (Telegram)', type: 'telegram', value: 'max_dacar' },
+    { id: 'mc-2', name: 'Дежурный офис (Звонок)', type: 'phone', value: '+78432220099' }
+  ];
+  const localContacts = localStorage.getItem('dacar_manager_contacts');
+  const parsedContacts = localContacts ? JSON.parse(localContacts) : defaultContacts;
+
   return {
     currentTab: 'home',
     activeCarId: null,
@@ -190,6 +215,15 @@ export const useStore = create<AppStore>((set, get) => {
     homepageBannerUrl: savedBannerUrl,
     homepageBannerTitle: savedBannerTitle,
     homepageBannerSubtitle: savedBannerSubtitle,
+    appTexts: {
+      homeTitle: savedHomeTitle,
+      homeSubtitle: savedHomeSubtitle,
+      showroomAddress: savedShowroomAddress,
+      officePhone: savedOfficePhone,
+      websiteUrl: savedWebsiteUrl,
+      legalInfo: savedLegalInfo,
+    },
+    managerContacts: parsedContacts,
 
     setCurrentTab: (tab) => set({ currentTab: tab }),
     
@@ -343,6 +377,39 @@ export const useStore = create<AppStore>((set, get) => {
     setHomepageBannerSubtitle: (sub) => {
       localStorage.setItem('dacar_banner_subtitle', sub);
       set({ homepageBannerSubtitle: sub });
-    }
+    },
+
+    setAppTexts: (newTexts) => set((state) => {
+      const updated = { ...state.appTexts, ...newTexts };
+      if (updated.homeTitle !== undefined) localStorage.setItem('dacar_home_title', updated.homeTitle);
+      if (updated.homeSubtitle !== undefined) localStorage.setItem('dacar_home_subtitle', updated.homeSubtitle);
+      if (updated.showroomAddress !== undefined) localStorage.setItem('dacar_showroom_address', updated.showroomAddress);
+      if (updated.officePhone !== undefined) localStorage.setItem('dacar_office_phone', updated.officePhone);
+      if (updated.websiteUrl !== undefined) localStorage.setItem('dacar_website_url', updated.websiteUrl);
+      if (updated.legalInfo !== undefined) localStorage.setItem('dacar_legal_info', updated.legalInfo);
+      return { appTexts: updated };
+    }),
+
+    addManagerContact: (contact) => set((state) => {
+      const newContact: ManagerContact = {
+        ...contact,
+        id: `mc-${Date.now()}`
+      };
+      const updated = [...state.managerContacts, newContact];
+      localStorage.setItem('dacar_manager_contacts', JSON.stringify(updated));
+      return { managerContacts: updated };
+    }),
+
+    deleteManagerContact: (id) => set((state) => {
+      const updated = state.managerContacts.filter(c => c.id !== id);
+      localStorage.setItem('dacar_manager_contacts', JSON.stringify(updated));
+      return { managerContacts: updated };
+    }),
+
+    updateManagerContact: (id, updatedFields) => set((state) => {
+      const updated = state.managerContacts.map(c => c.id === id ? { ...c, ...updatedFields } : c);
+      localStorage.setItem('dacar_manager_contacts', JSON.stringify(updated));
+      return { managerContacts: updated };
+    })
   };
 });

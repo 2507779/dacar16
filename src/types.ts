@@ -79,3 +79,19 @@ export interface ExchangeRates {
   USD_to_RUB: number;
   EUR_to_RUB: number;
 }
+
+export interface AppTexts {
+  homeTitle: string;
+  homeSubtitle: string;
+  showroomAddress: string;
+  officePhone: string;
+  websiteUrl: string;
+  legalInfo: string;
+}
+
+export interface ManagerContact {
+  id: string;
+  name: string;
+  type: 'telegram' | 'phone';
+  value: string;
+}

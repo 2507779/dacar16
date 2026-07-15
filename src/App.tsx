@@ -14,11 +14,14 @@ import Profile from './pages/Profile';
 import VehicleDetails from './pages/VehicleDetails';
 import VehicleStories from './components/VehicleStories';
 import { AnimatePresence, motion } from 'motion/react';
-import { Car } from 'lucide-react';
+import { Car, Power } from 'lucide-react';
+import { playEngineStartupSound } from './utils/engineSound';
+import { triggerHaptic } from './utils/haptics';
 
 export default function App() {
   const { currentTab, activeCarId } = useStore();
   const [isSplash, setIsSplash] = useState(true);
+  const [loadingDone, setLoadingDone] = useState(false);
 
   useEffect(() => {
     // Инициализация Telegram WebApp API
@@ -39,13 +42,19 @@ export default function App() {
       }
     }
 
-    // Скрыть заставку через 2.8 секунды
+    // Симуляция загрузки каталога (2.2 секунды)
     const timer = setTimeout(() => {
-      setIsSplash(false);
-    }, 2800);
+      setLoadingDone(true);
+    }, 2200);
 
     return () => clearTimeout(timer);
   }, []);
+
+  const handleStartApp = () => {
+    triggerHaptic('heavy');
+    playEngineStartupSound('v12');
+    setIsSplash(false);
+  };
 
   const renderActiveTab = () => {
     // Если открыта конкретная карточка машины, рендерим её детали поверх любой вкладки
@@ -179,24 +188,62 @@ export default function App() {
               </div>
             </div>
 
-            {/* Bottom Elegant Progress Loader */}
-            <div className="w-full max-w-[200px] flex flex-col items-center space-y-4 relative z-10">
-              <div className="w-full h-[2px] bg-[#C5A880]/10 rounded-full overflow-hidden">
-                <motion.div
-                  initial={{ width: "0%" }}
-                  animate={{ width: "100%" }}
-                  transition={{ duration: 2.6, ease: "easeInOut" }}
-                  className="h-full bg-gradient-to-r from-[#C5A880] via-[#EFEBE4] to-[#C5A880] rounded-full"
-                />
-              </div>
-              <motion.span
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.4 }}
-                transition={{ delay: 0.8 }}
-                className="text-[9px] font-mono tracking-wider text-[#1C1917] uppercase"
-              >
-                Загрузка каталога...
-              </motion.span>
+            {/* Bottom Elegant Progress Loader or tactile START button */}
+            <div className="w-full max-w-[260px] flex flex-col items-center justify-center min-h-[140px] relative z-10">
+              <AnimatePresence mode="wait">
+                {!loadingDone ? (
+                  <motion.div
+                    key="loader"
+                    initial={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.3 }}
+                    className="w-full flex flex-col items-center space-y-4"
+                  >
+                    <div className="w-full h-[2px] bg-[#C5A880]/10 rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: "0%" }}
+                        animate={{ width: "100%" }}
+                        transition={{ duration: 2.0, ease: "easeInOut" }}
+                        className="h-full bg-gradient-to-r from-[#C5A880] via-[#EFEBE4] to-[#C5A880] rounded-full"
+                      />
+                    </div>
+                    <span className="text-[9px] font-mono tracking-wider text-[#78716C] uppercase">
+                      Загрузка каталога...
+                    </span>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="start-btn"
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                    className="flex flex-col items-center space-y-4"
+                  >
+                    {/* Glowing outer ring */}
+                    <div className="relative">
+                      <div className="absolute -inset-2 bg-gradient-to-r from-[#C5A880] to-[#E5C494] rounded-full blur-md opacity-45 animate-pulse" />
+                      <button
+                        onClick={handleStartApp}
+                        className="relative w-24 h-24 rounded-full bg-gradient-to-b from-[#292524] to-[#1C1917] border-2 border-[#C5A880] flex flex-col items-center justify-center shadow-[0_8px_20px_rgba(197,168,128,0.25)] active:scale-95 transition-transform group cursor-pointer"
+                      >
+                        {/* Red ignition light */}
+                        <div className="w-2.5 h-2.5 rounded-full bg-[#EF4444] shadow-[0_0_8px_#EF4444] mb-1.5 animate-ping absolute top-5" />
+                        <div className="w-2.5 h-2.5 rounded-full bg-[#EF4444] shadow-[0_0_8px_#EF4444] mb-1.5 absolute top-5" />
+                        
+                        <Power className="w-6 h-6 text-[#C5A880] group-hover:text-[#FAF8F5] transition-colors mt-2" />
+                        
+                        <span className="text-[8px] font-display font-black tracking-widest text-[#C5A880] mt-1.5 pl-[0.1em]">
+                          START
+                        </span>
+                      </button>
+                    </div>
+                    
+                    <span className="text-[10px] font-display font-bold tracking-wider text-[#1C1917] uppercase animate-pulse">
+                      Запустить двигатель
+                    </span>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
         )}
