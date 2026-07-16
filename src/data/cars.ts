@@ -87,8 +87,8 @@ export const CARS_DATA: Car[] = [
     transmission: 'Automatic',
     color: 'Темно-серый металлик',
     images: [
-      'https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80'
+      'https://github.com/2507779/dacar16/blob/main/public/cars/Highlander.jpg',
+      'https://github.com/2507779/dacar16/blob/main/public/cars/Highlander1.jpg'
     ],
     priceUSD: 44000,
     recyclingFeeRUB: 3400,
