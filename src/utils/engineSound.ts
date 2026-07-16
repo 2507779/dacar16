@@ -7,6 +7,21 @@
  * Синтезатор звука двигателя автомобиля на базе Web Audio API.
  * Работает полностью на стороне клиента, без внешних аудиофайлов.
  */
+export function playStartupSound() {
+  const enabled = localStorage.getItem('dacar_settings_engine_sound');
+  if (enabled === 'false') return;
+
+  try {
+    const audio = new Audio('/startup.mp3');
+    audio.volume = 0.55; // Оптимальная громкость
+    audio.play().catch((err) => {
+      console.log('Кастомный звук запуска не воспроизвелся или еще не загружен:', err.message);
+    });
+  } catch (e) {
+    console.warn('Не удалось воспроизвести звук запуска:', e);
+  }
+}
+
 export function playEngineStartupSound(type: 'v12' | 'v8' | 'inline6' | 'electric' = 'v12') {
   // Проверка пользовательских настроек звука
   const enabled = localStorage.getItem('dacar_settings_engine_sound');

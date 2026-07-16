@@ -6,6 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { useStore, ORDER_STATUSES } from '../store/useStore';
 import { triggerHaptic } from '../utils/haptics';
+import { APP_CONFIG } from '../config';
 import { 
   Settings, Key, ChevronDown, Plus, Trash2, Copy, Check, Car, 
   Bot, Image as ImageIcon, Loader2, RefreshCw, AlertCircle, 
@@ -46,8 +47,16 @@ export function AdminPanel() {
     homepageBannerSubtitle,
     setHomepageBannerUrl,
     setHomepageBannerTitle,
-    setHomepageBannerSubtitle
+    setHomepageBannerSubtitle,
+    managerContacts,
+    addManagerContact,
+    deleteManagerContact
   } = useStore();
+
+  // Добавление контактов менеджеров
+  const [newContactName, setNewContactName] = useState('');
+  const [newContactType, setNewContactType] = useState<'telegram' | 'phone'>('telegram');
+  const [newContactValue, setNewContactValue] = useState('');
 
   // Основной переключатель открыт/закрыт
   const [isAdminOpen, setIsAdminOpen] = useState(false);
@@ -67,11 +76,11 @@ export function AdminPanel() {
   const [newPhotoUrl, setNewPhotoUrl] = useState('');
 
   // Настройки Воронки и Ботов
-  const [tgBotToken, setTgBotToken] = useState(() => localStorage.getItem('tg_bot_token') || '');
-  const [tgChannelId, setTgChannelId] = useState(() => localStorage.getItem('tg_channel_id') || '');
+  const [tgBotToken, setTgBotToken] = useState(() => localStorage.getItem('tg_bot_token') || APP_CONFIG.DEFAULT_TG_BOT_TOKEN);
+  const [tgChannelId, setTgChannelId] = useState(() => localStorage.getItem('tg_channel_id') || APP_CONFIG.DEFAULT_TG_CHANNEL_ID);
 
   // Авто-установщик & ТГ-парсер состояния
-  const [installerToken, setInstallerToken] = useState(() => localStorage.getItem('tg_bot_token') || '');
+  const [installerToken, setInstallerToken] = useState(() => localStorage.getItem('tg_bot_token') || APP_CONFIG.DEFAULT_TG_BOT_TOKEN);
   const [installerChannel, setInstallerChannel] = useState(() => localStorage.getItem('tg_channel_id') || 'https://t.me/dacar_channel');
   const [isInstalling, setIsInstalling] = useState(false);
   const [installerLogs, setInstallerLogs] = useState<string[]>([]);
@@ -1112,6 +1121,22 @@ export const CARS_DATA: Car[] = ${formattedCars};
     alert('✅ Контактные данные дилера успешно сохранены и применены!');
   };
 
+  const handleAddManagerContact = () => {
+    if (!newContactName.trim() || !newContactValue.trim()) {
+      alert('⚠️ Заполните имя менеджера и контактные данные!');
+      return;
+    }
+    addManagerContact({
+      name: newContactName,
+      type: newContactType,
+      value: newContactValue
+    });
+    setNewContactName('');
+    setNewContactValue('');
+    triggerHaptic('success');
+    alert('✅ Новый контакт менеджера успешно добавлен!');
+  };
+
   // VIP ФУНКЦИЯ 4: Добавление отзыва клиента
   const handleAddVipReview = () => {
     if (!newReviewName.trim() || !newReviewText.trim()) {
@@ -1493,7 +1518,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                               <select
                                 value={selectedCarForSync}
                                 onChange={(e) => setSelectedCarForSync(e.target.value)}
-                                className="w-full bg-[#FAF8F5] border border-[#EFEBE4] rounded-xl px-2.5 py-1.5 text-[11px] outline-none text-[#1C1917] font-bold"
+                                className="w-full bg-[#F0EEEC] border border-[#EFEBE4] rounded-xl px-2.5 py-1.5 text-[11px] outline-none text-[#1C1917] font-bold"
                               >
                                 <option value="">-- Выберите автомобиль из каталога --</option>
                                 {cars.map(c => (
@@ -1504,7 +1529,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                               {/* Фото-галерея из канала */}
                               <div className="grid grid-cols-3 gap-1.5 pt-1">
                                 {fetchedPhotos.map((url, i) => (
-                                  <div key={i} className="relative group aspect-square bg-[#FAF8F5] border border-[#EFEBE4] rounded-xl overflow-hidden shadow-sm">
+                                  <div key={i} className="relative group aspect-square bg-[#F0EEEC] border border-[#EFEBE4] rounded-xl overflow-hidden shadow-sm">
                                     <img src={url} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                                     <button
                                       type="button"
@@ -1557,7 +1582,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                               type="button"
                               onClick={handleAuditBotRights}
                               disabled={isTestingRights}
-                              className="px-3.5 py-1.5 bg-[#FAF8F5] text-[#1C1917] border border-[#EFEBE4] hover:border-[#C5A880] rounded-xl text-[9px] font-bold transition flex items-center space-x-1 shadow-sm"
+                              className="px-3.5 py-1.5 bg-[#F0EEEC] text-[#1C1917] border border-[#EFEBE4] hover:border-[#C5A880] rounded-xl text-[9px] font-bold transition flex items-center space-x-1 shadow-sm"
                             >
                               {isTestingRights ? <Loader2 className="w-3 animate-spin shrink-0" /> : <Activity className="w-3 h-3 text-blue-500" />}
                               <span>Проверить права в канале</span>
@@ -1578,7 +1603,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                             <p className="text-[9px] text-[#78716C] leading-normal">
                               Проверяет доступность контента по публичным линкам. Линки t.me/s/... поддерживают автоматический парсинг фото.
                             </p>
-                            <div className="bg-[#FAF8F5] p-2.5 rounded-xl border border-[#EFEBE4] text-[9px] font-medium space-y-1 font-mono">
+                            <div className="bg-[#F0EEEC] p-2.5 rounded-xl border border-[#EFEBE4] text-[9px] font-medium space-y-1 font-mono">
                               <div className="flex justify-between">
                                 <span className="text-[#78716C]">Канал:</span>
                                 <span className="text-[#1C1917] font-bold">{installerChannel}</span>
@@ -1620,7 +1645,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                                   setWatermarkText(e.target.value);
                                   localStorage.setItem('dacar_watermark', e.target.value);
                                 }}
-                                className="w-full bg-[#FAF8F5] border border-[#EFEBE4] rounded-xl px-2.5 py-1.5 text-[10px] outline-none text-[#1C1917] font-mono"
+                                className="w-full bg-[#F0EEEC] border border-[#EFEBE4] rounded-xl px-2.5 py-1.5 text-[10px] outline-none text-[#1C1917] font-mono"
                                 placeholder="Текст водяного знака"
                               />
                             </div>
@@ -1639,7 +1664,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                               type="button"
                               onClick={handleBackupCatalog}
                               disabled={isBackingUp}
-                              className="px-3.5 py-1.5 bg-[#FAF8F5] text-[#1C1917] border border-[#EFEBE4] hover:border-[#C5A880] rounded-xl text-[9px] font-bold transition flex items-center space-x-1 shadow-sm"
+                              className="px-3.5 py-1.5 bg-[#F0EEEC] text-[#1C1917] border border-[#EFEBE4] hover:border-[#C5A880] rounded-xl text-[9px] font-bold transition flex items-center space-x-1 shadow-sm"
                             >
                               {isBackingUp ? <Loader2 className="w-3 animate-spin shrink-0" /> : <Download className="w-3 h-3 text-[#C5A880]" />}
                               <span>Экспортировать дамп каталога</span>
@@ -1658,7 +1683,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                               <span>Умный шаблонизатор постов в ТГ</span>
                             </h6>
                             <p className="text-[9px] text-[#78716C] leading-normal">
-                              Создайте шаблон, по которому автопостинг формирует описание. Поддерживает теги: <code className="bg-[#FAF8F5] px-1 font-mono text-[8px]">{'{brand}'}</code>, <code className="bg-[#FAF8F5] px-1 font-mono text-[8px]">{'{model}'}</code>, <code className="bg-[#FAF8F5] px-1 font-mono text-[8px]">{'{price}'}</code>, <code className="bg-[#FAF8F5] px-1 font-mono text-[8px]">{'{year}'}</code>.
+                              Создайте шаблон, по которому автопостинг формирует описание. Поддерживает теги: <code className="bg-[#F0EEEC] px-1 font-mono text-[8px]">{'{brand}'}</code>, <code className="bg-[#F0EEEC] px-1 font-mono text-[8px]">{'{model}'}</code>, <code className="bg-[#F0EEEC] px-1 font-mono text-[8px]">{'{price}'}</code>, <code className="bg-[#F0EEEC] px-1 font-mono text-[8px]">{'{year}'}</code>.
                             </p>
                             <textarea
                               value={captionTemplate}
@@ -1668,7 +1693,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                                 localStorage.setItem('dacar_caption_template', e.target.value);
                               }}
                               rows={3}
-                              className="w-full bg-[#FAF8F5] border border-[#EFEBE4] rounded-xl px-2.5 py-1.5 text-[9px] font-mono outline-none text-[#1C1917] resize-none"
+                              className="w-full bg-[#F0EEEC] border border-[#EFEBE4] rounded-xl px-2.5 py-1.5 text-[9px] font-mono outline-none text-[#1C1917] resize-none"
                             />
                           </div>
 
@@ -1726,7 +1751,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                             <p className="text-[9px] text-[#78716C] leading-normal">
                               Подключается к финансовым API для получения курсов USD/RUB. Курс используется для расчетов цен в каталоге под ключ.
                             </p>
-                            <div className="flex items-center justify-between bg-[#FAF8F5] p-2.5 rounded-xl border border-[#EFEBE4] text-[10px] font-bold">
+                            <div className="flex items-center justify-between bg-[#F0EEEC] p-2.5 rounded-xl border border-[#EFEBE4] text-[10px] font-bold">
                               <div>
                                 <p className="text-[#78716C] text-[8px] font-mono">ТЕКУЩИЙ КУРС USD:</p>
                                 <p className="text-[#1C1917] font-black font-mono">{exchangeRateUSD} RUB</p>
@@ -1757,10 +1782,10 @@ export const CARS_DATA: Car[] = ${formattedCars};
                                 type="text"
                                 value={qrPromoCode}
                                 onChange={(e) => setQrPromoCode(e.target.value)}
-                                className="w-full bg-[#FAF8F5] border border-[#EFEBE4] rounded-xl px-2.5 py-1.5 text-[10px] outline-none text-[#1C1917] font-mono"
+                                className="w-full bg-[#F0EEEC] border border-[#EFEBE4] rounded-xl px-2.5 py-1.5 text-[10px] outline-none text-[#1C1917] font-mono"
                                 placeholder="Напр. dacar_promo"
                               />
-                              <div className="p-3 bg-[#FAF8F5] border border-[#EFEBE4] rounded-xl flex items-center space-x-3">
+                              <div className="p-3 bg-[#F0EEEC] border border-[#EFEBE4] rounded-xl flex items-center space-x-3">
                                 <div className="w-14 h-14 bg-white border border-[#EFEBE4] p-1 rounded-lg shrink-0 flex items-center justify-center">
                                   <div className="grid grid-cols-4 gap-0.5 w-full h-full opacity-80">
                                     <div className="bg-black"></div><div className="bg-black"></div><div className="bg-white"></div><div className="bg-black"></div>
@@ -2080,7 +2105,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                         {formSection === 'media' && (
                           <div className="space-y-3.5">
                             {/* СЕКЦИЯ УПРАВЛЕНИЯ ФОТОГРАФИЯМИ */}
-                            <div className="bg-[#FAF8F5] border border-[#E5E7EB] p-3 rounded-2xl space-y-3 shadow-inner">
+                            <div className="bg-[#F0EEEC] border border-[#E5E7EB] p-3 rounded-2xl space-y-3 shadow-inner">
                               <div className="flex justify-between items-center">
                                 <label className="block text-[9px] text-[#111827] uppercase font-black font-mono">
                                   📸 ФОТОГАЛЕРЕЯ АВТОМОБИЛЯ
@@ -2178,7 +2203,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                                       key={preset.path}
                                       type="button"
                                       onClick={() => handleAddPresetForNewCar(preset.path)}
-                                      className="border border-[#E5E7EB] hover:border-blue-500 rounded-lg overflow-hidden transition text-left group bg-[#FAF8F5] active:scale-95"
+                                      className="border border-[#E5E7EB] hover:border-blue-500 rounded-lg overflow-hidden transition text-left group bg-[#F0EEEC] active:scale-95"
                                     >
                                       <img src={preset.path} alt="" className="w-full h-8 object-cover" />
                                       <div className="p-0.5 text-[6.5px] font-black text-center truncate text-stone-700 group-hover:text-blue-600">
@@ -2415,7 +2440,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                                               key={preset.path}
                                               type="button"
                                               onClick={() => handleAddPresetToCar(c.id, preset.path)}
-                                              className="border border-[#E5E7EB] hover:border-blue-500 rounded-lg overflow-hidden transition text-left group bg-[#FAF8F5] active:scale-95"
+                                              className="border border-[#E5E7EB] hover:border-blue-500 rounded-lg overflow-hidden transition text-left group bg-[#F0EEEC] active:scale-95"
                                             >
                                               <img src={preset.path} alt="" className="w-full h-7 object-cover" />
                                               <div className="p-0.5 text-[6.5px] font-black text-center truncate text-stone-700 group-hover:text-blue-600">
@@ -2427,7 +2452,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                                       </div>
 
                                       {/* Форма добавления новой фотографии */}
-                                      <div className="space-y-2 bg-[#FAF8F5] p-2.5 rounded-xl border border-[#E5E7EB]">
+                                      <div className="space-y-2 bg-[#F0EEEC] p-2.5 rounded-xl border border-[#E5E7EB]">
                                         <span className="text-[7.5px] font-black text-[#64748B] uppercase tracking-wide font-mono block">
                                           ➕ Добавить новое фото:
                                         </span>
@@ -2997,6 +3022,83 @@ export const CARS_DATA: Car[] = ${formattedCars};
                               <Save className="w-3.5 h-3.5" />
                               <span>Сохранить Контактный Профиль</span>
                             </button>
+
+                            {/* Dynamic Managers Contact List */}
+                            <div className="border-t border-slate-250 pt-3.5 mt-3.5 space-y-3">
+                              <span className="block text-[10px] font-bold text-slate-800 uppercase tracking-wide font-mono">
+                                📞 Список менеджеров для заявок
+                              </span>
+                              <p className="text-[8.5px] text-[#64748B] leading-normal font-medium">
+                                Добавьте конкретных менеджеров, которые будут показываться клиентам для быстрой связи по подбору авто.
+                              </p>
+
+                              {/* Текущий список контактов */}
+                              <div className="space-y-1.5">
+                                {managerContacts && managerContacts.map((c) => (
+                                  <div key={c.id} className="flex items-center justify-between bg-white border border-[#E5E7EB] p-2 rounded-xl">
+                                    <div className="min-w-0">
+                                      <p className="text-xs font-bold text-slate-900 truncate">{c.name}</p>
+                                      <p className="text-[9px] text-[#64748B] font-mono truncate">
+                                        {c.type === 'telegram' ? 'Telegram' : 'Телефон'}: {c.value}
+                                      </p>
+                                    </div>
+                                    <button
+                                      onClick={() => {
+                                        deleteManagerContact(c.id);
+                                        triggerHaptic('light');
+                                      }}
+                                      className="p-1 text-red-500 hover:bg-red-55 rounded-lg transition cursor-pointer"
+                                      title="Удалить"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                ))}
+                                {(!managerContacts || managerContacts.length === 0) && (
+                                  <p className="text-[9px] text-[#64748B] italic text-center py-2">Контакты не добавлены. Будут использованы контакты по умолчанию.</p>
+                                )}
+                              </div>
+
+                              {/* Форма добавления нового контакта */}
+                              <div className="bg-slate-100 border border-[#E5E7EB] p-3 rounded-xl space-y-2">
+                                <p className="text-[8.5px] font-bold text-[#64748B] uppercase tracking-wider font-mono">Добавить менеджера</p>
+                                
+                                <div className="space-y-2">
+                                  <input
+                                    type="text"
+                                    placeholder="Имя менеджера (напр. Менеджер Александр)"
+                                    value={newContactName}
+                                    onChange={(e) => setNewContactName(e.target.value)}
+                                    className="w-full bg-white border border-[#E5E7EB] rounded-lg px-2.5 py-1.5 text-xs outline-none text-[#111827]"
+                                  />
+                                  <div className="grid grid-cols-2 gap-2">
+                                    <select
+                                      value={newContactType}
+                                      onChange={(e) => setNewContactType(e.target.value as 'telegram' | 'phone')}
+                                      className="bg-white border border-[#E5E7EB] rounded-lg px-2 py-1.5 text-xs outline-none text-[#111827]"
+                                    >
+                                      <option value="telegram">Telegram (@username)</option>
+                                      <option value="phone">Телефон (Звонок)</option>
+                                    </select>
+                                    <input
+                                      type="text"
+                                      placeholder={newContactType === 'telegram' ? 'username (без @)' : '+79991234567'}
+                                      value={newContactValue}
+                                      onChange={(e) => setNewContactValue(e.target.value)}
+                                      className="bg-white border border-[#E5E7EB] rounded-lg px-2.5 py-1.5 text-xs outline-none text-[#111827]"
+                                    />
+                                  </div>
+                                </div>
+
+                                <button
+                                  onClick={handleAddManagerContact}
+                                  className="w-full py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-black text-[9px] rounded-lg transition cursor-pointer flex items-center justify-center space-x-1 uppercase tracking-wider"
+                                >
+                                  <Plus className="w-3.5 h-3.5" />
+                                  <span>Добавить контакт</span>
+                                </button>
+                              </div>
+                            </div>
                           </div>
                         </div>
 

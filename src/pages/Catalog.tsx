@@ -10,6 +10,43 @@ import { triggerHaptic } from '../utils/haptics';
 import { Search, SlidersHorizontal, Grid, List, ArrowUpDown, X, Heart, Sparkles, CheckCircle, Truck } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
+const SkeletonCard = () => (
+  <div className="bg-white border border-[#EFEBE4] rounded-3xl overflow-hidden flex flex-col p-3.5 space-y-3.5 shadow-md select-none animate-pulse">
+    <div className="h-28 w-full bg-[#EFEBE4]/50 rounded-2xl" />
+    <div className="space-y-2">
+      <div className="h-3 w-1/3 bg-[#EFEBE4]/60 rounded" />
+      <div className="h-4 w-3/4 bg-[#EFEBE4]/85 rounded" />
+    </div>
+    <div className="flex space-x-2 pt-1">
+      <div className="h-2.5 w-1/4 bg-[#EFEBE4]/50 rounded" />
+      <div className="h-2.5 w-1/4 bg-[#EFEBE4]/50 rounded" />
+    </div>
+    <div className="h-px bg-[#EFEBE4]/40 w-full" />
+    <div className="flex justify-between items-center pt-1">
+      <div className="space-y-1.5 flex-1">
+        <div className="h-2.5 w-1/2 bg-[#EFEBE4]/50 rounded" />
+        <div className="h-4 w-5/6 bg-[#EFEBE4]/85 rounded" />
+      </div>
+    </div>
+  </div>
+);
+
+const SkeletonRow = () => (
+  <div className="bg-white border border-[#EFEBE4] rounded-3xl overflow-hidden flex p-3.5 space-x-4 shadow-md select-none animate-pulse">
+    <div className="w-28 h-24 bg-[#EFEBE4]/50 rounded-2xl shrink-0" />
+    <div className="flex-1 flex flex-col justify-between py-1">
+      <div className="space-y-2">
+        <div className="h-4 w-2/3 bg-[#EFEBE4]/85 rounded" />
+        <div className="h-3 w-1/2 bg-[#EFEBE4]/50 rounded" />
+      </div>
+      <div className="flex justify-between items-end border-t border-[#EFEBE4]/40 pt-2">
+        <div className="h-3 w-1/4 bg-[#EFEBE4]/50 rounded" />
+        <div className="h-4 w-1/3 bg-[#EFEBE4]/85 rounded" />
+      </div>
+    </div>
+  </div>
+);
+
 export default function Catalog() {
   const {
     cars,
@@ -21,12 +58,22 @@ export default function Catalog() {
     setActiveCarId,
     setActiveStoryCarId,
     favorites,
-    toggleFavorite
+    toggleFavorite,
+    selectedCity
   } = useStore();
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortOption, setSortOption] = useState<'price_asc' | 'price_desc' | 'year_desc'>('year_desc');
+  const [isLoading, setIsLoading] = useState(false);
+
+  React.useEffect(() => {
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [searchQuery, JSON.stringify(filters), sortOption]);
 
   // Уникальные бренды в нашем каталоге
   const allBrands = Array.from(new Set(cars.map(c => c.brand)));
@@ -61,8 +108,8 @@ export default function Catalog() {
 
   // Сортировка данных
   const sortedCars = [...filteredCars].sort((a, b) => {
-    const aPrice = calculateFullCarPrice(a).finalPriceRUB;
-    const bPrice = calculateFullCarPrice(b).finalPriceRUB;
+    const aPrice = calculateFullCarPrice(a, selectedCity).finalPriceRUB;
+    const bPrice = calculateFullCarPrice(b, selectedCity).finalPriceRUB;
 
     if (sortOption === 'price_asc') return aPrice - bPrice;
     if (sortOption === 'price_desc') return bPrice - aPrice;
@@ -98,10 +145,10 @@ export default function Catalog() {
   };
 
   return (
-    <div className="flex flex-col text-[#1C1917] pb-12 select-none bg-[#FAF8F5]">
+    <div className="flex flex-col text-[#1C1917] pb-12 select-none bg-[#F0EEEC]">
       
       {/* 1. Поисковая строка и Настройки вида */}
-      <div className="px-4 pt-4 sticky top-0 bg-[#FAF8F5]/95 backdrop-blur-md z-10 pb-3 border-b border-[#EFEBE4] flex flex-col space-y-3">
+      <div className="px-4 pt-4 sticky top-0 bg-[#F0EEEC]/95 backdrop-blur-md z-10 pb-3 border-b border-[#EFEBE4] flex flex-col space-y-3">
         <div className="flex items-center space-x-2">
           <div className="flex-1 bg-white border border-[#EFEBE4] rounded-2xl px-3.5 py-2.5 flex items-center space-x-2 shadow-sm focus-within:border-[#C5A880]/70 transition-colors">
             <Search className="w-4 h-4 text-[#78716C]/70" />
@@ -233,151 +280,159 @@ export default function Catalog() {
           </div>
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-2 gap-3">
-            {sortedCars.map((car) => {
-              const calculated = calculateFullCarPrice(car);
-              const isFav = favorites.includes(car.id);
-              return (
-                <motion.div
-                  key={car.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-20px' }}
-                  transition={{ duration: 0.4, ease: 'easeOut' }}
-                  onClick={() => {
-                    triggerHaptic('light');
-                    setActiveCarId(car.id);
-                  }}
-                  className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/25 rounded-3xl overflow-hidden flex flex-col shadow-md cursor-pointer group relative"
-                >
-                  <div 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      triggerHaptic('medium');
-                      setActiveStoryCarId(car.id);
+            {isLoading ? (
+              Array.from({ length: 4 }).map((_, idx) => <SkeletonCard key={idx} />)
+            ) : (
+              sortedCars.map((car) => {
+                const calculated = calculateFullCarPrice(car, selectedCity);
+                const isFav = favorites.includes(car.id);
+                return (
+                  <motion.div
+                    key={car.id}
+                    initial={{ opacity: 0, y: 24, scale: 0.97 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    viewport={{ once: true, margin: '-30px' }}
+                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    onClick={() => {
+                      triggerHaptic('light');
+                      setActiveCarId(car.id);
                     }}
-                    className="h-28 overflow-hidden relative cursor-zoom-in"
-                    title="Смотреть Stories"
+                    className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/25 rounded-3xl overflow-hidden flex flex-col shadow-md cursor-pointer group relative"
                   >
-                    <img
-                      src={car.images[0]}
-                      alt={`${car.brand} ${car.model}`}
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    {/* Кнопка "Сторис" */}
-                    <div className="absolute top-2 left-2 bg-[#C5A880] text-white text-[7px] font-black px-1.5 py-0.5 rounded shadow-md flex items-center space-x-1 z-10">
-                      <span className="w-1 h-1 bg-white rounded-full animate-ping"></span>
-                      <span>STORIES</span>
-                    </div>
-
-                    <button
-                      onClick={(e) => handleToggleFav(e, car.id)}
-                      className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white text-[#1C1917] transition active:scale-90 z-10 shadow-sm border border-black/[0.03]"
+                    <div 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        triggerHaptic('medium');
+                        setActiveStoryCarId(car.id);
+                      }}
+                      className="h-28 overflow-hidden relative cursor-zoom-in"
+                      title="Смотреть Stories"
                     >
-                      <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-red-500 text-red-500' : 'text-[#78716C]'}`} />
-                    </button>
-                    <span className="absolute bottom-1.5 left-2 bg-white/90 backdrop-blur-md text-[#1C1917] text-[8px] font-bold px-1.5 py-0.5 rounded uppercase z-10 border border-black/[0.03]">
-                      {car.country === 'China' ? 'КНР 🇨🇳' : car.country === 'South Korea' ? 'Корея 🇰🇷' : 'КР 🇰🇬'}
-                    </span>
-                  </div>
-
-                  <div className="p-3 flex flex-col flex-1 justify-between bg-white">
-                    <div>
-                      <h4 className="font-display font-bold text-xs text-[#1C1917] group-hover:text-[#C5A880] transition-colors truncate">
-                        {car.brand} {car.model}
-                      </h4>
-                      <p className="text-[10px] text-[#78716C] mt-0.5">
-                        {car.year} г. • {car.power} л.с.
-                      </p>
-                    </div>
-                    <div className="mt-3.5 pt-2 border-t border-[#EFEBE4]/40 flex flex-col">
-                      <span className="text-[8px] text-[#78716C] uppercase tracking-widest block font-mono">Итого под ключ</span>
-                      <span className="font-display font-bold text-[#C5A880] text-xs mt-0.5">
-                        {formatCurrency(calculated.finalPriceRUB)}
-                      </span>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {sortedCars.map((car) => {
-              const calculated = calculateFullCarPrice(car);
-              const isFav = favorites.includes(car.id);
-              return (
-                <motion.div
-                  key={car.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-20px' }}
-                  transition={{ duration: 0.4, ease: 'easeOut' }}
-                  onClick={() => {
-                    triggerHaptic('light');
-                    setActiveCarId(car.id);
-                  }}
-                  className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/25 rounded-3xl overflow-hidden flex shadow-md cursor-pointer group relative"
-                >
-                  <div 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      triggerHaptic('medium');
-                      setActiveStoryCarId(car.id);
-                    }}
-                    className="w-28 h-24 shrink-0 overflow-hidden relative cursor-zoom-in"
-                    title="Смотреть Stories"
-                  >
-                    <img
-                      src={car.images[0]}
-                      alt={`${car.brand} ${car.model}`}
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    {/* Кнопка "Сторис" */}
-                    <div className="absolute top-2 left-2 bg-[#C5A880] text-white text-[7px] font-black px-1.5 py-0.5 rounded shadow-md flex items-center space-x-1 z-10">
-                      <span className="w-1 h-1 bg-white rounded-full animate-ping"></span>
-                      <span>STORIES</span>
-                    </div>
-
-                    <button
-                      onClick={(e) => handleToggleFav(e, car.id)}
-                      className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white text-[#1C1917] transition active:scale-90 z-10 shadow-sm border border-black/[0.03]"
-                    >
-                      <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-red-500 text-red-500' : 'text-[#78716C]'}`} />
-                    </button>
-                  </div>
-
-                  <div className="p-3.5 flex-1 flex flex-col justify-between min-w-0 bg-white">
-                    <div className="flex justify-between items-start">
-                      <div className="min-w-0">
-                        <h4 className="font-display font-bold text-xs text-[#1C1917] group-hover:text-[#C5A880] transition-colors truncate">
-                          {car.brand} {car.model}
-                        </h4>
-                        <p className="text-[10px] text-[#78716C] mt-0.5">
-                          {car.year} г. • {car.engineVolume} • {car.power} л.с.
-                        </p>
+                      <img
+                        src={car.images[0]}
+                        alt={`${car.brand} ${car.model}`}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      {/* Кнопка "Сторис" */}
+                      <div className="absolute top-2 left-2 bg-[#C5A880] text-white text-[7px] font-black px-1.5 py-0.5 rounded shadow-md flex items-center space-x-1 z-10">
+                        <span className="w-1 h-1 bg-white rounded-full animate-ping"></span>
+                        <span>STORIES</span>
                       </div>
-                      <span className="bg-[#FAF8F5] border border-[#EFEBE4] text-[#1C1917] text-[8px] font-bold px-2 py-0.5 rounded-md shrink-0 uppercase tracking-wider ml-1">
+
+                      <button
+                        onClick={(e) => handleToggleFav(e, car.id)}
+                        className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white text-[#1C1917] transition active:scale-90 z-10 shadow-sm border border-black/[0.03]"
+                      >
+                        <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-red-500 text-red-500' : 'text-[#78716C]'}`} />
+                      </button>
+                      <span className="absolute bottom-1.5 left-2 bg-white/90 backdrop-blur-md text-[#1C1917] text-[8px] font-bold px-1.5 py-0.5 rounded uppercase z-10 border border-black/[0.03]">
                         {car.country === 'China' ? 'КНР 🇨🇳' : car.country === 'South Korea' ? 'Корея 🇰🇷' : 'КР 🇰🇬'}
                       </span>
                     </div>
 
-                    <div className="flex justify-between items-end border-t border-[#EFEBE4]/40 pt-2 mt-1.5">
-                      <span className="text-[9px] text-[#C5A880] font-bold flex items-center space-x-0.5">
-                        <CheckCircle className="w-3.5 h-3.5 shrink-0 animate-pulse" />
-                        <span>~{car.deliveryDays} дней</span>
-                      </span>
-                      <div className="text-right">
-                        <span className="font-display font-black text-[#C5A880] text-xs">
+                    <div className="p-3 flex flex-col flex-1 justify-between bg-white">
+                      <div>
+                        <h4 className="font-display font-bold text-xs text-[#1C1917] group-hover:text-[#C5A880] transition-colors truncate">
+                          {car.brand} {car.model}
+                        </h4>
+                        <p className="text-[10px] text-[#78716C] mt-0.5">
+                          {car.year} г. • {car.power} л.с.
+                        </p>
+                      </div>
+                      <div className="mt-3.5 pt-2 border-t border-[#EFEBE4]/40 flex flex-col">
+                        <span className="text-[8px] text-[#78716C] uppercase tracking-widest block font-mono">Итого под ключ</span>
+                        <span className="font-display font-bold text-[#C5A880] text-xs mt-0.5">
                           {formatCurrency(calculated.finalPriceRUB)}
                         </span>
                       </div>
                     </div>
-                  </div>
-                </motion.div>
-              );
-            })}
+                  </motion.div>
+                );
+              })
+            )}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {isLoading ? (
+              Array.from({ length: 3 }).map((_, idx) => <SkeletonRow key={idx} />)
+) : (
+              sortedCars.map((car) => {
+                const calculated = calculateFullCarPrice(car, selectedCity);
+                const isFav = favorites.includes(car.id);
+                return (
+                  <motion.div
+                    key={car.id}
+                    initial={{ opacity: 0, y: 24, scale: 0.97 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    viewport={{ once: true, margin: '-30px' }}
+                    transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    onClick={() => {
+                      triggerHaptic('light');
+                      setActiveCarId(car.id);
+                    }}
+                    className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/25 rounded-3xl overflow-hidden flex shadow-md cursor-pointer group relative"
+                  >
+                    <div 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        triggerHaptic('medium');
+                        setActiveStoryCarId(car.id);
+                      }}
+                      className="w-28 h-24 shrink-0 overflow-hidden relative cursor-zoom-in"
+                      title="Смотреть Stories"
+                    >
+                      <img
+                        src={car.images[0]}
+                        alt={`${car.brand} ${car.model}`}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      {/* Кнопка "Сторис" */}
+                      <div className="absolute top-2 left-2 bg-[#C5A880] text-white text-[7px] font-black px-1.5 py-0.5 rounded shadow-md flex items-center space-x-1 z-10">
+                        <span className="w-1 h-1 bg-white rounded-full animate-ping"></span>
+                        <span>STORIES</span>
+                      </div>
+
+                      <button
+                        onClick={(e) => handleToggleFav(e, car.id)}
+                        className="absolute top-2 right-2 p-1.5 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white text-[#1C1917] transition active:scale-90 z-10 shadow-sm border border-black/[0.03]"
+                      >
+                        <Heart className={`w-3.5 h-3.5 ${isFav ? 'fill-red-500 text-red-500' : 'text-[#78716C]'}`} />
+                      </button>
+                    </div>
+
+                    <div className="p-3.5 flex-1 flex flex-col justify-between min-w-0 bg-white">
+                      <div className="flex justify-between items-start">
+                        <div className="min-w-0">
+                          <h4 className="font-display font-bold text-xs text-[#1C1917] group-hover:text-[#C5A880] transition-colors truncate">
+                            {car.brand} {car.model}
+                          </h4>
+                          <p className="text-[10px] text-[#78716C] mt-0.5">
+                            {car.year} г. • {car.engineVolume} • {car.power} л.с.
+                          </p>
+                        </div>
+                        <span className="bg-[#F0EEEC] border border-[#EFEBE4] text-[#1C1917] text-[8px] font-bold px-2 py-0.5 rounded-md shrink-0 uppercase tracking-wider ml-1">
+                          {car.country === 'China' ? 'КНР 🇨🇳' : car.country === 'South Korea' ? 'Корея 🇰🇷' : 'КР 🇰🇬'}
+                        </span>
+                      </div>
+
+                      <div className="flex justify-between items-end border-t border-[#EFEBE4]/40 pt-2 mt-1.5">
+                        <span className="text-[9px] text-[#C5A880] font-bold flex items-center space-x-0.5">
+                          <CheckCircle className="w-3.5 h-3.5 shrink-0 animate-pulse" />
+                          <span>~{car.deliveryDays} дней</span>
+                        </span>
+                        <div className="text-right">
+                          <span className="font-display font-black text-[#C5A880] text-xs">
+                            {formatCurrency(calculated.finalPriceRUB)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })
+            )}
           </div>
         )}
       </div>
@@ -401,7 +456,7 @@ export default function Catalog() {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-              className="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-[#FAF8F5] rounded-t-[32px] z-50 p-6 flex flex-col max-h-[85%] overflow-y-auto shadow-2xl border-t border-[#EFEBE4] select-none"
+              className="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-[#F0EEEC] rounded-t-[32px] z-50 p-6 flex flex-col max-h-[85%] overflow-y-auto shadow-2xl border-t border-[#EFEBE4] select-none"
             >
               <div className="w-12 h-1 bg-[#EFEBE4] rounded-full mx-auto mb-6 shrink-0"></div>
 
@@ -554,7 +609,7 @@ export default function Catalog() {
                     triggerHaptic('medium');
                     resetFilters();
                   }}
-                  className="flex-1 py-3 border border-[#EFEBE4] hover:bg-[#FAF8F5] font-semibold text-xs rounded-xl text-[#78716C] cursor-pointer active:scale-95 transition-bezier"
+                  className="flex-1 py-3 border border-[#EFEBE4] hover:bg-[#F0EEEC] font-semibold text-xs rounded-xl text-[#78716C] cursor-pointer active:scale-95 transition-bezier"
                 >
                   Сбросить все
                 </button>

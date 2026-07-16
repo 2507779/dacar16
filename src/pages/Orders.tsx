@@ -26,27 +26,27 @@ export default function Orders() {
   };
 
   return (
-    <div className="flex flex-col text-[#1C1917] pb-12 select-none bg-[#FAF8F5]">
+    <div className="flex flex-col text-[#1C1917] pb-12 select-none bg-[#F0EEEC]">
       
       {/* Шапка заказов */}
-      <div className="px-4 pt-4 pb-3 border-b border-[#EFEBE4] flex justify-between items-center bg-[#FAF8F5]/95 sticky top-0 backdrop-blur-md z-10">
+      <div className="px-4 pt-4 pb-3 border-b border-[#EFEBE4] flex justify-between items-center bg-[#F0EEEC]/95 sticky top-0 backdrop-blur-md z-10">
         <div>
-          <h2 className="font-display font-black text-base text-[#1C1917] tracking-tight">Мои заказы</h2>
-          <p className="text-[10px] text-[#78716C] mt-0.5 font-mono">Всего заказов: {orders.length}</p>
+          <h2 className="font-display font-black text-base text-[#1C1917] tracking-tight">Мой подбор авто</h2>
+          <p className="text-[10px] text-[#78716C] mt-0.5 font-mono">Всего заявок: {orders.length}</p>
         </div>
       </div>
 
       <div className="px-4 mt-4 space-y-4">
         {orders.length === 0 ? (
-          /* Пустой список заказов */
+          /* Пустой список заявок */
           <div className="bg-white rounded-3xl p-8 border border-[#EFEBE4] text-center flex flex-col items-center justify-center space-y-4 shadow-md my-10">
-            <div className="w-16 h-16 bg-[#FAF8F5] rounded-full flex items-center justify-center text-[#C5A880] border border-[#EFEBE4] shadow-inner animate-pulse">
+            <div className="w-16 h-16 bg-[#F0EEEC] rounded-full flex items-center justify-center text-[#C5A880] border border-[#EFEBE4] shadow-inner animate-pulse">
               <Package className="w-7 h-7" />
             </div>
             <div>
-              <h4 className="font-display font-bold text-sm text-[#1C1917]">Активных заказов нет</h4>
+              <h4 className="font-display font-bold text-sm text-[#1C1917]">Активных заявок нет</h4>
               <p className="text-xs text-[#78716C] mt-1.5 leading-relaxed">
-                Вы еще не оформили ни одного автомобиля. Перейдите в каталог, выберите подходящую модель, рассчитайте стоимость и отправьте заявку.
+                Вы еще не отправили ни одного запроса на подбор. Перейдите в каталог, выберите подходящую модель под ваш бюджет, рассчитайте стоимость и отправьте заявку на подбор.
               </p>
             </div>
             <button
@@ -112,7 +112,7 @@ export default function Orders() {
                       <span className="font-mono text-[#C5A880]">Прогресс: {progressPercent}%</span>
                       <span>Владелец</span>
                     </div>
-                    <div className="w-full h-1.5 bg-[#FAF8F5] rounded-full overflow-hidden border border-[#EFEBE4]">
+                    <div className="w-full h-1.5 bg-[#F0EEEC] rounded-full overflow-hidden border border-[#EFEBE4]">
                       <div
                         className="h-full bg-[#C5A880] transition-all duration-500 rounded-full"
                         style={{ width: `${progressPercent}%` }}
@@ -142,7 +142,7 @@ export default function Orders() {
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.3, ease: 'easeInOut' }}
-                      className="border-t border-[#EFEBE4]/40 bg-[#FAF8F5]/40"
+                      className="border-t border-[#EFEBE4]/40 bg-[#F0EEEC]/40"
                     >
                       {/* Панель Админ-Симулятора */}
                       <div className="bg-[#C5A880]/10 border border-[#C5A880]/20 p-4 m-4 rounded-2xl">
@@ -187,28 +187,28 @@ export default function Orders() {
                         </p>
 
                         <div className="grid grid-cols-2 gap-2 text-[10px] font-medium pt-1">
-                          <div className="bg-[#FAF8F5] border border-[#EFEBE4] p-2 rounded-xl flex justify-between items-center">
+                          <div className="bg-[#F0EEEC] border border-[#EFEBE4] p-2 rounded-xl flex justify-between items-center">
                             <span className="text-[#78716C]">1. СБКТС (Лаборатория)</span>
-                            <span className={`px-2 py-0.5 rounded text-[8px] font-black ${currentStatusIndex >= 8 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-[#FAF8F5] text-[#78716C] border border-[#EFEBE4]'}`}>
+                            <span className={`px-2 py-0.5 rounded text-[8px] font-black ${currentStatusIndex >= 8 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-[#F0EEEC] text-[#78716C] border border-[#EFEBE4]'}`}>
                               {currentStatusIndex >= 8 ? 'Получен 🟢' : 'В очереди ⏳'}
                             </span>
                           </div>
 
-                          <div className="bg-[#FAF8F5] border border-[#EFEBE4] p-2 rounded-xl flex justify-between items-center">
+                          <div className="bg-[#F0EEEC] border border-[#EFEBE4] p-2 rounded-xl flex justify-between items-center">
                             <span className="text-[#78716C]">2. Таможенный ордер</span>
-                            <span className={`px-2 py-0.5 rounded text-[8px] font-black ${currentStatusIndex >= 7 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-[#FAF8F5] text-[#78716C] border border-[#EFEBE4]'}`}>
+                            <span className={`px-2 py-0.5 rounded text-[8px] font-black ${currentStatusIndex >= 7 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-[#F0EEEC] text-[#78716C] border border-[#EFEBE4]'}`}>
                               {currentStatusIndex >= 7 ? 'Оплачен 🟢' : 'Ожидание ⏳'}
                             </span>
                           </div>
 
-                          <div className="bg-[#FAF8F5] border border-[#EFEBE4] p-2 rounded-xl flex justify-between items-center">
+                          <div className="bg-[#F0EEEC] border border-[#EFEBE4] p-2 rounded-xl flex justify-between items-center">
                             <span className="text-[#78716C]">3. Списание Утильсбора</span>
-                            <span className={`px-2 py-0.5 rounded text-[8px] font-black ${currentStatusIndex >= 8 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-[#FAF8F5] text-[#78716C] border border-[#EFEBE4]'}`}>
+                            <span className={`px-2 py-0.5 rounded text-[8px] font-black ${currentStatusIndex >= 8 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-[#F0EEEC] text-[#78716C] border border-[#EFEBE4]'}`}>
                               {currentStatusIndex >= 8 ? 'Списан 🟢' : 'Ожидание ⏳'}
                             </span>
                           </div>
 
-                          <div className="bg-[#FAF8F5] border border-[#EFEBE4] p-2 rounded-xl flex justify-between items-center">
+                          <div className="bg-[#F0EEEC] border border-[#EFEBE4] p-2 rounded-xl flex justify-between items-center">
                             <span className="text-[#78716C]">4. Активация ЭПТС</span>
                             <span className={`px-2 py-0.5 rounded text-[8px] font-black ${currentStatusIndex >= 10 ? 'bg-emerald-500/10 text-emerald-600' : 'bg-amber-500/10 text-amber-600 animate-pulse'}`}>
                               {currentStatusIndex >= 10 ? 'Активен 🟢' : 'В процессе ⏳'}
@@ -263,7 +263,7 @@ export default function Orders() {
                                   </div>
                                   
                                   {step.date && (
-                                    <span className="text-[9px] font-mono text-[#78716C] shrink-0 bg-[#FAF8F5] px-1.5 py-0.5 border border-[#EFEBE4]/50 rounded">
+                                    <span className="text-[9px] font-mono text-[#78716C] shrink-0 bg-[#F0EEEC] px-1.5 py-0.5 border border-[#EFEBE4]/50 rounded">
                                       {step.date.split(',')[0]}
                                     </span>
                                   )}

@@ -8,24 +8,35 @@
 }
 
 :root {
-  --bg-primary: #FAF8F5; /* Warm stoney linen background */
+  --bg-primary: #F0EEEC; /* PANTONE 11-4201 Cloud Dancer background */
   --bg-secondary: #FFFFFF; /* White Cards */
-  --bg-tertiary: #EFEBE4; /* Warm linen divider line */
+  --bg-tertiary: #E1DFDD; /* Cohesive cool-warm divider line */
   --text-primary: #1C1917; /* Deep stone-charcoal */
   --text-secondary: #78716C; /* Warm stone-gray */
   --accent-primary: #C5A880; /* Premium Brand Copper Gold */
   --accent-primary-hover: #B0936B; /* Deep Gold-Bronze Hover */
-  --border-light: #EFEBE4; /* Delicate Sand-Linen Border */
+  --border-light: #E1DFDD; /* Cohesive cool-warm border */
   --border-primary: rgba(197, 168, 128, 0.15);
 }
 
 /* Стили для Telegram Mini App */
 body {
   font-family: var(--font-sans);
-  background-color: #FAF8F5; /* Элегантный светлый премиальный фон */
+  background-color: #F0EEEC; /* PANTONE 11-4201 Cloud Dancer background */
   color: #1C1917;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 639px) {
+  html, body, #root {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
 }
 
 /* Скрытие дефолтных скроллбаров */

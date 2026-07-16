@@ -15,7 +15,7 @@ import VehicleDetails from './pages/VehicleDetails';
 import VehicleStories from './components/VehicleStories';
 import { AnimatePresence, motion } from 'motion/react';
 import { Car, Power } from 'lucide-react';
-import { playEngineStartupSound } from './utils/engineSound';
+import { playEngineStartupSound, playStartupSound } from './utils/engineSound';
 import { triggerHaptic } from './utils/haptics';
 
 export default function App() {
@@ -37,24 +37,24 @@ export default function App() {
       
       // Header and Background colors are supported in Telegram WebApp API 6.1+
       if (tg.isVersionAtLeast?.('6.1')) {
-        tg.setHeaderColor?.('#FAF8F5'); // Warm Linen
-        tg.setBackgroundColor?.('#FAF8F5');
+        tg.setHeaderColor?.('#F0EEEC'); // PANTONE 11-4201 Cloud Dancer
+        tg.setBackgroundColor?.('#F0EEEC');
       }
     }
 
     // Симуляция загрузки каталога (2.2 секунды)
     const timer = setTimeout(() => {
       setLoadingDone(true);
+      // Автоматически открываем салон и запускаем проигрывание MP3
+      setTimeout(() => {
+        triggerHaptic('medium');
+        setIsSplash(false);
+        playStartupSound();
+      }, 300);
     }, 2200);
 
     return () => clearTimeout(timer);
   }, []);
-
-  const handleStartApp = () => {
-    triggerHaptic('heavy');
-    playEngineStartupSound('v12');
-    setIsSplash(false);
-  };
 
   const renderActiveTab = () => {
     // Если открыта конкретная карточка машины, рендерим её детали поверх любой вкладки
@@ -147,7 +147,7 @@ export default function App() {
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 bg-[#FAF8F5] z-50 flex flex-col items-center justify-between py-12 px-6 select-none overflow-hidden"
+            className="fixed inset-0 bg-[#F0EEEC] z-50 flex flex-col items-center justify-between py-12 px-6 select-none overflow-hidden"
           >
             {/* Top glowing ambient background effect */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[300px] bg-[#C5A880]/8 blur-[120px] rounded-full pointer-events-none" />
@@ -188,62 +188,21 @@ export default function App() {
               </div>
             </div>
 
-            {/* Bottom Elegant Progress Loader or tactile START button */}
+            {/* Bottom Elegant Progress Loader */}
             <div className="w-full max-w-[260px] flex flex-col items-center justify-center min-h-[140px] relative z-10">
-              <AnimatePresence mode="wait">
-                {!loadingDone ? (
+              <div className="w-full flex flex-col items-center space-y-4">
+                <div className="w-full h-[2px] bg-[#C5A880]/10 rounded-full overflow-hidden">
                   <motion.div
-                    key="loader"
-                    initial={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3 }}
-                    className="w-full flex flex-col items-center space-y-4"
-                  >
-                    <div className="w-full h-[2px] bg-[#C5A880]/10 rounded-full overflow-hidden">
-                      <motion.div
-                        initial={{ width: "0%" }}
-                        animate={{ width: "100%" }}
-                        transition={{ duration: 2.0, ease: "easeInOut" }}
-                        className="h-full bg-gradient-to-r from-[#C5A880] via-[#EFEBE4] to-[#C5A880] rounded-full"
-                      />
-                    </div>
-                    <span className="text-[9px] font-mono tracking-wider text-[#78716C] uppercase">
-                      Загрузка каталога...
-                    </span>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="start-btn"
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: "spring", stiffness: 200, damping: 15 }}
-                    className="flex flex-col items-center space-y-4"
-                  >
-                    {/* Glowing outer ring */}
-                    <div className="relative">
-                      <div className="absolute -inset-2 bg-gradient-to-r from-[#C5A880] to-[#E5C494] rounded-full blur-md opacity-45 animate-pulse" />
-                      <button
-                        onClick={handleStartApp}
-                        className="relative w-24 h-24 rounded-full bg-gradient-to-b from-[#292524] to-[#1C1917] border-2 border-[#C5A880] flex flex-col items-center justify-center shadow-[0_8px_20px_rgba(197,168,128,0.25)] active:scale-95 transition-transform group cursor-pointer"
-                      >
-                        {/* Red ignition light */}
-                        <div className="w-2.5 h-2.5 rounded-full bg-[#EF4444] shadow-[0_0_8px_#EF4444] mb-1.5 animate-ping absolute top-5" />
-                        <div className="w-2.5 h-2.5 rounded-full bg-[#EF4444] shadow-[0_0_8px_#EF4444] mb-1.5 absolute top-5" />
-                        
-                        <Power className="w-6 h-6 text-[#C5A880] group-hover:text-[#FAF8F5] transition-colors mt-2" />
-                        
-                        <span className="text-[8px] font-display font-black tracking-widest text-[#C5A880] mt-1.5 pl-[0.1em]">
-                          START
-                        </span>
-                      </button>
-                    </div>
-                    
-                    <span className="text-[10px] font-display font-bold tracking-wider text-[#1C1917] uppercase animate-pulse">
-                      Запустить двигатель
-                    </span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    initial={{ width: "0%" }}
+                    animate={{ width: "100%" }}
+                    transition={{ duration: 2.0, ease: "easeInOut" }}
+                    className="h-full bg-gradient-to-r from-[#C5A880] via-[#EFEBE4] to-[#C5A880] rounded-full"
+                  />
+                </div>
+                <span className="text-[9px] font-mono tracking-wider text-[#78716C] uppercase">
+                  {loadingDone ? 'Добро пожаловать' : 'Загрузка каталога...'}
+                </span>
+              </div>
             </div>
           </motion.div>
         )}

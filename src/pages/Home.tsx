@@ -15,7 +15,8 @@ export default function Home() {
     homepageBannerUrl,
     appTexts,
     favorites,
-    toggleFavorite
+    toggleFavorite,
+    selectedCity
   } = useStore();
 
   // Feature 9: Onboarding Stories
@@ -94,7 +95,7 @@ export default function Home() {
   const hotCars = cars.slice(0, 3);
 
   return (
-    <div className="flex flex-col text-[#1C1917] pb-12 select-none bg-[#FAF8F5]">
+    <div className="flex flex-col text-[#1C1917] pb-12 select-none bg-[#F0EEEC]">
       
       {/* Имиджевый баннер шапки из брошюры-флаера */}
       <motion.div 
@@ -156,7 +157,7 @@ export default function Home() {
                 triggerHaptic('medium');
                 setCurrentTab('catalog');
               }}
-              className="bg-white hover:bg-[#FAF8F5] text-[#1C1917] px-4 py-2 rounded-xl text-[10px] font-black flex items-center space-x-1.5 cursor-pointer active:scale-95 transition-bezier shadow-md"
+              className="bg-white hover:bg-[#F0EEEC] text-[#1C1917] px-4 py-2 rounded-xl text-[10px] font-black flex items-center space-x-1.5 cursor-pointer active:scale-95 transition-bezier shadow-md"
             >
               <span>Подобрать</span>
               <ArrowRight className="w-3 h-3 text-[#1C1917]" />
@@ -209,7 +210,7 @@ export default function Home() {
             <button
               key={c.id}
               onClick={() => handleCountrySelect(c.id as any)}
-              className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/40 hover:bg-[#FAF8F5]/50 active:scale-95 transition-bezier p-3 rounded-2xl flex flex-col items-center justify-center text-center shadow-sm cursor-pointer group"
+              className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/40 hover:bg-[#F0EEEC]/50 active:scale-95 transition-bezier p-3 rounded-2xl flex flex-col items-center justify-center text-center shadow-sm cursor-pointer group"
             >
               <span className="font-black text-xs text-[#1C1917] group-hover:text-[#C5A880] transition-colors">{c.label}</span>
               <span className="text-[7.5px] font-bold text-[#78716C] mt-0.5 leading-none">{c.desc}</span>
@@ -242,7 +243,7 @@ export default function Home() {
               const StepIcon = step.icon;
               return (
                 <div key={idx} className="flex flex-col items-center group">
-                  <div className="w-8 h-8 rounded-full bg-[#FAF8F5] border border-[#EFEBE4] flex items-center justify-center text-[#C5A880] relative mb-1.5 shadow-sm">
+                  <div className="w-8 h-8 rounded-full bg-[#F0EEEC] border border-[#EFEBE4] flex items-center justify-center text-[#C5A880] relative mb-1.5 shadow-sm">
                     <StepIcon className="w-3.5 h-3.5" />
                     <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#1C1917] border border-white text-white text-[7px] font-black flex items-center justify-center">
                       {step.num}
@@ -280,7 +281,7 @@ export default function Home() {
 
         <div className="space-y-4">
           {hotCars.map((car) => {
-            const calculated = calculateFullCarPrice(car);
+            const calculated = calculateFullCarPrice(car, selectedCity);
             return (
               <motion.div
                 key={car.id}
@@ -353,7 +354,7 @@ export default function Home() {
                         e.stopPropagation();
                         toggleFavorite(car.id);
                       }}
-                      className="p-2 border border-[#EFEBE4] hover:border-[#C5A880]/30 rounded-xl bg-[#FAF8F5] active:scale-95 transition cursor-pointer shrink-0"
+                      className="p-2 border border-[#EFEBE4] hover:border-[#C5A880]/30 rounded-xl bg-[#F0EEEC] active:scale-95 transition cursor-pointer shrink-0"
                     >
                       <Heart className={`w-4 h-4 ${favorites.includes(car.id) ? 'fill-red-500 text-red-500' : 'text-[#78716C]'}`} />
                     </button>
@@ -374,7 +375,7 @@ export default function Home() {
 
       {/* Спецификация Офиса из Брошюры */}
       <div className="px-4 mt-6">
-        <div className="bg-gradient-to-br from-[#FAF8F5] to-white border border-[#EFEBE4] rounded-3xl p-5 shadow-sm text-center">
+        <div className="bg-gradient-to-br from-[#F0EEEC] to-white border border-[#EFEBE4] rounded-3xl p-5 shadow-sm text-center">
           <h4 className="text-[9px] font-black text-[#1C1917] uppercase tracking-widest mb-3">Официальное представительство</h4>
           
           <div className="grid grid-cols-2 gap-4 text-left border-y border-[#EFEBE4] py-3 mb-3">

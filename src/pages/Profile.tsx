@@ -6,18 +6,18 @@
 import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { triggerHaptic } from '../utils/haptics';
+import { APP_CONFIG } from '../config';
 import { MessageSquare, Phone, MapPin, ShieldAlert, BadgeCheck, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AdminPanel } from '../components/AdminPanel';
 
 export default function Profile() {
-  const { orders } = useStore();
+  const { orders, managerContacts, appTexts } = useStore();
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const [activeConsultation, setActiveConsultation] = useState(false);
   const [avatarClicks, setAvatarClicks] = useState(0);
 
   // Настройки комфорта интерфейса
-  const [engineSoundEnabled, setEngineSoundEnabled] = useState(() => localStorage.getItem('dacar_settings_engine_sound') !== 'false');
   const [hapticsEnabled, setHapticsEnabled] = useState(() => localStorage.getItem('dacar_settings_haptics') !== 'false');
   const [clicksEnabled, setClicksEnabled] = useState(() => localStorage.getItem('dacar_settings_clicks') !== 'false');
 
@@ -56,6 +56,12 @@ export default function Profile() {
     }
   ]);
 
+  // Данные о пользователе Telegram WebApp
+  const tgUser = (window as any).Telegram?.WebApp?.initDataUnsafe?.user;
+  const userName = tgUser ? [tgUser.first_name, tgUser.last_name].filter(Boolean).join(' ') || tgUser.username : 'Premium Клиент';
+  const userId = tgUser?.id ? `tg_user_id: ${tgUser.id}` : 'tg_user_id: 841b57fe';
+  const userAvatarChar = userName.charAt(0).toUpperCase();
+
   const faqData = [
     {
       q: 'Как рассчитывается таможенная пошлина?',
@@ -71,7 +77,7 @@ export default function Profile() {
     },
     {
       q: 'Где забирать готовый автомобиль?',
-      a: 'Наш главный филиал выдачи находится в Казани на Спартаковской 6. Мы проводим полную предпродажную подготовку, детейлинг и передаем авто на закрытой площадке. Также отправляем закрытыми автовозами в Москву, СПб, Екатеринбург и любой другой город РФ.'
+      a: `Наш главный филиал выдачи находится по адресу: ${appTexts.showroomAddress}. Мы проводим полную предпродажную подготовку, детейлинг и передаем авто на закрытой площадке. Также отправляем закрытыми автовозами в Москву, СПб, Екатеринбург и любой другой город РФ.`
     }
   ];
 
@@ -113,80 +119,125 @@ export default function Profile() {
   };
 
   return (
-    <div className="flex flex-col text-[#1C1917] pb-12 select-none bg-[#FAF8F5]">
+    <div className="flex flex-col text-[#1C1917] pb-12 select-none bg-[#F0EEEC]">
       
       {/* Профиль Пользователя */}
-      <div className="px-4 pt-6 pb-4 bg-[#FAF8F5] border-b border-[#EFEBE4]/40 flex items-center space-x-4">
+      <div className="px-4 pt-6 pb-4 bg-[#F0EEEC] border-b border-[#EFEBE4]/40 flex items-center space-x-4">
         <div 
           onClick={handleAvatarClick}
           className="w-16 h-16 bg-[#C5A880] rounded-full flex items-center justify-center font-display font-black text-white text-xl shadow-md relative shrink-0 cursor-pointer active:scale-95 transition-transform"
         >
-          U
+          {userAvatarChar}
           <span className="absolute bottom-0 right-0 w-5 h-5 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center text-[8px] text-white font-black">✓</span>
         </div>
         <div className="flex-1 min-w-0">
           <h2 className="font-display font-black text-base text-[#1C1917] flex items-center space-x-1.5 tracking-tight">
-            <span>Premium Клиент</span>
+            <span>{userName}</span>
           </h2>
-          <p className="text-xs text-[#78716C] truncate font-mono">tg_user_id: 841b57fe</p>
+          <p className="text-xs text-[#78716C] truncate font-mono">{userId}</p>
           <div className="flex space-x-2 mt-1.5">
             <span className="bg-[#C5A880]/15 text-[#C5A880] text-[9px] font-black px-3 py-0.5 rounded-full uppercase tracking-wider border border-[#C5A880]/20 font-mono">
-              Активных заказов: {orders.length}
+              Активных заявок: {orders.length}
             </span>
           </div>
         </div>
       </div>
 
       {/* Быстрые Кнопки Контактов */}
-      <div className="grid grid-cols-2 gap-3 px-4 mt-4">
-        <button
-          onClick={() => {
-            triggerHaptic('medium');
-            setActiveConsultation(true);
-          }}
-          className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/45 rounded-2xl p-4 flex flex-col items-center justify-center text-center shadow-md active:scale-95 transition cursor-pointer"
-        >
-          <MessageSquare className="w-6 h-6 text-[#C5A880]" />
-          <span className="text-xs font-bold text-[#1C1917] mt-2">Чат с менеджером</span>
-          <span className="text-[8px] text-[#78716C] mt-0.5 font-mono">Консультация онлайн</span>
-        </button>
+      <div className="px-4 mt-4 space-y-3">
+        <h3 className="font-display text-[11px] font-bold uppercase tracking-widest text-[#78716C] mb-1 font-mono">Связаться с нами</h3>
+        
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => {
+              triggerHaptic('medium');
+              setActiveConsultation(true);
+            }}
+            className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/45 rounded-2xl p-4 flex flex-col items-center justify-center text-center shadow-md active:scale-95 transition cursor-pointer"
+          >
+            <MessageSquare className="w-6 h-6 text-[#C5A880]" />
+            <span className="text-xs font-bold text-[#1C1917] mt-2">Чат с менеджером</span>
+            <span className="text-[8px] text-[#78716C] mt-0.5 font-mono">Консультация онлайн</span>
+          </button>
 
-        <a
-          href="tel:+78432220099"
-          onClick={() => triggerHaptic('light')}
-          className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/45 rounded-2xl p-4 flex flex-col items-center justify-center text-center shadow-md active:scale-95 transition cursor-pointer col-span-1"
-        >
-          <Phone className="w-6 h-6 text-emerald-600" />
-          <span className="text-xs font-bold text-[#1C1917] mt-2">Позвонить в офис</span>
-          <span className="text-[8px] text-[#78716C] mt-0.5 font-mono">+7 (843) 222-00-99</span>
-        </a>
+          {/* Первые два контакта из панели админа, либо стандартный звонок */}
+          {managerContacts && managerContacts.length > 0 ? (
+            managerContacts.slice(0, 1).map((c) => (
+              <a
+                key={c.id}
+                href={c.type === 'telegram' ? `https://t.me/${c.value}` : `tel:${c.value}`}
+                onClick={() => triggerHaptic('light')}
+                target={c.type === 'telegram' ? '_blank' : undefined}
+                rel="noreferrer"
+                className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/45 rounded-2xl p-4 flex flex-col items-center justify-center text-center shadow-md active:scale-95 transition cursor-pointer"
+              >
+                {c.type === 'telegram' ? (
+                  <MessageSquare className="w-6 h-6 text-blue-500" />
+                ) : (
+                  <Phone className="w-6 h-6 text-emerald-600" />
+                )}
+                <span className="text-xs font-bold text-[#1C1917] mt-2 truncate max-w-full">{c.name}</span>
+                <span className="text-[8px] text-[#78716C] mt-0.5 font-mono truncate max-w-full">
+                  {c.type === 'telegram' ? `@${c.value}` : c.value}
+                </span>
+              </a>
+            ))
+          ) : (
+            <a
+              href="tel:+78432220099"
+              onClick={() => triggerHaptic('light')}
+              className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/45 rounded-2xl p-4 flex flex-col items-center justify-center text-center shadow-md active:scale-95 transition cursor-pointer col-span-1"
+            >
+              <Phone className="w-6 h-6 text-emerald-600" />
+              <span className="text-xs font-bold text-[#1C1917] mt-2">Позвонить в офис</span>
+              <span className="text-[8px] text-[#78716C] mt-0.5 font-mono">+7 (843) 222-00-99</span>
+            </a>
+          )}
+        </div>
+
+        {/* Если контактов больше одного, выведем их элегантным списком */}
+        {managerContacts && managerContacts.length > 1 && (
+          <div className="bg-white rounded-2xl border border-[#EFEBE4] p-3 shadow-md space-y-2">
+            <p className="text-[9px] font-black uppercase tracking-wider text-[#78716C] border-b border-[#EFEBE4]/55 pb-1 mb-1 font-mono">Дополнительные контакты:</p>
+            <div className="grid grid-cols-1 gap-2">
+              {managerContacts.slice(1).map((c) => (
+                <a
+                  key={c.id}
+                  href={c.type === 'telegram' ? `https://t.me/${c.value}` : `tel:${c.value}`}
+                  onClick={() => triggerHaptic('light')}
+                  target={c.type === 'telegram' ? '_blank' : undefined}
+                  rel="noreferrer"
+                  className="flex items-center justify-between p-2 rounded-xl bg-[#F0EEEC] border border-[#EFEBE4]/60 active:scale-[0.99] transition hover:border-[#C5A880]/30 cursor-pointer"
+                >
+                  <div className="flex items-center space-x-2.5 min-w-0">
+                    <div className="w-7 h-7 bg-[#C5A880]/10 rounded-full flex items-center justify-center shrink-0">
+                      {c.type === 'telegram' ? (
+                        <MessageSquare className="w-4 h-4 text-[#C5A880]" />
+                      ) : (
+                        <Phone className="w-4 h-4 text-emerald-600" />
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] font-bold text-[#1C1917] truncate">{c.name}</p>
+                      <p className="text-[8px] text-[#78716C] font-mono truncate">
+                        {c.type === 'telegram' ? `Telegram: @${c.value}` : `Тел: ${c.value}`}
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronDown className="w-3.5 h-3.5 text-[#78716C] -rotate-90 shrink-0" />
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Центр управления комфортом */}
       <div className="px-4 mt-6">
         <h3 className="font-display text-[11px] font-bold uppercase tracking-widest text-[#78716C] mb-2.5 font-mono">Центр управления комфортом</h3>
         <div className="bg-white rounded-3xl border border-[#EFEBE4] p-4.5 space-y-4 shadow-md">
-          {/* Звук двигателя */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h4 className="text-xs font-bold text-[#1C1917]">Звук запуска двигателя</h4>
-              <p className="text-[10px] text-[#78716C] mt-0.5 font-medium leading-tight">Воспроизводит рев V12 при старте приложения</p>
-            </div>
-            <button
-              onClick={() => {
-                const newValue = engineSoundEnabled ? 'false' : 'true';
-                setEngineSoundEnabled(!engineSoundEnabled);
-                localStorage.setItem('dacar_settings_engine_sound', newValue);
-                triggerHaptic('medium');
-              }}
-              className={`w-11 h-6 rounded-full transition-colors relative shrink-0 ${engineSoundEnabled ? 'bg-[#C5A880]' : 'bg-[#EFEBE4]'}`}
-            >
-              <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform shadow-sm ${engineSoundEnabled ? 'right-1' : 'left-1'}`} />
-            </button>
-          </div>
-
           {/* Тактильная отдача */}
-          <div className="flex items-center justify-between border-t border-[#EFEBE4]/50 pt-3.5">
+          <div className="flex items-center justify-between">
             <div>
               <h4 className="text-xs font-bold text-[#1C1917]">Тактильная отдача (Haptic)</h4>
               <p className="text-[10px] text-[#78716C] mt-0.5 font-medium leading-tight">Премиум-вибрация при кликах и действиях</p>
@@ -246,7 +297,7 @@ export default function Profile() {
             <div>
               <h4 className="font-bold text-[#1C1917]">Официальное юрлицо РФ</h4>
               <p className="text-[10px] text-[#78716C] leading-normal mt-0.5 font-sans font-medium">
-                Договор заключается с ООО «ДА!КАР ИМПОРТ» (ИНН 1655489022). Все платежи принимаются на расчетный счет в Альфа-Банке.
+                {appTexts.legalInfo}
               </p>
             </div>
           </div>
@@ -264,9 +315,9 @@ export default function Profile() {
           <div className="flex items-start space-x-3 text-xs border-t border-[#EFEBE4]/40 pt-3.5">
             <MapPin className="w-5 h-5 text-[#C5A880] shrink-0 mt-0.5" />
             <div>
-              <h4 className="font-bold text-[#1C1917]">Шоурум в Казани</h4>
+              <h4 className="font-bold text-[#1C1917]">Шоурум выдачи</h4>
               <p className="text-[10px] text-[#78716C] leading-normal mt-0.5 font-sans font-medium">
-                Приезжайте знакомиться лично! г. Казань, ул. Серова, д. 48, к. 2. Рады видеть вас каждый день с 10:00 до 20:00.
+                Приезжайте знакомиться лично! {appTexts.showroomAddress}. Рады видеть вас каждый день с 10:00 до 20:00.
               </p>
             </div>
           </div>
@@ -286,7 +337,7 @@ export default function Profile() {
               >
                 <button
                   onClick={() => toggleFaq(index)}
-                  className="w-full px-4 py-3.5 flex justify-between items-center text-left text-xs font-bold text-[#1C1917] hover:bg-[#FAF8F5]"
+                  className="w-full px-4 py-3.5 flex justify-between items-center text-left text-xs font-bold text-[#1C1917] hover:bg-[#F0EEEC]"
                 >
                   <span className="pr-4">{faq.q}</span>
                   <ChevronDown className={`w-4 h-4 text-[#78716C] shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
@@ -297,7 +348,7 @@ export default function Profile() {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="px-4 pb-4 border-t border-[#EFEBE4]/40 text-[10px] text-[#78716C] leading-relaxed pt-2.5 bg-[#FAF8F5]/50 font-sans font-medium"
+                      className="px-4 pb-4 border-t border-[#EFEBE4]/40 text-[10px] text-[#78716C] leading-relaxed pt-2.5 bg-[#F0EEEC]/50 font-sans font-medium"
                     >
                       {faq.a}
                     </motion.div>
@@ -327,7 +378,7 @@ export default function Profile() {
               initial={{ y: '100%' }}
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
-              className="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-[#FAF8F5] border-t border-[#EFEBE4] rounded-t-[32px] z-50 p-5 flex flex-col h-[75%] shadow-2xl select-none"
+              className="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-[#F0EEEC] border-t border-[#EFEBE4] rounded-t-[32px] z-50 p-5 flex flex-col h-[75%] shadow-2xl select-none"
             >
               <div className="w-12 h-1 bg-[#EFEBE4] rounded-full mx-auto mb-4 shrink-0"></div>
 
@@ -369,6 +420,72 @@ export default function Profile() {
                 ))}
               </div>
 
+              {/* Форма заявки на подбор и обратный звонок */}
+              <div className="bg-[#C5A880]/10 border border-[#C5A880]/30 rounded-2xl p-3.5 mb-2.5 space-y-2 shrink-0">
+                <p className="text-[10px] font-black uppercase text-[#1C1917] font-mono flex items-center space-x-1">
+                  <span>🎯 Подбор под ваш бюджет</span>
+                </p>
+                <p className="text-[8.5px] text-[#78716C] leading-normal font-medium">
+                  Оставьте ваш телефон, чтобы получить детальный подбор и расчет моделей под ваш персональный бюджет в течение 10 минут!
+                </p>
+                
+                <div className="flex space-x-2">
+                  <input
+                    type="tel"
+                    id="callback-phone-input"
+                    placeholder="+7 (999) 000-00-00"
+                    className="flex-1 bg-white border border-[#EFEBE4] text-xs rounded-xl px-3 py-2 outline-none focus:border-[#C5A880]/50"
+                  />
+                  <button
+                    onClick={() => {
+                      const inp = document.getElementById('callback-phone-input') as HTMLInputElement;
+                      if (!inp || !inp.value.trim()) {
+                        alert('⚠️ Введите корректный номер телефона!');
+                        return;
+                      }
+                      
+                      const phone = inp.value.trim();
+                      triggerHaptic('success');
+                      
+                      // Добавим в чат сообщение пользователя и ответ менеджера
+                      setConsultationChat(prev => [
+                        ...prev,
+                        { sender: 'user', text: `Заявка на подбор под бюджет. Телефон: ${phone}` },
+                        { sender: 'manager', text: `Спасибо! Ваша заявка принята. Менеджер уже анализирует рынок и готовит лучшие варианты подбора под ваш бюджет для номера ${phone}!` }
+                      ]);
+                      inp.value = '';
+
+                      // Отправка в Telegram!
+                      try {
+                        const botToken = localStorage.getItem('tg_bot_token') || APP_CONFIG.DEFAULT_TG_BOT_TOKEN;
+                        const channelId = localStorage.getItem('tg_channel_id') || APP_CONFIG.DEFAULT_TG_CHANNEL_ID;
+                        if (botToken && channelId) {
+                          const tgMessage = `📞 **ЗАКАЗ ОБРАТНОГО ЗВОНКА**\n\n` +
+                            `👤 **Пользователь:** Premium Клиент\n` +
+                            `📞 **Телефон:** ${phone}\n\n` +
+                            `⚡ *Срочно перезвоните клиенту!*`;
+
+                          fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              chat_id: channelId,
+                              text: tgMessage,
+                              parse_mode: 'Markdown'
+                            })
+                          });
+                        }
+                      } catch (e) {
+                        console.error('Callback TG error:', e);
+                      }
+                    }}
+                    className="bg-[#1C1917] hover:bg-[#2E2A27] text-white text-[10px] font-black uppercase px-3 rounded-xl transition active:scale-95 cursor-pointer"
+                  >
+                    Перезвонить
+                  </button>
+                </div>
+              </div>
+
               {/* Предустановленные Кнопки-Вопросы */}
               <div className="border-t border-[#EFEBE4]/65 pt-3.5 shrink-0 space-y-2">
                 <p className="text-[9px] text-[#78716C] font-bold uppercase tracking-widest px-1 font-mono">
@@ -379,7 +496,7 @@ export default function Profile() {
                     <button
                       key={index}
                       onClick={() => handleAskQuestion(cq.q, cq.a)}
-                      className="bg-white hover:bg-[#FAF8F5] text-[#1C1917] text-left px-3.5 py-2 rounded-xl text-[10px] font-bold transition-bezier cursor-pointer border border-[#EFEBE4] shadow-sm"
+                      className="bg-white hover:bg-[#F0EEEC] text-[#1C1917] text-left px-3.5 py-2 rounded-xl text-[10px] font-bold transition-bezier cursor-pointer border border-[#EFEBE4] shadow-sm"
                     >
                       {cq.q}
                     </button>

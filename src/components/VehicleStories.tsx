@@ -19,7 +19,9 @@ export default function VehicleStories() {
     activeStoryCarId, 
     setActiveStoryCarId, 
     cars, 
-    addOrder 
+    addOrder,
+    selectedCity,
+    setSelectedCity
   } = useStore();
 
   const car = cars.find(c => c.id === activeStoryCarId);
@@ -28,7 +30,6 @@ export default function VehicleStories() {
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [selectedCity, setSelectedCity] = useState('Казань (Главный филиал)');
   const [showOrderForm, setShowOrderForm] = useState(false);
 
   // Поля формы заказа в 1 клик
@@ -166,7 +167,7 @@ export default function VehicleStories() {
   return (
     <div className="fixed inset-0 bg-black/45 backdrop-blur-md z-50 flex items-center justify-center select-none overflow-hidden">
       {/* Контейнер сторис */}
-      <div className="w-full h-full max-w-[440px] bg-[#FAF8F5] flex flex-col justify-between relative shadow-2xl overflow-y-auto scrollbar-none sm:rounded-[40px]">
+      <div className="w-full h-full max-w-[440px] bg-[#F0EEEC] flex flex-col justify-between relative shadow-2xl overflow-y-auto scrollbar-none sm:rounded-[40px]">
         
         {/* ФОНОВЫЕ СВЕЧЕНИЯ */}
         <div className="absolute top-[-20%] left-[-20%] w-[80%] h-[50%] bg-[#C5A880]/8 rounded-full blur-3xl pointer-events-none"></div>
@@ -248,7 +249,7 @@ export default function VehicleStories() {
         </div>
 
         {/* ГЛАВНЫЙ СЛАЙД С КАРТОЧКОЙ В СТИЛЕ ПЛАКАТА */}
-        <div className="flex-1 w-full bg-[#FAF8F5] px-4 pt-16 pb-4 flex flex-col justify-between overflow-y-auto scrollbar-none relative z-10">
+        <div className="flex-1 w-full bg-[#F0EEEC] px-4 pt-16 pb-4 flex flex-col justify-between overflow-y-auto scrollbar-none relative z-10">
           
           {/* 1. ШАПКА КАРТОЧКИ */}
           <div className="flex justify-between items-center border-b border-[#EFEBE4] pb-2.5 mt-3 shrink-0">
@@ -399,7 +400,7 @@ export default function VehicleStories() {
                   className="bg-black/10 text-[#1C1917] text-[9px] font-black px-2 py-1 rounded border border-[#1C1917]/10 outline-none cursor-pointer pr-1"
                 >
                   {DELIVERY_CITIES.map(c => (
-                    <option key={c.name} value={c.name} className="bg-[#FAF8F5] text-[#1C1917] text-[9px]">
+                    <option key={c.name} value={c.name} className="bg-[#F0EEEC] text-[#1C1917] text-[9px]">
                       {c.name.split(' ')[0]}
                     </option>
                   ))}
@@ -417,7 +418,7 @@ export default function VehicleStories() {
             </div>
 
             {/* Описание "включено всё" */}
-            <div className="mt-2.5 bg-[#FAF8F5]/35 border border-[#1C1917]/10 px-2 py-1.5 rounded text-center">
+            <div className="mt-2.5 bg-[#F0EEEC]/35 border border-[#1C1917]/10 px-2 py-1.5 rounded text-center">
               <span className="text-[7px] uppercase tracking-wider text-[#1C1917] font-black block">
                 Включено всё: Автомобиль + Доставка + Таможня + ЭПТС + Утильсбор РФ
               </span>
@@ -493,18 +494,18 @@ export default function VehicleStories() {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-              className="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-[#FAF8F5] border-t border-[#EFEBE4] rounded-t-[32px] p-6 z-50 select-none text-[#1C1917] shadow-2xl"
+              className="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-[#F0EEEC] border-t border-[#EFEBE4] rounded-t-[32px] p-6 z-50 select-none text-[#1C1917] shadow-2xl"
             >
               <div className="w-12 h-1 bg-[#EFEBE4] rounded-full mx-auto mb-5"></div>
 
               <div className="flex justify-between items-center mb-5">
                 <div>
-                  <h3 className="font-display font-bold text-base text-[#1C1917]">Быстрый заказ</h3>
-                  <p className="text-[10px] text-[#78716C] mt-0.5 font-medium">Оставьте контакты, менеджер перезвонит через 5 минут</p>
+                  <h3 className="font-display font-bold text-base text-[#1C1917]">Подбор под бюджет</h3>
+                  <p className="text-[10px] text-[#78716C] mt-0.5 font-medium">Оставьте контакты для бесплатного подбора и расчета под ваш бюджет</p>
                 </div>
                 <button 
                   onClick={() => setShowOrderForm(false)}
-                  className="p-1.5 bg-[#FAF8F5] hover:bg-[#EFEBE4] rounded-full text-[#78716C] transition cursor-pointer"
+                  className="p-1.5 bg-[#F0EEEC] hover:bg-[#EFEBE4] rounded-full text-[#78716C] transition cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -522,7 +523,7 @@ export default function VehicleStories() {
                   <div>
                     <h4 className="font-display font-bold text-sm text-emerald-600">Заявка принята!</h4>
                     <p className="text-[10px] text-[#78716C] mt-1 leading-relaxed">
-                      Автомобиль {car.brand} {car.model} забронирован за вами. Менеджер свяжется с вами по номеру в ближайшее время.
+                      Заявка на подбор автомобиля {car.brand} {car.model} под ваш бюджет принята. Менеджер свяжется с вами по номеру в ближайшее время.
                     </p>
                   </div>
                 </motion.div>
@@ -530,7 +531,7 @@ export default function VehicleStories() {
                 <form onSubmit={handleOrderSubmit} className="space-y-4">
                   
                   {/* Описание выбранного авто */}
-                  <div className="bg-[#FAF8F5] border border-[#EFEBE4] p-3 rounded-xl flex items-center space-x-3">
+                  <div className="bg-[#F0EEEC] border border-[#EFEBE4] p-3 rounded-xl flex items-center space-x-3">
                     <img 
                       src={car.images[0]} 
                       alt="" 
@@ -553,7 +554,7 @@ export default function VehicleStories() {
                       placeholder="Иван Иванов"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-[#FAF8F5] border border-[#EFEBE4] rounded-xl px-3.5 py-2.5 text-xs text-[#1C1917] outline-none focus:border-[#C5A880] font-sans font-semibold transition"
+                      className="w-full bg-[#F0EEEC] border border-[#EFEBE4] rounded-xl px-3.5 py-2.5 text-xs text-[#1C1917] outline-none focus:border-[#C5A880] font-sans font-semibold transition"
                       required
                     />
                   </div>
@@ -566,7 +567,7 @@ export default function VehicleStories() {
                       placeholder="+7 (999) 123-45-67"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full bg-[#FAF8F5] border border-[#EFEBE4] rounded-xl px-3.5 py-2.5 text-xs text-[#1C1917] outline-none focus:border-[#C5A880] font-sans font-semibold transition"
+                      className="w-full bg-[#F0EEEC] border border-[#EFEBE4] rounded-xl px-3.5 py-2.5 text-xs text-[#1C1917] outline-none focus:border-[#C5A880] font-sans font-semibold transition"
                       required
                     />
                   </div>

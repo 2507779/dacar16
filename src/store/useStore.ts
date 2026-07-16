@@ -6,6 +6,7 @@
 import { create } from 'zustand';
 import { Car, Order, OrderStatus, TrackingStep, AppTexts, ManagerContact } from '../types';
 import { CARS_DATA, calculateFullCarPrice } from '../data/cars';
+import { APP_CONFIG } from '../config';
 
 // Список всех статусов логистики по порядку
 export const ORDER_STATUSES: { status: OrderStatus; label: string; desc: string }[] = [
@@ -77,6 +78,7 @@ interface AppStore {
   homepageBannerUrl: string;
   homepageBannerTitle: string;
   homepageBannerSubtitle: string;
+  selectedCity: string;
   
   // Editable App Texts & Contacts
   appTexts: AppTexts;
@@ -86,6 +88,7 @@ interface AppStore {
   setCurrentTab: (tab: 'home' | 'catalog' | 'favorites' | 'orders' | 'profile') => void;
   setActiveCarId: (id: string | null) => void;
   setActiveStoryCarId: (id: string | null) => void;
+  setSelectedCity: (city: string) => void;
   toggleFavorite: (carId: string) => void;
   addOrder: (
     car: Car,
@@ -189,19 +192,18 @@ export const useStore = create<AppStore>((set, get) => {
   const parsedOrders = localOrders ? JSON.parse(localOrders) : sampleOrders;
 
   // Загрузка кастомизации текстов и контактов
-  const savedHomeTitle = localStorage.getItem('dacar_home_title') || 'Автомобили под заказ';
-  const savedHomeSubtitle = localStorage.getItem('dacar_home_subtitle') || 'без лишних хлопот';
-  const savedShowroomAddress = localStorage.getItem('dacar_showroom_address') || 'г. Казань, ул. Серова, 48 к2';
-  const savedOfficePhone = localStorage.getItem('dacar_office_phone') || '+7 (843) 222-00-99';
-  const savedWebsiteUrl = localStorage.getItem('dacar_website_url') || 'dacar16.ru';
-  const savedLegalInfo = localStorage.getItem('dacar_legal_info') || 'ООО «ДА!КАР ИМПОРТ» (ИНН 1655489022). Все платежи принимаются на расчетный счет в Альфа-Банке.';
+  const savedHomeTitle = localStorage.getItem('dacar_home_title') || APP_CONFIG.DEFAULT_HOME_TITLE;
+  const savedHomeSubtitle = localStorage.getItem('dacar_home_subtitle') || APP_CONFIG.DEFAULT_HOME_SUBTITLE;
+  const savedShowroomAddress = localStorage.getItem('dacar_showroom_address') || APP_CONFIG.DEFAULT_SHOWROOM_ADDRESS;
+  const savedOfficePhone = localStorage.getItem('dacar_office_phone') || APP_CONFIG.DEFAULT_OFFICE_PHONE;
+  const savedWebsiteUrl = localStorage.getItem('dacar_website_url') || APP_CONFIG.DEFAULT_WEBSITE_URL;
+  const savedLegalInfo = localStorage.getItem('dacar_legal_info') || APP_CONFIG.DEFAULT_LEGAL_INFO;
 
-  const defaultContacts: ManagerContact[] = [
-    { id: 'mc-1', name: 'Менеджер Max (Telegram)', type: 'telegram', value: 'max_dacar' },
-    { id: 'mc-2', name: 'Дежурный офис (Звонок)', type: 'phone', value: '+78432220099' }
-  ];
+  const defaultContacts = APP_CONFIG.DEFAULT_MANAGER_CONTACTS;
   const localContacts = localStorage.getItem('dacar_manager_contacts');
   const parsedContacts = localContacts ? JSON.parse(localContacts) : defaultContacts;
+
+  const savedCity = localStorage.getItem('dacar_delivery_city') || 'Казань (Главный филиал)';
 
   return {
     currentTab: 'home',
@@ -215,6 +217,7 @@ export const useStore = create<AppStore>((set, get) => {
     homepageBannerUrl: savedBannerUrl,
     homepageBannerTitle: savedBannerTitle,
     homepageBannerSubtitle: savedBannerSubtitle,
+    selectedCity: savedCity,
     appTexts: {
       homeTitle: savedHomeTitle,
       homeSubtitle: savedHomeSubtitle,
@@ -230,6 +233,11 @@ export const useStore = create<AppStore>((set, get) => {
     setActiveCarId: (id) => set({ activeCarId: id }),
 
     setActiveStoryCarId: (id) => set({ activeStoryCarId: id }),
+
+    setSelectedCity: (city) => {
+      localStorage.setItem('dacar_delivery_city', city);
+      set({ selectedCity: city });
+    },
 
     toggleFavorite: (carId) => {
       const currentFavs = get().favorites;
@@ -267,6 +275,42 @@ export const useStore = create<AppStore>((set, get) => {
       const updatedOrders = [newOrder, ...get().orders];
       localStorage.setItem('dacar_orders', JSON.stringify(updatedOrders));
       set({ orders: updatedOrders });
+
+      // REAL TELEGRAM NOTIFICATION DISPATCH
+      try {
+        const botToken = localStorage.getItem('tg_bot_token') || APP_CONFIG.DEFAULT_TG_BOT_TOKEN;
+        const channelId = localStorage.getItem('tg_channel_id') || APP_CONFIG.DEFAULT_TG_CHANNEL_ID;
+
+        if (botToken && channelId) {
+          const leadMessage = `🔔 **НОВАЯ ЗАЯВКА НА АВТОМОБИЛЬ DA!CAR**\n\n` +
+            `👤 **Имя клиента:** ${customerName}\n` +
+            `📞 **Телефон:** ${customerPhone}\n` +
+            `🚘 **Выбранный автомобиль:** ${car.brand} ${car.model} (${car.year} г.)\n` +
+            `💰 **Стоимость под ключ:** ${finalPriceRUB.toLocaleString('ru-RU')} ₽\n` +
+            `📍 **Город доставки:** ${customerCity}\n\n` +
+            `⏳ *Менеджер уже получил уведомление и связывается с клиентом!*`;
+
+          fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: channelId,
+              text: leadMessage,
+              parse_mode: 'Markdown'
+            })
+          })
+          .then(res => {
+            if (!res.ok) {
+              console.warn('Telegram sending failed', res.statusText);
+            }
+          })
+          .catch(err => {
+            console.error('Error sending message to Telegram', err);
+          });
+        }
+      } catch (err) {
+        console.error('Telegram notification dispatch error:', err);
+      }
 
       return newOrder;
     },

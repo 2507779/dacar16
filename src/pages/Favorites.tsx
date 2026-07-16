@@ -11,7 +11,7 @@ import { Heart, Sparkles, Plus, Scale, Trash2, ArrowRight, Check, CheckCircle2, 
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function Favorites() {
-  const { cars, favorites, toggleFavorite, setCurrentTab, setActiveCarId } = useStore();
+  const { cars, favorites, toggleFavorite, setCurrentTab, setActiveCarId, selectedCity } = useStore();
   const [isCompareMode, setIsCompareMode] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -22,7 +22,7 @@ export default function Favorites() {
   // Вычисление лучших показателей для подсветки (Feature 8)
   const maxPower = favoriteCars.length > 0 ? Math.max(...favoriteCars.map(c => c.power)) : 0;
   const lowestPrice = favoriteCars.length > 0 ? Math.min(...favoriteCars.map(c => {
-    const calc = calculateFullCarPrice(c);
+    const calc = calculateFullCarPrice(c, selectedCity);
     return calc.finalPriceRUB;
   })) : 0;
 
@@ -50,10 +50,10 @@ export default function Favorites() {
   };
 
   return (
-    <div className="flex flex-col text-[#1C1917] pb-12 select-none bg-[#FAF8F5]">
+    <div className="flex flex-col text-[#1C1917] pb-12 select-none bg-[#F0EEEC]">
       
       {/* Шапка Избранного */}
-      <div className="px-4 pt-4 pb-3 border-b border-[#EFEBE4] flex justify-between items-center bg-[#FAF8F5]/95 sticky top-0 backdrop-blur-md z-10">
+      <div className="px-4 pt-4 pb-3 border-b border-[#EFEBE4] flex justify-between items-center bg-[#F0EEEC]/95 sticky top-0 backdrop-blur-md z-10">
         <div>
           <h2 className="font-display font-black text-base text-[#1C1917] tracking-tight">Избранные авто</h2>
           <p className="text-[10px] text-[#78716C] mt-0.5 font-mono">В списке: {favoriteCars.length}</p>
@@ -79,7 +79,7 @@ export default function Favorites() {
               className={`px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition active:scale-95 cursor-pointer border shadow-sm ${
                 isCompareMode
                   ? 'bg-[#C5A880] border-[#C5A880] text-white shadow-md'
-                  : 'bg-white border-[#EFEBE4] text-[#1C1917] hover:border-[#C5A880]/40 hover:bg-[#FAF8F5]'
+                  : 'bg-white border-[#EFEBE4] text-[#1C1917] hover:border-[#C5A880]/40 hover:bg-[#F0EEEC]'
               }`}
             >
               <Scale className="w-4 h-4" />
@@ -94,7 +94,7 @@ export default function Favorites() {
         {favoriteCars.length === 0 ? (
           /* Пустое состояние */
           <div className="bg-white rounded-3xl p-8 border border-[#EFEBE4] text-center flex flex-col items-center justify-center space-y-4 shadow-md my-10">
-            <div className="w-16 h-16 bg-[#FAF8F5] rounded-full flex items-center justify-center text-[#C5A880] border border-[#EFEBE4] shadow-inner animate-pulse">
+            <div className="w-16 h-16 bg-[#F0EEEC] rounded-full flex items-center justify-center text-[#C5A880] border border-[#EFEBE4] shadow-inner animate-pulse">
               <Heart className="w-7 h-7 fill-[#C5A880]/20" />
             </div>
             <div>
@@ -205,10 +205,10 @@ export default function Favorites() {
                       </td>
                     ))}
                   </tr>
-                  <tr className="bg-[#FAF8F5]">
+                  <tr className="bg-[#F0EEEC]">
                     <td className="py-3 font-bold text-[#1C1917]">Цена под ключ</td>
                     {favoriteCars.map(car => {
-                      const calculated = calculateFullCarPrice(car);
+                      const calculated = calculateFullCarPrice(car, selectedCity);
                       const isBest = calculated.finalPriceRUB === lowestPrice && favoriteCars.length > 1;
                       return (
                         <td key={car.id} className="py-3 px-3 text-center animate-fade-in">
@@ -242,7 +242,7 @@ export default function Favorites() {
           /* Список избранного */
           <div className="space-y-3">
             {favoriteCars.map((car) => {
-              const calculated = calculateFullCarPrice(car);
+              const calculated = calculateFullCarPrice(car, selectedCity);
               return (
                 <div
                   key={car.id}
@@ -275,7 +275,7 @@ export default function Favorites() {
                           {car.year} г. • {car.power} л.с.
                         </p>
                       </div>
-                      <span className="bg-[#FAF8F5] border border-[#EFEBE4] text-[#1C1917] text-[8px] font-bold px-2 py-0.5 rounded-md shrink-0 uppercase tracking-wider ml-1">
+                      <span className="bg-[#F0EEEC] border border-[#EFEBE4] text-[#1C1917] text-[8px] font-bold px-2 py-0.5 rounded-md shrink-0 uppercase tracking-wider ml-1">
                         {car.country === 'China' ? 'КНР 🇨🇳' : car.country === 'South Korea' ? 'Корея 🇰🇷' : 'КР 🇰🇬'}
                       </span>
                     </div>
@@ -336,7 +336,7 @@ export default function Favorites() {
                 </p>
 
                 {/* Флайер-сводка */}
-                <div className="bg-[#FAF8F5] border border-[#C5A880]/30 rounded-2xl p-4 space-y-3 relative overflow-hidden">
+                <div className="bg-[#F0EEEC] border border-[#C5A880]/30 rounded-2xl p-4 space-y-3 relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-24 h-24 bg-[#C5A880]/5 rounded-full -mr-8 -mt-8 blur-md" />
                   
                   <div className="flex justify-between items-center">
@@ -348,7 +348,7 @@ export default function Favorites() {
 
                   <div className="space-y-2 border-t border-[#EFEBE4] pt-2">
                     {favoriteCars.map((car, idx) => {
-                      const calc = calculateFullCarPrice(car);
+                      const calc = calculateFullCarPrice(car, selectedCity);
                       return (
                         <div key={car.id} className="flex justify-between items-center text-[10px] font-medium">
                           <span className="text-[#1C1917]">
