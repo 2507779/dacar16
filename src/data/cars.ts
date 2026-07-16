@@ -60,7 +60,7 @@ export const CARS_DATA: Car[] = [
     color: 'Белый жемчуг (White Pearl)',
     images: [
       'https://images.unsplash.com/photo-1603386329225-868f9b1ee6c9?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1567818735868-e71b99932e29?auto=format&fit=crop&w=800&q=80'
+      'https://github.com/2507779/dacar16/blob/main/public/cars/Highlander1.jpg'
     ],
     priceUSD: 28500,
     recyclingFeeRUB: 3400,
@@ -87,7 +87,7 @@ export const CARS_DATA: Car[] = [
     transmission: 'Automatic',
     color: 'Темно-серый металлик',
     images: [
-      'https://github.com/2507779/dacar16/blob/main/public/cars/Highlander.jpg',
+      'https://drive.google.com/file/d/1qYaZ9Y67xQ29tO_tyJquRxc4FsvIMYMn/view?usp=drivesdk',
       'https://github.com/2507779/dacar16/blob/main/public/cars/Highlander1.jpg'
     ],
     priceUSD: 44000,
