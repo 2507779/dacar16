@@ -52,7 +52,7 @@ export default function Profile() {
   const [consultationChat, setConsultationChat] = useState<Array<{ sender: 'manager' | 'user'; text: string }>>([
     { 
       sender: 'manager', 
-      text: 'Приветствуем! Я дежурный менеджер отдела логистики DA!CAR. Выберите интересующий вас вопрос ниже, и я подробно отвечу вам.' 
+      text: 'Приветствуем! Я менеджер отдела логистики DA!CAR. Выберите интересующий вас вопрос ниже, и я подробно отвечу вам.' 
     }
   ]);
 
