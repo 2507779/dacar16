@@ -1,8 +1,8 @@
 import { Car } from '../types';
 
 export const EXCHANGE_RATES = {
-  USD_TO_RUB: 92.5,
-  EUR_TO_RUB: 100.5
+  USD_TO_RUB: 79.5,
+  EUR_TO_RUB: 80.5
 };
 
 export const BASE_DELIVERY_KAZAN_RUB = 150000;
