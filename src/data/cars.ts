@@ -1,8 +1,8 @@
 import { Car } from '../types';
 
 export const EXCHANGE_RATES = {
-  USD_TO_RUB: 79.5,
-  EUR_TO_RUB: 80.5
+  USD_TO_RUB: 92.5,
+  EUR_TO_RUB: 100.5
 };
 
 export const BASE_DELIVERY_KAZAN_RUB = 150000;
@@ -124,7 +124,9 @@ export const CARS_DATA: Car[] = [
       "Трехзонный климат-контроль"
     ],
     "availability": "on_order",
-    "deliveryDays": 15
+    "deliveryDays": 12,
+    "customsEUR": 6800,
+    "recyclingRUB": 3400
   },
   {
     "id": "gac-s7-2024-kg",
