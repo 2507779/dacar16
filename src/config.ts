@@ -25,5 +25,5 @@ export const APP_CONFIG = {
   DEFAULT_SHOWROOM_ADDRESS: 'г. Казань, ул. Серова, 48 к2',
   DEFAULT_OFFICE_PHONE: '+7 9656057511',
   DEFAULT_WEBSITE_URL: 'dacar16.ru',
-  DEFAULT_LEGAL_INFO: 'ООО «ДАКАР» ИНН 1685024690. Все платежи принимаются на расчетный счет в Альфа-Банке.'
+  DEFAULT_LEGAL_INFO: 'ООО «ДАКАР» ИНН 1685024690.'
 };
