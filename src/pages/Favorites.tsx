@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
-import { formatCurrency, calculateFullCarPrice } from '../data/cars';
+import { formatCurrency, calculateFullCarPrice, getCarImages } from '../data/cars';
 import { triggerHaptic } from '../utils/haptics';
 import { Heart, Sparkles, Plus, Scale, Trash2, ArrowRight, Check, CheckCircle2, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -251,7 +251,7 @@ export default function Favorites() {
                 >
                   <div className="w-28 h-24 shrink-0 overflow-hidden relative">
                     <img
-                      src={car.images[0]}
+                      src={getCarImages(car)[0]}
                       alt={`${car.brand} ${car.model}`}
                       referrerPolicy="no-referrer"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

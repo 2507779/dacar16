@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore';
-import { formatCurrency, calculateFullCarPrice, EXCHANGE_RATES } from '../data/cars';
+import { formatCurrency, calculateFullCarPrice, EXCHANGE_RATES, getCarImages } from '../data/cars';
 import { triggerHaptic } from '../utils/haptics';
 import { ShieldCheck, Truck, Percent, Coins, MessageSquare, ArrowRight, Zap, Flame, Award, Sparkles, Globe, Crown, Shield, FileText, Check, HelpCircle, MapPin, Search, Play, HelpCircle as HelpIcon, TrendingUp, TrendingDown, RefreshCw, Heart, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -302,7 +302,7 @@ export default function Home() {
                   title="Смотреть Stories"
                 >
                   <img
-                    src={car.images[0]}
+                    src={getCarImages(car)[0]}
                     alt={`${car.brand} ${car.model}`}
                     referrerPolicy="no-referrer"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

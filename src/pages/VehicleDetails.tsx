@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore';
-import { calculateFullCarPrice, formatCurrency, DELIVERY_CITIES, COMPANY_COMMISSION, BROKER_FEE_RUB, BASE_DELIVERY_KAZAN_RUB, EXCHANGE_RATES } from '../data/cars';
+import { calculateFullCarPrice, formatCurrency, DELIVERY_CITIES, COMPANY_COMMISSION, BROKER_FEE_RUB, BASE_DELIVERY_KAZAN_RUB, EXCHANGE_RATES, getCarImages, getCarFeatures } from '../data/cars';
 import { triggerHaptic } from '../utils/haptics';
 import { playEngineStartupSound, EngineSimulator } from '../utils/engineSound';
 import { Heart, ChevronRight, MapPin, Truck, ShieldCheck, FileText, Send, X, Check, CheckCircle2, Award, Settings, Gauge, Power, Music, CircleDot } from 'lucide-react';
@@ -45,6 +45,10 @@ export default function VehicleDetails() {
   const [simulator, setSimulator] = useState<EngineSimulator | null>(null);
 
   const car = cars.find(c => c.id === activeCarId);
+
+  useEffect(() => {
+    setActiveImageIndex(0);
+  }, [activeCarId]);
 
   // Валидация телефона
   const isFormValid = userName.trim().length >= 2 && userPhone.trim().length >= 6;
@@ -212,7 +216,7 @@ export default function VehicleDetails() {
       {/* 1. Слайдер Изображений */}
       <div className="relative h-64 bg-[#1C1917] overflow-hidden">
         <img
-          src={car.images[activeImageIndex]}
+          src={getCarImages(car)[activeImageIndex] || getCarImages(car)[0]}
           alt={`${car.brand} ${car.model}`}
           referrerPolicy="no-referrer"
           className="w-full h-full object-cover"
@@ -220,7 +224,7 @@ export default function VehicleDetails() {
 
         {/* Индикаторы слайдов */}
         <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
-          {car.images.map((_, idx) => (
+          {getCarImages(car).map((_, idx) => (
             <button
               key={idx}
               onClick={() => {
@@ -305,7 +309,7 @@ export default function VehicleDetails() {
       <div className="px-4 mt-6">
         <h3 className="font-display text-[10px] font-bold uppercase tracking-widest text-[#78716C] mb-2.5 font-mono">Оснащение премиум-класса</h3>
         <div className="flex flex-wrap gap-2">
-          {car.features.map((feat, index) => (
+          {getCarFeatures(car).map((feat, index) => (
             <span
               key={index}
               className="bg-white text-[#C5A880] text-[10px] font-black px-3 py-1.5 rounded-xl border border-[#EFEBE4] shadow-sm hover:border-[#C5A880]/30 transition duration-300"
@@ -459,7 +463,7 @@ export default function VehicleDetails() {
               {/* Детали авто в заказе */}
               <div className="bg-[#F0EEEC] rounded-2xl p-3 flex items-center space-x-3 mb-5 border border-[#EFEBE4]/60 shadow-sm">
                 <img
-                  src={car.images[0]}
+                  src={getCarImages(car)[0]}
                   alt={`${car.brand} ${car.model}`}
                   referrerPolicy="no-referrer"
                   className="w-12 h-12 rounded-xl object-cover shrink-0 border border-[#EFEBE4]/40"

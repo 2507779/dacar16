@@ -5,16 +5,16 @@ export const APP_CONFIG = {
   // НАСТРОЙКИ TELEGRAM (ПО УМОЛЧАНИЮ ДЛЯ ВСЕХ)
   // ==========================================
   // Укажите ваши реальные данные здесь, чтобы они работали у всех пользователей сразу:
-  DEFAULT_TG_BOT_TOKEN: '8901004949:AAH5tDlxyLahIr7vh9iRLC00bDwV4UOIj9k', // Например: '7234567890:ABCdefGhI_klMnoPqrStUvWxYz'
-  DEFAULT_TG_CHANNEL_ID: '-1004472641899', // Например: '-1001234567890' (обязательно с дефисом для супергрупп/каналов)
+  DEFAULT_TG_BOT_TOKEN: '', // Например: '7234567890:ABCdefGhI_klMnoPqrStUvWxYz'
+  DEFAULT_TG_CHANNEL_ID: '', // Например: '-1001234567890' (обязательно с дефисом для супергрупп/каналов)
 
   // ==========================================
   // СПИСОК МЕНЕДЖЕРОВ ПО УМОЛЧАНИЮ ДЛЯ ВСЕХ
   // ==========================================
   // Эти контакты будут отображаться в карточке успеха и профиле у всех посетителей:
   DEFAULT_MANAGER_CONTACTS: [
-    { id: 'mc-1', name: 'Менеджер Олег (Telegram)', type: 'telegram', value: 'rus564' },
-    { id: 'mc-2', name: 'Главный офис (Звонок)', type: 'phone', value: '+79656057511' }
+    { id: 'mc-1', name: 'Менеджер Max (Telegram)', type: 'telegram', value: 'max_dacar' },
+    { id: 'mc-2', name: 'Дежурный офис (Звонок)', type: 'phone', value: '+78432220099' }
   ] as ManagerContact[],
 
   // ==========================================
@@ -23,7 +23,7 @@ export const APP_CONFIG = {
   DEFAULT_HOME_TITLE: 'Автомобили под заказ',
   DEFAULT_HOME_SUBTITLE: 'без лишних хлопот',
   DEFAULT_SHOWROOM_ADDRESS: 'г. Казань, ул. Серова, 48 к2',
-  DEFAULT_OFFICE_PHONE: '+7 9656057511',
+  DEFAULT_OFFICE_PHONE: '+7 (843) 222-00-99',
   DEFAULT_WEBSITE_URL: 'dacar16.ru',
-  DEFAULT_LEGAL_INFO: 'ООО «ДАКАР» ИНН 1685024690.'
+  DEFAULT_LEGAL_INFO: 'ООО «ДА!КАР ИМПОРТ» (ИНН 1655489022). Все платежи принимаются на расчетный счет в Альфа-Банке.'
 };
