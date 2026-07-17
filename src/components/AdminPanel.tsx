@@ -74,6 +74,38 @@ export function AdminPanel() {
   // Кастомизация галереи фотографий по авто
   const [activeCarPhotoEditorId, setActiveCarPhotoEditorId] = useState<string | null>(null);
   const [newPhotoUrl, setNewPhotoUrl] = useState('');
+  const [isPhotoUploading, setIsPhotoUploading] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+  const handleManualSync = async () => {
+    setIsSyncing(true);
+    setSyncStatus('loading');
+    triggerHaptic('medium');
+    try {
+      const res = await fetch('/api/cars', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(cars)
+      });
+      if (res.ok) {
+        setSyncStatus('success');
+        triggerHaptic('success');
+        setTimeout(() => setSyncStatus('idle'), 4000);
+      } else {
+        setSyncStatus('error');
+        triggerHaptic('error');
+        setTimeout(() => setSyncStatus('idle'), 4000);
+      }
+    } catch (err) {
+      console.error(err);
+      setSyncStatus('error');
+      triggerHaptic('error');
+      setTimeout(() => setSyncStatus('idle'), 4000);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   // Настройки Воронки и Ботов
   const [tgBotToken, setTgBotToken] = useState(() => localStorage.getItem('tg_bot_token') || APP_CONFIG.DEFAULT_TG_BOT_TOKEN);
@@ -727,19 +759,41 @@ export const CARS_DATA: Car[] = ${formattedCars};
 
   const handleReplacePhoto = (carId: string, index: number, file: File | null) => {
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Файл слишком большой! Пожалуйста, выберите изображение до 5 МБ.');
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Файл слишком большой! Пожалуйста, выберите изображение до 10 МБ.');
       return;
     }
+    setIsPhotoUploading(true);
     const reader = new FileReader();
-    reader.onloadend = () => {
+    reader.onloadend = async () => {
       if (typeof reader.result === 'string') {
-        const targetCar = cars.find(c => c.id === carId);
-        if (targetCar) {
-          triggerHaptic('medium');
-          const updatedImages = [...getCarImages(targetCar)];
-          updatedImages[index] = reader.result;
-          editCar(carId, { ...targetCar, images: updatedImages });
+        try {
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              filename: file.name,
+              base64Data: reader.result
+            })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            const targetCar = cars.find(c => c.id === carId);
+            if (targetCar && data.url) {
+              triggerHaptic('success');
+              const updatedImages = [...getCarImages(targetCar)];
+              updatedImages[index] = data.url;
+              editCar(carId, { ...targetCar, images: updatedImages });
+            }
+          } else {
+            const err = await res.json();
+            alert(err.error || 'Ошибка загрузки фотографии на сервер.');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Ошибка связи с сервером при загрузке.');
+        } finally {
+          setIsPhotoUploading(false);
         }
       }
     };
@@ -748,18 +802,40 @@ export const CARS_DATA: Car[] = ${formattedCars};
 
   const handleUploadNewPhoto = (carId: string, file: File | null) => {
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Файл слишком большой! Пожалуйста, выберите изображение до 5 МБ.');
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Файл слишком большой! Пожалуйста, выберите изображение до 10 МБ.');
       return;
     }
+    setIsPhotoUploading(true);
     const reader = new FileReader();
-    reader.onloadend = () => {
+    reader.onloadend = async () => {
       if (typeof reader.result === 'string') {
-        const targetCar = cars.find(c => c.id === carId);
-        if (targetCar) {
-          triggerHaptic('medium');
-          const updatedGallery = [...getCarImages(targetCar), reader.result];
-          editCar(carId, { ...targetCar, images: updatedGallery });
+        try {
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              filename: file.name,
+              base64Data: reader.result
+            })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            const targetCar = cars.find(c => c.id === carId);
+            if (targetCar && data.url) {
+              triggerHaptic('success');
+              const updatedGallery = [...getCarImages(targetCar), data.url];
+              editCar(carId, { ...targetCar, images: updatedGallery });
+            }
+          } else {
+            const err = await res.json();
+            alert(err.error || 'Ошибка загрузки фотографии на сервер.');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Ошибка связи с сервером при загрузке.');
+        } finally {
+          setIsPhotoUploading(false);
         }
       }
     };
@@ -777,19 +853,43 @@ export const CARS_DATA: Car[] = ${formattedCars};
 
   const handleUploadForNewCar = (file: File | null) => {
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      alert('Файл слишком большой! Пожалуйста, выберите изображение до 5 МБ.');
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Файл слишком большой! Пожалуйста, выберите изображение до 10 МБ.');
       return;
     }
+    setIsPhotoUploading(true);
     const reader = new FileReader();
-    reader.onloadend = () => {
+    reader.onloadend = async () => {
       if (typeof reader.result === 'string') {
-        triggerHaptic('medium');
-        setNewImgUrl(prev => {
-          const lines = prev.split('\n').map(l => l.trim()).filter(Boolean);
-          lines.push(reader.result as string);
-          return lines.join('\n');
-        });
+        try {
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              filename: file.name,
+              base64Data: reader.result
+            })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.url) {
+              triggerHaptic('success');
+              setNewImgUrl(prev => {
+                const lines = prev.split('\n').map(l => l.trim()).filter(Boolean);
+                lines.push(data.url);
+                return lines.join('\n');
+              });
+            }
+          } else {
+            const err = await res.json();
+            alert(err.error || 'Ошибка загрузки фотографии на сервер.');
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Ошибка связи с сервером при загрузке.');
+        } finally {
+          setIsPhotoUploading(false);
+        }
       }
     };
     reader.readAsDataURL(file);
@@ -1492,6 +1592,44 @@ export const CARS_DATA: Car[] = ${formattedCars};
                     >
                       Выйти
                     </button>
+                  </div>
+
+                  {/* Индикатор синхронизации с GitHub */}
+                  <div className="bg-[#FAF8F5] p-2.5 rounded-2xl border border-[#E5E7EB]/45 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                    <div className="flex items-center space-x-2">
+                      <div className="p-1.5 bg-blue-50 text-blue-600 rounded-xl">
+                        <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+                      </div>
+                      <div>
+                        <p className="text-[10px] font-black text-stone-800">Синхронизация каталога</p>
+                        <p className="text-[8px] text-[#64748B] font-medium leading-tight">Обновляет cars.json на сервере и в вашем GitHub репозитории</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center space-x-1.5 self-end sm:self-auto">
+                      {syncStatus === 'success' && (
+                        <span className="text-[8.5px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">
+                          ✅ Синхронизировано!
+                        </span>
+                      )}
+                      {syncStatus === 'error' && (
+                        <span className="text-[8.5px] font-bold text-red-600 bg-red-50 px-2 py-1 rounded-lg">
+                          ❌ Ошибка синхронизации
+                        </span>
+                      )}
+                      
+                      <button
+                        onClick={handleManualSync}
+                        disabled={isSyncing}
+                        className={`py-1.5 px-3 rounded-xl text-[9.5px] font-extrabold shadow-sm transition active:scale-95 flex items-center space-x-1 ${
+                          isSyncing 
+                            ? 'bg-slate-100 text-slate-400 cursor-not-allowed' 
+                            : 'bg-stone-900 hover:bg-stone-800 text-white cursor-pointer'
+                        }`}
+                      >
+                        {isSyncing ? 'Синхронизация...' : 'Синхронизировать с GitHub'}
+                      </button>
+                    </div>
                   </div>
 
                   {/* Навигационные табы панели */}
@@ -2330,13 +2468,25 @@ export const CARS_DATA: Car[] = ${formattedCars};
                               {/* КНОПКИ ЗАГРУЗКИ И ПРЕОБРАЗОВАНИЯ */}
                               <div className="grid grid-cols-2 gap-2">
                                 {/* КНОПКА ЗАГРУЗКИ ФАЙЛА */}
-                                <label className="py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-xl text-[9.5px] transition flex items-center justify-center space-x-1 cursor-pointer shadow-sm">
-                                  <Upload className="w-3.5 h-3.5" />
-                                  <span>Загрузить с телефона/ПК</span>
+                                <label className={`py-2 px-3 text-white font-extrabold rounded-xl text-[9.5px] transition flex items-center justify-center space-x-1 cursor-pointer shadow-sm ${
+                                  isPhotoUploading ? 'bg-slate-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+                                }`}>
+                                  {isPhotoUploading ? (
+                                    <>
+                                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                      <span>Загрузка...</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Upload className="w-3.5 h-3.5" />
+                                      <span>Загрузить с телефона/ПК</span>
+                                    </>
+                                  )}
                                   <input
                                     type="file"
                                     accept="image/*"
                                     className="hidden"
+                                    disabled={isPhotoUploading}
                                     onChange={(e) => {
                                       const file = e.target.files?.[0] || null;
                                       handleUploadForNewCar(file);
@@ -2614,13 +2764,25 @@ export const CARS_DATA: Car[] = ${formattedCars};
                                             {/* Панель управления на каждом фото */}
                                             <div className="absolute bottom-1 inset-x-1 flex justify-between gap-1">
                                               {/* Кнопка замены */}
-                                              <label className="flex-1 p-1 bg-blue-600/90 hover:bg-blue-600 text-white rounded-lg transition cursor-pointer flex items-center justify-center space-x-0.5 active:scale-95 shadow">
-                                                <Upload className="w-2.5 h-2.5" />
-                                                <span className="text-[7.5px] font-bold">Заменить</span>
+                                              <label className={`flex-1 p-1 text-white rounded-lg transition cursor-pointer flex items-center justify-center space-x-0.5 active:scale-95 shadow ${
+                                                isPhotoUploading ? 'bg-slate-400 cursor-not-allowed' : 'bg-blue-600/90 hover:bg-blue-600'
+                                              }`}>
+                                                {isPhotoUploading ? (
+                                                  <>
+                                                    <Loader2 className="w-2.5 h-2.5 animate-spin" />
+                                                    <span className="text-[7.5px] font-bold">Ждите...</span>
+                                                  </>
+                                                ) : (
+                                                  <>
+                                                    <Upload className="w-2.5 h-2.5" />
+                                                    <span className="text-[7.5px] font-bold">Заменить</span>
+                                                  </>
+                                                )}
                                                 <input
                                                   type="file"
                                                   accept="image/*"
                                                   className="hidden"
+                                                  disabled={isPhotoUploading}
                                                   onChange={(e) => {
                                                     const file = e.target.files?.[0] || null;
                                                     handleReplacePhoto(c.id, idx, file);
@@ -2686,13 +2848,25 @@ export const CARS_DATA: Car[] = ${formattedCars};
                                         </span>
                                         <div className="flex flex-col sm:flex-row gap-1.5">
                                           {/* Способ 1: Загрузка файла */}
-                                          <label className="py-1.5 px-3 bg-blue-600 hover:bg-blue-700 text-white font-extrabold rounded-lg text-[9px] transition flex items-center justify-center space-x-1 cursor-pointer shadow shrink-0">
-                                            <Upload className="w-3 h-3" />
-                                            <span>Выбрать файл с устройства</span>
+                                          <label className={`py-1.5 px-3 text-white font-extrabold rounded-lg text-[9px] transition flex items-center justify-center space-x-1 cursor-pointer shadow shrink-0 ${
+                                            isPhotoUploading ? 'bg-slate-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+                                          }`}>
+                                            {isPhotoUploading ? (
+                                              <>
+                                                <Loader2 className="w-3 h-3 animate-spin" />
+                                                <span>Загрузка...</span>
+                                              </>
+                                            ) : (
+                                              <>
+                                                <Upload className="w-3 h-3" />
+                                                <span>Выбрать файл с устройства</span>
+                                              </>
+                                            )}
                                             <input
                                               type="file"
                                               accept="image/*"
                                               className="hidden"
+                                              disabled={isPhotoUploading}
                                               onChange={(e) => {
                                                 const file = e.target.files?.[0] || null;
                                                 handleUploadNewPhoto(c.id, file);

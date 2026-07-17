@@ -145,7 +145,8 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(express.json());
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
   // API для конфигурации Telegram & GitHub
   app.get('/api/telegram/config', (req, res) => {
@@ -454,6 +455,56 @@ async function startServer() {
     }
   });
 
+  // Загрузка фото с мобильного или ПК из Панели Администратора с коммитом в GitHub
+  app.post('/api/upload', async (req, res) => {
+    try {
+      const { filename, base64Data } = req.body;
+      if (!filename || !base64Data) {
+        return res.status(400).json({ error: 'Filename and base64Data are required' });
+      }
+
+      // Очищаем и делаем имя файла безопасным
+      const ext = path.extname(filename).toLowerCase() || '.jpg';
+      const cleanBaseName = transliterate(path.basename(filename, ext));
+      const safeFilename = `${cleanBaseName}_${Date.now()}${ext}`;
+
+      // Превращаем Base64 в Buffer
+      let pureBase64 = base64Data;
+      if (base64Data.includes(';base64,')) {
+        pureBase64 = base64Data.split(';base64,')[1];
+      }
+      const buffer = Buffer.from(pureBase64, 'base64');
+
+      // Сохраняем локально
+      const publicCarsDir = path.join(process.cwd(), 'public', 'cars');
+      if (!fs.existsSync(publicCarsDir)) {
+        fs.mkdirSync(publicCarsDir, { recursive: true });
+      }
+      const localFilePath = path.join(publicCarsDir, safeFilename);
+      fs.writeFileSync(localFilePath, buffer);
+      console.log(`[Upload API] Saved photo locally to ${localFilePath}`);
+
+      // Синхронизируем с GitHub
+      const gitSuccess = await commitToGithub(
+        localFilePath,
+        buffer,
+        `🤖 Загружено фото ${safeFilename} через Панель Администратора`
+      );
+
+      const imageUrl = `/cars/${safeFilename}`;
+
+      return res.json({
+        success: true,
+        message: 'Фотография успешно сохранена!',
+        url: imageUrl,
+        syncedWithGithub: gitSuccess
+      });
+    } catch (err: any) {
+      console.error('Error handling upload:', err);
+      return res.status(500).json({ error: err.message || 'Failed to handle file upload' });
+    }
+  });
+
   // Настройка Vite middleware в режиме разработки
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
@@ -464,7 +515,9 @@ async function startServer() {
   } else {
     // В продакшене отдаем статические файлы
     const distPath = path.join(process.cwd(), 'dist');
+    const publicPath = path.join(process.cwd(), 'public');
     app.use(express.static(distPath));
+    app.use(express.static(publicPath));
     app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
