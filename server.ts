@@ -131,6 +131,119 @@ function transliterate(text: string): string {
     .replace(/^_+|_+$/g, '');
 }
 
+// Чтение списка автомобилей из базы данных (cars.json или default)
+function readCars(): any[] {
+  try {
+    if (fs.existsSync(CARS_FILE_PATH)) {
+      const data = fs.readFileSync(CARS_FILE_PATH, 'utf-8');
+      return JSON.parse(data);
+    }
+  } catch (err) {
+    console.error('Error reading cars file:', err);
+  }
+  return CARS_DATA;
+}
+
+// Запись списка автомобилей в базу данных
+function writeCars(cars: any[]): boolean {
+  try {
+    fs.writeFileSync(CARS_FILE_PATH, JSON.stringify(cars, null, 2), 'utf-8');
+    return true;
+  } catch (err) {
+    console.error('Error writing cars file:', err);
+    return false;
+  }
+}
+
+// Парсинг деталей автомобиля из текста сообщения Telegram
+function parseCarFromMessage(text: string): any | null {
+  const lines = text.split('\n');
+  const result: any = {};
+  
+  const fieldMapping: { [key: string]: { key: string; type: 'string' | 'number' | 'array' | 'availability' | 'condition' | 'country' | 'engine' | 'drive' } } = {
+    'id': { key: 'id', type: 'string' },
+    'марка': { key: 'brand', type: 'string' },
+    'модель': { key: 'model', type: 'string' },
+    'поколение': { key: 'generation', type: 'string' },
+    'год': { key: 'year', type: 'number' },
+    'пробег': { key: 'mileage', type: 'number' },
+    'состояние': { key: 'condition', type: 'condition' },
+    'страна': { key: 'country', type: 'country' },
+    'кузов': { key: 'bodyType', type: 'string' },
+    'двигатель': { key: 'engineType', type: 'engine' },
+    'объем': { key: 'engineVolume', type: 'string' },
+    'мощность': { key: 'power', type: 'number' },
+    'привод': { key: 'driveType', type: 'drive' },
+    'кпп': { key: 'transmission', type: 'string' },
+    'цвет': { key: 'color', type: 'string' },
+    'цена usd': { key: 'priceUSD', type: 'number' },
+    'утиль rub': { key: 'recyclingFeeRUB', type: 'number' },
+    'пошлина eur': { key: 'customsDutyEUR', type: 'number' },
+    'цена rub': { key: 'customFinalPriceRUB', type: 'number' },
+    'наличие': { key: 'availability', type: 'availability' },
+    'доставка дней': { key: 'deliveryDays', type: 'number' },
+    'фото': { key: 'images', type: 'array' },
+    'описание': { key: 'description', type: 'string' }
+  };
+
+  let hasData = false;
+  for (const line of lines) {
+    if (!line.includes(':')) continue;
+    const separatorIdx = line.indexOf(':');
+    const label = line.slice(0, separatorIdx).trim().toLowerCase();
+    const val = line.slice(separatorIdx + 1).trim();
+    
+    const mapping = fieldMapping[label];
+    if (mapping) {
+      hasData = true;
+      if (mapping.type === 'number') {
+        result[mapping.key] = parseFloat(val.replace(/[^0-9.-]/g, '')) || 0;
+      } else if (mapping.type === 'array') {
+        result[mapping.key] = val ? val.split(',').map(s => s.trim()).filter(Boolean) : [];
+      } else if (mapping.type === 'condition') {
+        const lowerVal = val.toLowerCase();
+        result[mapping.key] = lowerVal.includes('use') || lowerVal.includes('б/у') || lowerVal.includes('бу') || lowerVal.includes('пробег') ? 'used' : 'new';
+      } else if (mapping.type === 'availability') {
+        const lowerVal = val.toLowerCase();
+        result[mapping.key] = lowerVal.includes('order') || lowerVal.includes('зак') || lowerVal.includes('под') ? 'on_order' : 'in_stock';
+      } else if (mapping.type === 'country') {
+        const lowerVal = val.toLowerCase();
+        if (lowerVal.includes('korea') || lowerVal.includes('корея')) {
+          result[mapping.key] = 'South Korea';
+        } else if (lowerVal.includes('kyrgyz') || lowerVal.includes('киргиз') || lowerVal.includes('кыргыз')) {
+          result[mapping.key] = 'Kyrgyzstan';
+        } else {
+          result[mapping.key] = 'China';
+        }
+      } else if (mapping.type === 'engine') {
+        const lowerVal = val.toLowerCase();
+        if (lowerVal.includes('electr') || lowerVal.includes('электр')) {
+          result[mapping.key] = 'electric';
+        } else if (lowerVal.includes('hybrid') || lowerVal.includes('гибрид')) {
+          result[mapping.key] = 'hybrid';
+        } else if (lowerVal.includes('diesel') || lowerVal.includes('дизел')) {
+          result[mapping.key] = 'diesel';
+        } else {
+          result[mapping.key] = 'gasoline';
+        }
+      } else if (mapping.type === 'drive') {
+        const lowerVal = val.toUpperCase();
+        if (lowerVal.includes('FWD') || lowerVal.includes('ПЕРЕД')) {
+          result[mapping.key] = 'FWD';
+        } else if (lowerVal.includes('RWD') || lowerVal.includes('ЗАДН')) {
+          result[mapping.key] = 'RWD';
+        } else {
+          result[mapping.key] = 'AWD';
+        }
+      } else {
+        result[mapping.key] = val;
+      }
+    }
+  }
+
+  return hasData ? result : null;
+}
+
 // Инициализируем локальный cars.json дефолтными данными из src/data/cars.ts, если его ещё нет
 try {
   if (!fs.existsSync(CARS_FILE_PATH)) {
@@ -235,7 +348,7 @@ async function startServer() {
       }
 
       const chatId = message.chat.id;
-      const text = message.text || '';
+      const text = (message.text || message.caption || '').trim();
       
       // Проверка разрешенных Chat ID (если настроена)
       if (config.allowedChatIds) {
@@ -247,25 +360,491 @@ async function startServer() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               chat_id: chatId,
-              text: `⚠️ У вас нет доступа к загрузке файлов. Ваш Chat ID: \`${chatId}\`. Укажите его в настройках админ-панели.`
+              text: `⚠️ У вас нет доступа к управлению ботом. Ваш Chat ID: \`${chatId}\`. Укажите его в поле "Доступные Chat ID" в вашей панели администратора на сайте.`
             })
           });
           return res.status(200).send('Unauthorized chat id');
         }
       }
 
-      // Если прислали команду /start или /help
+      // --- ОБРАБОТЧИК КОМАНД TELEGRAM ---
+
+      // 1. Команда /start или /help
       if (text.startsWith('/start') || text.startsWith('/help')) {
         await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendMessage`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             chat_id: chatId,
-            text: `🚗 *Добро пожаловать в бота DA!CAR!* \n\nОтправьте мне любое фото автомобиля. \n\n*Совет:* укажите в подписи к фото (caption) название автомобиля на русском или английском (например, \`zeekr_001\` или \`зикр_001_вид_сбоку\`). Я автоматически назову файл красиво и сохраню его напрямую в ваш GitHub репозиторий *${config.githubRepo}*!`
+            text: `🚗 *Панель управления каталогом Dacar16 через Telegram* 🚗\n\n` +
+                  `Вы можете полноценно управлять списком автомобилей прямо из этого чата!\n\n` +
+                  `📋 *Просмотр каталога:* \n` +
+                  `/list или /cars — Показать все авто в каталоге с номерами для быстрого удаления/редактирования.\n\n` +
+                  `➕ *Добавление авто:* \n` +
+                  `/add — Получить шаблон с инструкцией для заполнения.\n\n` +
+                  `📝 *Редактирование:* \n` +
+                  `/edit <id_авто> — Получить заполненный шаблон для редактирования.\n` +
+                  `Также можно просто кликнуть по быстрой ссылке вида \`/edit_номер\` в списке каталога.\n\n` +
+                  `🗑️ *Удаление:* \n` +
+                  `/del <id_авто> — Удалить авто по ID.\n` +
+                  `Также можно кликнуть по ссылке \`/del_номер\` в списке каталога.\n\n` +
+                  `💾 *Синхронизация:* \n` +
+                  `/sync или /push — Вручную отправить базу автомобилей \`cars.json\` в GitHub.\n\n` +
+                  `📸 *Загрузка фото:* \n` +
+                  `Просто пришлите фото автомобиля (сжатым файлом), и я сохраню его. \n\n` +
+                  `💡 *Лайфхак:* Вы можете прислать фотографию и добавить заполненный шаблон \`/save_car\` прямо в описание (caption) к фото — тогда авто создастся сразу с этой фотографией!`,
+            parse_mode: 'Markdown'
           })
         });
-        return res.status(200).send('Start message sent');
+        return res.status(200).send('Help message sent');
       }
+
+      // 2. Команда /list или /cars
+      if (text.startsWith('/list') || text.startsWith('/cars')) {
+        const cars = readCars();
+        if (cars.length === 0) {
+          await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: chatId,
+              text: `📭 Каталог автомобилей пуст. Используйте команду /add, чтобы добавить первый автомобиль!`
+            })
+          });
+          return res.status(200).send('Cars list is empty');
+        }
+
+        let listText = `📋 *Каталог автомобилей (${cars.length} шт.):*\n\n`;
+        cars.forEach((car, index) => {
+          const num = index + 1;
+          const conditionText = car.condition === 'new' ? '🆕 Новый' : '🚗 Б/У';
+          const priceText = car.priceUSD ? `${car.priceUSD.toLocaleString()}$` : 'Не указана';
+          const rubPrice = car.customFinalPriceRUB 
+            ? `${car.customFinalPriceRUB.toLocaleString()} ₽` 
+            : `${Math.round(car.priceUSD * 90).toLocaleString()} ₽ (расчет)`;
+          
+          listText += `${num}. *${car.brand} ${car.model}* (${car.year})\n`;
+          listText += `   • ID: \`${car.id}\` | ${conditionText} | ${car.country}\n`;
+          listText += `   • Цена: ${priceText} (~ ${rubPrice})\n`;
+          listText += `   • Изменить: /edit_${num} | Удалить: /del_${num}\n\n`;
+        });
+
+        if (listText.length > 4000) {
+          listText = listText.slice(0, 3900) + '\n\n... список усечен из-за ограничений Telegram. Используйте /edit <id> напрямую.';
+        }
+
+        await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: listText,
+            parse_mode: 'Markdown'
+          })
+        });
+        return res.status(200).send('Cars list sent');
+      }
+
+      // 3. Команда /add (шаблон для нового автомобиля)
+      if (text.startsWith('/add')) {
+        const template = `✍️ *Шаблон для добавления нового автомобиля:*\n\n` +
+          `Скопируйте текст сообщения ниже, заполните поля и отправьте боту. \n` +
+          `*Совет:* можно прикрепить фотографию автомобиля к этому сообщению — тогда она автоматически привяжется к новой машине!\n\n` +
+          `\`\`\`\n` +
+          `/save_car\n` +
+          `ID: \n` +
+          `Марка: Lixiang\n` +
+          `Модель: L9 Ultra\n` +
+          `Поколение: I\n` +
+          `Год: 2024\n` +
+          `Пробег: 0\n` +
+          `Состояние: new\n` +
+          `Страна: China\n` +
+          `Кузов: Внедорожник\n` +
+          `Двигатель: hybrid\n` +
+          `Объем: 1.5L Turbo\n` +
+          `Мощность: 449\n` +
+          `Привод: AWD\n` +
+          `КПП: Single-speed\n` +
+          `Цвет: Зеленый\n` +
+          `Цена USD: 58000\n` +
+          `Утиль RUB: 306000\n` +
+          `Пошлина EUR: 0\n` +
+          `Цена RUB: 7200000\n` +
+          `Наличие: in_stock\n` +
+          `Доставка дней: 25\n` +
+          `Фото: /cars/lixiang_l9.jpg\n` +
+          `Описание: Роскошный гибридный внедорожник с роскошным салоном и запасом хода до 1300 км.\n` +
+          `\`\`\``;
+
+        await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: template,
+            parse_mode: 'Markdown'
+          })
+        });
+        return res.status(200).send('Add template sent');
+      }
+
+      // 4. Команда /edit (получить заполненный шаблон для редактирования)
+      if (text.startsWith('/edit')) {
+        const cars = readCars();
+        let targetCar: any = null;
+
+        if (text.startsWith('/edit_')) {
+          const indexPart = text.split('_')[1];
+          const index = parseInt(indexPart, 10);
+          if (!isNaN(index) && index > 0 && index <= cars.length) {
+            targetCar = cars[index - 1];
+          }
+        } else {
+          const idPart = text.replace('/edit', '').trim();
+          if (idPart) {
+            targetCar = cars.find(c => c.id === idPart);
+          }
+        }
+
+        if (!targetCar) {
+          await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: chatId,
+              text: `❌ Автомобиль не найден! Введите правильный ID (например: \`/edit zeekr-001\`) или кликните по ссылке из списка /list.`
+            })
+          });
+          return res.status(200).send('Car to edit not found');
+        }
+
+        const template = `✍️ *Редактирование автомобиля ${targetCar.brand} ${targetCar.model} (${targetCar.year})*:\n\n` +
+          `Скопируйте блок ниже, отредактируйте нужные значения и отправьте обратно боту:\n\n` +
+          `\`\`\`\n` +
+          `/save_car\n` +
+          `ID: ${targetCar.id}\n` +
+          `Марка: ${targetCar.brand}\n` +
+          `Модель: ${targetCar.model}\n` +
+          `Поколение: ${targetCar.generation || ''}\n` +
+          `Год: ${targetCar.year || 2024}\n` +
+          `Пробег: ${targetCar.mileage || 0}\n` +
+          `Состояние: ${targetCar.condition || 'new'}\n` +
+          `Страна: ${targetCar.country || 'China'}\n` +
+          `Кузов: ${targetCar.bodyType || 'Внедорожник'}\n` +
+          `Двигатель: ${targetCar.engineType || 'hybrid'}\n` +
+          `Объем: ${targetCar.engineVolume || ''}\n` +
+          `Мощность: ${targetCar.power || 0}\n` +
+          `Привод: ${targetCar.driveType || 'AWD'}\n` +
+          `КПП: ${targetCar.transmission || 'Automatic'}\n` +
+          `Цвет: ${targetCar.color || ''}\n` +
+          `Цена USD: ${targetCar.priceUSD || 0}\n` +
+          `Утиль RUB: ${targetCar.recyclingFeeRUB || 0}\n` +
+          `Пошлина EUR: ${targetCar.customsDutyEUR || 0}\n` +
+          `Цена RUB: ${targetCar.customFinalPriceRUB || ''}\n` +
+          `Наличие: ${targetCar.availability || 'in_stock'}\n` +
+          `Доставка дней: ${targetCar.deliveryDays || 25}\n` +
+          `Фото: ${(targetCar.images || []).join(', ')}\n` +
+          `Описание: ${targetCar.description || ''}\n` +
+          `\`\`\``;
+
+        await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: template,
+            parse_mode: 'Markdown'
+          })
+        });
+        return res.status(200).send('Edit template sent');
+      }
+
+      // 5. Команда /del (удаление автомобиля)
+      if (text.startsWith('/del')) {
+        const cars = readCars();
+        let targetIndex = -1;
+
+        if (text.startsWith('/del_')) {
+          const indexPart = text.split('_')[1];
+          const index = parseInt(indexPart, 10);
+          if (!isNaN(index) && index > 0 && index <= cars.length) {
+            targetIndex = index - 1;
+          }
+        } else {
+          const idPart = text.replace('/del', '').trim();
+          if (idPart) {
+            targetIndex = cars.findIndex(c => c.id === idPart);
+          }
+        }
+
+        if (targetIndex === -1) {
+          await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: chatId,
+              text: `❌ Не удалось найти автомобиль для удаления! Проверьте ID или кликните ссылку из списка /list.`
+            })
+          });
+          return res.status(200).send('Car to delete not found');
+        }
+
+        const deletedCar = cars[targetIndex];
+        cars.splice(targetIndex, 1);
+        writeCars(cars);
+        
+        // Синхронизируем с GitHub
+        const contentString = JSON.stringify(cars, null, 2);
+        const gitSuccess = await commitToGithub(
+          CARS_FILE_PATH,
+          Buffer.from(contentString, 'utf-8'),
+          `🤖 Удален автомобиль ${deletedCar.brand} ${deletedCar.model} (${deletedCar.id}) через Telegram`
+        );
+
+        let replyText = `🗑️ *Автомобиль ${deletedCar.brand} ${deletedCar.model} успешно удален из базы!* \n\n`;
+        if (gitSuccess) {
+          replyText += `🐙 Изменения отправлены в GitHub репозиторий.`;
+        } else {
+          replyText += `⚠️ Сохранено локально на сервере, но не удалось синхронизировать с GitHub. Проверьте права доступа токена.`;
+        }
+
+        await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: replyText,
+            parse_mode: 'Markdown'
+          })
+        });
+        return res.status(200).send('Car deleted');
+      }
+
+      // 6. Команда /sync или /push (принудительный экспорт базы в GitHub)
+      if (text.startsWith('/sync') || text.startsWith('/push')) {
+        const cars = readCars();
+        const contentString = JSON.stringify(cars, null, 2);
+        
+        await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendChatAction`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: chatId, action: 'typing' })
+        });
+
+        const gitSuccess = await commitToGithub(
+          CARS_FILE_PATH,
+          Buffer.from(contentString, 'utf-8'),
+          `🤖 Ручная принудительная синхронизация каталога автомобилей с Telegram`
+        );
+
+        let replyText = '';
+        if (gitSuccess) {
+          replyText = `🐙 *Синхронизация с GitHub успешно завершена!* Все изменения каталога теперь зафиксированы в вашем репозитории.`;
+        } else {
+          replyText = `❌ Ошибка синхронизации с GitHub! Проверьте, настроен ли GitHub Token и репозиторий в панели администратора на сайте.`;
+        }
+
+        await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: replyText,
+            parse_mode: 'Markdown'
+          })
+        });
+        return res.status(200).send('Manual sync triggered');
+      }
+
+      // 7. Обработчик создания/сохранения автомобиля /save_car
+      if (text.startsWith('/save_car')) {
+        const parsedCar = parseCarFromMessage(text);
+        if (!parsedCar) {
+          await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: chatId,
+              text: `❌ *Ошибка разбора шаблона!* \n\nПожалуйста, убедитесь, что вы скопировали шаблон правильно и заполнили поля в формате \`Поле: Значение\`. `
+            })
+          });
+          return res.status(200).send('Failed to parse car message');
+        }
+
+        if (!parsedCar.brand || !parsedCar.model) {
+          await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: chatId,
+              text: `❌ *Пропущены обязательные поля!* \n\nВы должны указать \`Марка:\` и \`Модель:\` для создания или обновления автомобиля.`
+            })
+          });
+          return res.status(200).send('Missing brand or model');
+        }
+
+        // Если к сообщению с шаблоном прикрепили фото, скачиваем его
+        const photos = message.photo;
+        let downloadedPhotoPath = '';
+        if (photos && photos.length > 0) {
+          try {
+            await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendChatAction`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ chat_id: chatId, action: 'upload_photo' })
+            });
+
+            const photo = photos[photos.length - 1];
+            const fileId = photo.file_id;
+            const fileRes = await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/getFile?file_id=${fileId}`);
+            const fileData = await fileRes.json() as any;
+
+            if (fileData.ok) {
+              const telegramFilePath = fileData.result.file_path;
+              const fileUrl = `https://api.telegram.org/file/bot${config.telegramBotToken}/${telegramFilePath}`;
+              const downloadRes = await fetch(fileUrl);
+              
+              if (downloadRes.ok) {
+                const arrayBuffer = await downloadRes.arrayBuffer();
+                const buffer = Buffer.from(arrayBuffer);
+                const safeName = transliterate(`${parsedCar.brand}_${parsedCar.model}_${Date.now()}`);
+                const filename = `${safeName}.jpg`;
+
+                const publicCarsDir = path.join(process.cwd(), 'public', 'cars');
+                if (!fs.existsSync(publicCarsDir)) {
+                  fs.mkdirSync(publicCarsDir, { recursive: true });
+                }
+                const localFilePath = path.join(publicCarsDir, filename);
+                fs.writeFileSync(localFilePath, buffer);
+                
+                // Коммитим фото в GitHub
+                await commitToGithub(
+                  localFilePath,
+                  buffer,
+                  `🤖 Авто-загрузка фото для ${parsedCar.brand} ${parsedCar.model} через Telegram`
+                );
+
+                downloadedPhotoPath = `/cars/${filename}`;
+              }
+            }
+          } catch (picErr) {
+            console.error('Failed to auto-download photo during save_car:', picErr);
+          }
+        }
+
+        const cars = readCars();
+        let isUpdate = false;
+        let finalId = (parsedCar.id || '').trim();
+
+        if (finalId) {
+          const existingIndex = cars.findIndex(c => c.id === finalId);
+          if (existingIndex !== -1) {
+            isUpdate = true;
+            const origImages = cars[existingIndex].images || [];
+            const newImages = downloadedPhotoPath 
+              ? [downloadedPhotoPath] 
+              : (parsedCar.images && parsedCar.images.length > 0 ? parsedCar.images : origImages);
+
+            cars[existingIndex] = {
+              ...cars[existingIndex],
+              ...parsedCar,
+              images: newImages,
+              id: finalId
+            };
+            parsedCar.images = newImages;
+          }
+        }
+
+        if (!isUpdate) {
+          if (!finalId) {
+            finalId = transliterate(`${parsedCar.brand}_${parsedCar.model}_${parsedCar.year || Date.now()}`);
+            let uniqueId = finalId;
+            let counter = 1;
+            while (cars.some(c => c.id === uniqueId)) {
+              uniqueId = `${finalId}_${counter}`;
+              counter++;
+            }
+            finalId = uniqueId;
+          }
+
+          const newImages = downloadedPhotoPath 
+            ? [downloadedPhotoPath] 
+            : (parsedCar.images && parsedCar.images.length > 0 ? parsedCar.images : ['https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80']);
+
+          const fullNewCar = {
+            id: finalId,
+            brand: parsedCar.brand,
+            model: parsedCar.model,
+            generation: parsedCar.generation || 'I',
+            year: parsedCar.year || new Date().getFullYear(),
+            mileage: parsedCar.mileage || 0,
+            condition: parsedCar.condition || 'new',
+            country: parsedCar.country || 'China',
+            bodyType: parsedCar.bodyType || 'Внедорожник',
+            engineType: parsedCar.engineType || 'hybrid',
+            engineVolume: parsedCar.engineVolume || '2.0L',
+            power: parsedCar.power || 150,
+            driveType: parsedCar.driveType || 'AWD',
+            transmission: parsedCar.transmission || 'Automatic',
+            color: parsedCar.color || 'Черный',
+            images: newImages,
+            priceUSD: parsedCar.priceUSD || 0,
+            recyclingFeeRUB: parsedCar.recyclingFeeRUB || 0,
+            customsDutyEUR: parsedCar.customsDutyEUR || 0,
+            customFinalPriceRUB: parsedCar.customFinalPriceRUB || undefined,
+            description: parsedCar.description || '',
+            features: parsedCar.features || ['Premium sound', 'Panoramic roof', 'LED headlights'],
+            availability: parsedCar.availability || 'in_stock',
+            deliveryDays: parsedCar.deliveryDays || 25
+          };
+
+          cars.push(fullNewCar);
+          parsedCar.id = finalId;
+          parsedCar.images = newImages;
+        }
+
+        writeCars(cars);
+
+        const contentString = JSON.stringify(cars, null, 2);
+        const gitSuccess = await commitToGithub(
+          CARS_FILE_PATH,
+          Buffer.from(contentString, 'utf-8'),
+          `🤖 ${isUpdate ? 'Обновлен' : 'Добавлен'} автомобиль ${parsedCar.brand} ${parsedCar.model} (${finalId}) через Telegram`
+        );
+
+        let responseText = `✅ *Автомобиль успешно ${isUpdate ? 'обновлен' : 'добавлен'}!* \n\n`;
+        responseText += `🚘 *${parsedCar.brand} ${parsedCar.model}* (${parsedCar.year || 'н.д.'})\n`;
+        responseText += `🆔 ID: \`${finalId}\`\n`;
+        responseText += `💰 Цена: ${parsedCar.priceUSD?.toLocaleString() || 0} $\n`;
+        if (parsedCar.customFinalPriceRUB) {
+          responseText += `🔥 Цена под ключ: ${parsedCar.customFinalPriceRUB.toLocaleString()} ₽\n`;
+        }
+        responseText += `📍 Локация/страна: ${parsedCar.country || 'China'}\n`;
+        responseText += `🖼️ Фото: \`${parsedCar.images?.[0] || 'нет'}\n\n`;
+
+        if (gitSuccess) {
+          responseText += `🐙 *Синхронизировано с GitHub!* Каталог обновлен и выгружен в ваш репозиторий.\n\n`;
+        } else {
+          responseText += `⚠️ Сохранено на сервере, но не удалось синхронизировать с GitHub. Проверьте права токена в админ-панели на сайте.\n\n`;
+        }
+
+        responseText += `Просмотреть список: /list`;
+
+        await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: responseText,
+            parse_mode: 'Markdown'
+          })
+        });
+
+        return res.status(200).send('Car saved successfully');
+      }
+
+      // --- КОНЕЦ ОБРАБОТЧИКА КОМАНД ---
 
       const photos = message.photo;
       if (!photos || photos.length === 0) {
@@ -275,7 +854,7 @@ async function startServer() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             chat_id: chatId,
-            text: `📸 Пожалуйста, отправьте мне *изображение (фотографию)*.`
+            text: `📸 Пожалуйста, отправьте мне *изображение (фотографию)*, или используйте одну из команд (например, /help).`
           })
         });
         return res.status(200).send('Not a photo');

@@ -50,7 +50,9 @@ export function AdminPanel() {
     setHomepageBannerSubtitle,
     managerContacts,
     addManagerContact,
-    deleteManagerContact
+    deleteManagerContact,
+    appTexts,
+    setAppTexts
   } = useStore();
 
   // Добавление контактов менеджеров
@@ -2952,6 +2954,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                     {/* ТАБ 3: БАННЕР ГЛАВНОЙ */}
                     {adminTab === 'design' && (
                       <div className="space-y-4">
+                        {/* 1. Главный баннер */}
                         <div className="bg-[#F5F7FA] p-3 rounded-2xl border border-[#E5E7EB] space-y-3">
                           <h6 className="text-[10px] font-bold text-[#2563EB] uppercase tracking-wide font-mono">
                             Кастомизация главного баннера
@@ -2985,6 +2988,80 @@ export const CARS_DATA: Car[] = ${formattedCars};
                                 value={homepageBannerUrl}
                                 onChange={(e) => setHomepageBannerUrl(e.target.value)}
                                 className="w-full bg-white border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-[9px] font-mono outline-none text-[#111827]"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 2. Тексты и контактная информация дилера */}
+                        <div className="bg-[#F5F7FA] p-3 rounded-2xl border border-[#E5E7EB] space-y-3">
+                          <h6 className="text-[10px] font-bold text-[#A8884C] uppercase tracking-wide font-mono flex items-center space-x-1">
+                            <span>📝 Основные тексты и реквизиты сайта</span>
+                          </h6>
+                          <p className="text-[9px] text-[#64748B] leading-tight font-medium">
+                            Здесь вы можете изменить главные заголовки, адрес автосалона, официальный сайт и юридическую информацию, которая отображается на главной странице и в футере.
+                          </p>
+
+                          <div className="space-y-2.5 pt-1">
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] font-bold font-mono mb-1">Главный заголовок</label>
+                                <input
+                                  type="text"
+                                  value={appTexts?.homeTitle || ''}
+                                  onChange={(e) => setAppTexts({ homeTitle: e.target.value })}
+                                  className="w-full bg-white border border-[#E5E7EB] rounded-xl px-2.5 py-1 text-xs outline-none text-[#111827]"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] font-bold font-mono mb-1">Главный подзаголовок</label>
+                                <input
+                                  type="text"
+                                  value={appTexts?.homeSubtitle || ''}
+                                  onChange={(e) => setAppTexts({ homeSubtitle: e.target.value })}
+                                  className="w-full bg-white border border-[#E5E7EB] rounded-xl px-2.5 py-1 text-xs outline-none text-[#111827]"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] font-bold font-mono mb-1">Адрес Шоурума</label>
+                                <input
+                                  type="text"
+                                  value={appTexts?.showroomAddress || ''}
+                                  onChange={(e) => setAppTexts({ showroomAddress: e.target.value })}
+                                  className="w-full bg-white border border-[#E5E7EB] rounded-xl px-2.5 py-1 text-xs outline-none text-[#111827]"
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] font-bold font-mono mb-1">Телефон Офиса</label>
+                                <input
+                                  type="text"
+                                  value={appTexts?.officePhone || ''}
+                                  onChange={(e) => setAppTexts({ officePhone: e.target.value })}
+                                  className="w-full bg-white border border-[#E5E7EB] rounded-xl px-2.5 py-1 text-xs outline-none text-[#111827]"
+                                />
+                              </div>
+                            </div>
+
+                            <div>
+                              <label className="block text-[8px] text-[#64748B] font-bold font-mono mb-1">Официальный сайт (Домен)</label>
+                              <input
+                                type="text"
+                                value={appTexts?.websiteUrl || ''}
+                                onChange={(e) => setAppTexts({ websiteUrl: e.target.value })}
+                                className="w-full bg-white border border-[#E5E7EB] rounded-xl px-2.5 py-1 text-xs outline-none text-[#111827] font-mono"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-[8px] text-[#64748B] font-bold font-mono mb-1">Юридические данные (Футер)</label>
+                              <textarea
+                                value={appTexts?.legalInfo || ''}
+                                onChange={(e) => setAppTexts({ legalInfo: e.target.value })}
+                                rows={2}
+                                className="w-full bg-white border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-[10px] outline-none text-[#111827] resize-none"
                               />
                             </div>
                           </div>
@@ -4261,6 +4338,23 @@ export const CARS_DATA: Car[] = ${formattedCars};
                               <p>
                                 🌟 <b>Готово!</b> Отправьте любое изображение вашему боту в Telegram. Вы можете добавить подпись (caption), например <code>geely_coolray_grey</code>, и файл будет сохранен под этим именем в папку <code>public/cars/</code> как локально, так и выгружен прямо в ваш репозиторий GitHub. Теперь это фото сразу станет доступно для выбора при добавлении автомобиля!
                               </p>
+                            </div>
+
+                            <div className="border-t border-[#E2E8F0] pt-2 mt-2 space-y-1.5">
+                              <p className="text-[10px] font-black uppercase text-slate-700 tracking-wide font-mono flex items-center space-x-1">
+                                ⚡ Полное управление каталогом прямо из чата Telegram!
+                              </p>
+                              <p className="text-[9px] text-slate-600 font-sans font-medium">
+                                Наш Telegram бот теперь поддерживает расширенные интерактивные команды для полноценного администрирования каталога со смартфона:
+                              </p>
+                              <ul className="list-disc pl-4 space-y-1 text-[9px] text-slate-600 font-sans font-medium">
+                                <li><code>/list</code> или <code>/cars</code> — Посмотреть весь каталог с быстрыми интерактивными ссылками на изменение и удаление.</li>
+                                <li><code>/add</code> — Получить готовый текстовый шаблон для создания нового автомобиля с примерами.</li>
+                                <li><code>/edit &lt;id_авто&gt;</code> (или кликнуть по ссылке из списка) — Получить заполненный шаблон автомобиля для его моментального редактирования.</li>
+                                <li><code>/del &lt;id_авто&gt;</code> (или кликнуть по ссылке) — Полностью удалить автомобиль из базы и мгновенно закоммитить это в GitHub.</li>
+                                <li><code>/sync</code> или <code>/push</code> — Вручную отправить текущую базу автомобилей <code>cars.json</code> в репозиторий.</li>
+                                <li><b>Создание с фото:</b> Вы можете прикрепить фотографию автомобиля и вставить заполненный шаблон с первой строкой <code>/save_car</code> в подпись (caption) к фото — автомобиль создастся сразу с загруженным снимком!</li>
+                              </ul>
                             </div>
                           </div>
                         </div>
