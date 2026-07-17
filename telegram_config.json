@@ -1,0 +1,8 @@
+{
+  "telegramBotToken": "8901009852:AAGj7dfshjkdsfjhsdfjkdsIj9k",
+  "githubToken": "github_pat_11A234567890abcdef_some_token_here_with_sufficient_length",
+  "githubRepo": "2507779/dacar16",
+  "githubBranch": "main",
+  "allowedChatIds": "",
+  "webhookRegistered": false
+}
