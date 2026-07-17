@@ -28,15 +28,25 @@ const DEFAULT_CONFIG: TelegramConfig = {
 };
 
 function readConfig(): TelegramConfig {
+  let config = { ...DEFAULT_CONFIG };
   try {
     if (fs.existsSync(CONFIG_PATH)) {
       const content = fs.readFileSync(CONFIG_PATH, 'utf-8');
-      return { ...DEFAULT_CONFIG, ...JSON.parse(content) };
+      config = { ...config, ...JSON.parse(content) };
     }
   } catch (e) {
     console.error('Error reading telegram config:', e);
   }
-  return DEFAULT_CONFIG;
+
+  // Fallback to environment variables if not present in the configuration file
+  if (!config.telegramBotToken && process.env.TELEGRAM_BOT_TOKEN) {
+    config.telegramBotToken = process.env.TELEGRAM_BOT_TOKEN;
+  }
+  if (!config.githubToken && process.env.GITHUB_PAT) {
+    config.githubToken = process.env.GITHUB_PAT;
+  }
+  
+  return config;
 }
 
 function writeConfig(config: TelegramConfig) {
