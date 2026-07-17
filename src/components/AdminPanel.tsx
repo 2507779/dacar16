@@ -67,7 +67,7 @@ export function AdminPanel() {
   const [passcodeError, setPasscodeError] = useState(false);
 
   // Табы админки
-  const [adminTab, setAdminTab] = useState<'add' | 'edit' | 'design' | 'funnel' | 'installer' | 'vip'>('installer');
+  const [adminTab, setAdminTab] = useState<'add' | 'edit' | 'design' | 'funnel' | 'installer' | 'vip' | 'telegram'>('installer');
   const [editingCarId, setEditingCarId] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
 
@@ -201,6 +201,98 @@ export function AdminPanel() {
   const [isLoadingPresets, setIsLoadingPresets] = useState(false);
   const [showAllFormFields, setShowAllFormFields] = useState(true); // Режим "все поля на одном экране" по умолчанию для удобства
   const [catalogSearch, setCatalogSearch] = useState(''); // Быстрый поиск по каталогу для удобства управления
+
+  // Интеграция Telegram & GitHub для загрузки фото
+  const [tgGitBotToken, setTgGitBotToken] = useState('');
+  const [tgGitGithubToken, setTgGitGithubToken] = useState('');
+  const [tgGitGithubRepo, setTgGitGithubRepo] = useState('2507779/dacar16');
+  const [tgGitGithubBranch, setTgGitGithubBranch] = useState('main');
+  const [tgGitAllowedChatIds, setTgGitAllowedChatIds] = useState('');
+  const [tgGitWebhookRegistered, setTgGitWebhookRegistered] = useState(false);
+  const [tgGitLoading, setTgGitLoading] = useState(false);
+  const [tgGitStatus, setTgGitStatus] = useState<{ type: 'success' | 'error' | ''; message: string }>({ type: '', message: '' });
+
+  const fetchTgGitConfig = async () => {
+    try {
+      setTgGitLoading(true);
+      const res = await fetch('/api/telegram/config');
+      if (res.ok) {
+        const data = await res.json();
+        setTgGitBotToken(data.telegramBotToken || '');
+        setTgGitGithubToken(data.githubToken || '');
+        setTgGitGithubRepo(data.githubRepo || '2507779/dacar16');
+        setTgGitGithubBranch(data.githubBranch || 'main');
+        setTgGitAllowedChatIds(data.allowedChatIds || '');
+        setTgGitWebhookRegistered(data.webhookRegistered || false);
+      }
+    } catch (err) {
+      console.error('Failed to fetch tg/git config:', err);
+    } finally {
+      setTgGitLoading(false);
+    }
+  };
+
+  const handleSaveTgGitConfig = async () => {
+    try {
+      setTgGitLoading(true);
+      setTgGitStatus({ type: '', message: '' });
+      const res = await fetch('/api/telegram/config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          telegramBotToken: tgGitBotToken,
+          githubToken: tgGitGithubToken,
+          githubRepo: tgGitGithubRepo,
+          githubBranch: tgGitGithubBranch,
+          allowedChatIds: tgGitAllowedChatIds
+        })
+      });
+      if (res.ok) {
+        setTgGitStatus({ type: 'success', message: 'Настройки успешно сохранены!' });
+        triggerHaptic('success');
+        fetchTgGitConfig();
+      } else {
+        const err = await res.json();
+        setTgGitStatus({ type: 'error', message: err.error || 'Ошибка сохранения настроек.' });
+        triggerHaptic('error');
+      }
+    } catch (err) {
+      setTgGitStatus({ type: 'error', message: 'Ошибка связи с сервером.' });
+      triggerHaptic('error');
+    } finally {
+      setTgGitLoading(false);
+    }
+  };
+
+  const handleRegisterTgWebhook = async () => {
+    try {
+      setTgGitLoading(true);
+      setTgGitStatus({ type: '', message: '' });
+      const res = await fetch('/api/telegram/register-webhook', {
+        method: 'POST'
+      });
+      if (res.ok) {
+        setTgGitStatus({ type: 'success', message: 'Webhook успешно зарегистрирован в Telegram!' });
+        setTgGitWebhookRegistered(true);
+        triggerHaptic('success');
+      } else {
+        const err = await res.json();
+        setTgGitStatus({ type: 'error', message: err.error || 'Ошибка регистрации Webhook.' });
+        triggerHaptic('error');
+      }
+    } catch (err) {
+      setTgGitStatus({ type: 'error', message: 'Ошибка связи с сервером.' });
+      triggerHaptic('error');
+    } finally {
+      setTgGitLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (adminTab === 'telegram') {
+      fetchTgGitConfig();
+    }
+  }, [adminTab]);
 
   const loadPresetsFromBackend = () => {
     setIsLoadingPresets(true);
@@ -1453,6 +1545,15 @@ export const CARS_DATA: Car[] = ${formattedCars};
                     >
                       <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
                       <span>💎 VIP</span>
+                    </button>
+                    <button
+                      onClick={() => setAdminTab('telegram')}
+                      className={`flex-1 py-1.5 px-2 text-center text-[10px] font-bold rounded-lg transition shrink-0 flex items-center justify-center space-x-0.5 ${
+                        adminTab === 'telegram' ? 'bg-blue-600 text-white' : 'text-[#64748B] hover:text-[#111827]'
+                      }`}
+                    >
+                      <Share2 className="w-3.5 h-3.5" />
+                      <span>🔌 Telegram & Git</span>
                     </button>
                   </div>
 
@@ -3800,6 +3901,193 @@ export const CARS_DATA: Car[] = ${formattedCars};
                                 </button>
                               </div>
                             )}
+                          </div>
+                        </div>
+
+                      </div>
+                    )}
+
+                    {/* ТАБ: 🔌 TELEGRAM & GITHUB АВТОМАТИЗАЦИЯ */}
+                    {adminTab === 'telegram' && (
+                      <div className="space-y-4 text-left">
+                        
+                        {/* Заголовок */}
+                        <div className="bg-gradient-to-r from-[#1E293B] to-[#0F172A] p-4 rounded-3xl border border-slate-800 text-white space-y-1">
+                          <div className="flex items-center space-x-2">
+                            <Share2 className="w-5 h-5 text-blue-400" />
+                            <h4 className="text-xs font-black uppercase tracking-widest font-mono text-blue-400">Автоматическая Загрузка Фото</h4>
+                          </div>
+                          <p className="text-[10px] text-slate-300 leading-normal font-sans">
+                            Настройте вашего собственного Telegram-бота, чтобы отправлять в него фотографии автомобилей прямо со смартфона. Бот мгновенно скачает их и автоматически зальет в ваш GitHub репозиторий!
+                          </p>
+                        </div>
+
+                        {/* Форма настроек */}
+                        <div className="bg-[#F8FAFC] border border-[#E2E8F0] p-4 rounded-3xl space-y-4">
+                          <div className="space-y-3">
+                            <h5 className="text-[10px] font-black uppercase tracking-wider text-slate-700 font-mono flex items-center space-x-1">
+                              <Bot className="w-4 h-4 text-slate-500" />
+                              <span>1. Настройки Telegram Бота</span>
+                            </h5>
+                            
+                            <div className="space-y-2">
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] font-black uppercase tracking-wider font-mono mb-1">
+                                  Telegram Bot Token:
+                                </label>
+                                <input
+                                  type="text"
+                                  value={tgGitBotToken}
+                                  onChange={(e) => setTgGitBotToken(e.target.value)}
+                                  placeholder="123456789:ABCdefGhIJKlmNoPQRs..."
+                                  className="w-full bg-white border border-[#E5E7EB] rounded-xl px-3 py-2 text-xs outline-none text-[#111827] font-medium focus:border-blue-500"
+                                />
+                                <span className="text-[8px] text-[#64748B] font-medium leading-normal mt-1 block">
+                                  Получите у официального бота @BotFather в Telegram.
+                                </span>
+                              </div>
+
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] font-black uppercase tracking-wider font-mono mb-1">
+                                  Разрешенные Chat ID (Опционально):
+                                </label>
+                                <input
+                                  type="text"
+                                  value={tgGitAllowedChatIds}
+                                  onChange={(e) => setTgGitAllowedChatIds(e.target.value)}
+                                  placeholder="Например: 12345678, 98765432"
+                                  className="w-full bg-white border border-[#E5E7EB] rounded-xl px-3 py-2 text-xs outline-none text-[#111827] font-medium focus:border-blue-500"
+                                />
+                                <span className="text-[8px] text-[#64748B] font-medium leading-normal mt-1 block">
+                                  Оставьте пустым, чтобы разрешить загрузку всем, либо перечислите ID через запятую для безопасности.
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="border-t border-[#E2E8F0] pt-3 space-y-3">
+                            <h5 className="text-[10px] font-black uppercase tracking-wider text-slate-700 font-mono flex items-center space-x-1">
+                              <Database className="w-4 h-4 text-slate-500" />
+                              <span>2. Синхронизация с GitHub репозиторием</span>
+                            </h5>
+
+                            <div className="space-y-2.5">
+                              <div>
+                                <label className="block text-[8px] text-[#64748B] font-black uppercase tracking-wider font-mono mb-1">
+                                  GitHub Personal Access Token (PAT):
+                                </label>
+                                <input
+                                  type="password"
+                                  value={tgGitGithubToken}
+                                  onChange={(e) => setTgGitGithubToken(e.target.value)}
+                                  placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                                  className="w-full bg-white border border-[#E5E7EB] rounded-xl px-3 py-2 text-xs outline-none text-[#111827] font-medium focus:border-blue-500"
+                                />
+                                <span className="text-[8px] text-[#64748B] font-medium leading-normal mt-1 block">
+                                  Токен должен иметь права на запись (`repo` или `public_repo`). Создается в настройках GitHub &rarr; Developer Settings.
+                                </span>
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                  <label className="block text-[8px] text-[#64748B] font-black uppercase tracking-wider font-mono mb-1">
+                                    Репозиторий:
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={tgGitGithubRepo}
+                                    onChange={(e) => setTgGitGithubRepo(e.target.value)}
+                                    placeholder="2507779/dacar16"
+                                    className="w-full bg-white border border-[#E5E7EB] rounded-xl px-3 py-2 text-xs outline-none text-[#111827] font-bold focus:border-blue-500"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-[8px] text-[#64748B] font-black uppercase tracking-wider font-mono mb-1">
+                                    Ветка (Branch):
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={tgGitGithubBranch}
+                                    onChange={(e) => setTgGitGithubBranch(e.target.value)}
+                                    placeholder="main"
+                                    className="w-full bg-white border border-[#E5E7EB] rounded-xl px-3 py-2 text-xs outline-none text-[#111827] font-bold focus:border-blue-500"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Вывод статуса */}
+                          {tgGitStatus.message && (
+                            <div className={`p-3 rounded-xl border text-xs font-medium ${
+                              tgGitStatus.type === 'success' 
+                                ? 'bg-emerald-50 border-emerald-200 text-emerald-800' 
+                                : 'bg-rose-50 border-rose-200 text-rose-800'
+                            }`}>
+                              {tgGitStatus.message}
+                            </div>
+                          )}
+
+                          <div className="pt-2 flex flex-col sm:flex-row gap-2">
+                            <button
+                              onClick={handleSaveTgGitConfig}
+                              disabled={tgGitLoading}
+                              className="flex-1 py-2.5 bg-[#1C1917] hover:bg-[#2563EB] text-white font-black text-[10px] rounded-xl transition cursor-pointer flex items-center justify-center space-x-1 uppercase tracking-wider disabled:opacity-50"
+                            >
+                              {tgGitLoading ? (
+                                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              ) : (
+                                <Save className="w-3.5 h-3.5" />
+                              )}
+                              <span>Сохранить Настройки</span>
+                            </button>
+
+                            <button
+                              onClick={handleRegisterTgWebhook}
+                              disabled={tgGitLoading || !tgGitBotToken}
+                              className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-black text-[10px] rounded-xl transition cursor-pointer flex items-center justify-center space-x-1 uppercase tracking-wider disabled:opacity-50"
+                            >
+                              <RefreshCw className={`w-3.5 h-3.5 ${tgGitLoading ? 'animate-spin' : ''}`} />
+                              <span>🔌 Активировать Webhook</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Инструкции */}
+                        <div className="bg-[#F1F5F9] border border-[#E2E8F0] p-4 rounded-3xl space-y-3">
+                          <h6 className="text-[10px] font-black uppercase tracking-wider text-slate-700 font-mono flex items-center space-x-1">
+                            <HelpCircle className="w-4 h-4 text-blue-500" />
+                            <span>📋 Пошаговая Инструкция Установки</span>
+                          </h6>
+                          
+                          <div className="space-y-3 text-[10px] text-slate-600 leading-relaxed font-sans font-medium">
+                            <div className="flex space-x-2">
+                              <span className="bg-blue-500 text-white font-bold w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 mt-0.5">1</span>
+                              <p>
+                                Перейдите в Telegram к боту <b>@BotFather</b>, отправьте команду <code>/newbot</code>, задайте имя бота и получите уникальный <b>Bot Token</b>. Вставьте его в поле выше.
+                              </p>
+                            </div>
+
+                            <div className="flex space-x-2">
+                              <span className="bg-blue-500 text-white font-bold w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 mt-0.5">2</span>
+                              <p>
+                                Перейдите на GitHub в настройки профиля &rarr; <b>Settings</b> &rarr; <b>Developer settings</b> &rarr; <b>Personal access tokens (classic)</b> &rarr; <b>Generate new token</b>. Поставьте галочку напротив прав <code>repo</code> и скопируйте полученный токен (PAT) в поле выше.
+                              </p>
+                            </div>
+
+                            <div className="flex space-x-2">
+                              <span className="bg-blue-500 text-white font-bold w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 mt-0.5">3</span>
+                              <p>
+                                Нажмите <b>«Сохранить настройки»</b>, а затем нажмите синюю кнопку <b>«Активировать Webhook»</b>. Наш сервер автоматически свяжется с Telegram и включит мгновенный прием фотографий.
+                              </p>
+                            </div>
+
+                            <div className="flex space-x-2">
+                              <span className="bg-blue-500 text-white font-bold w-4 h-4 rounded-full flex items-center justify-center text-[9px] shrink-0 mt-0.5">4</span>
+                              <p>
+                                🌟 <b>Готово!</b> Отправьте любое изображение вашему боту в Telegram. Вы можете добавить подпись (caption), например <code>geely_coolray_grey</code>, и файл будет сохранен под этим именем в папку <code>public/cars/</code> как локально, так и выгружен прямо в ваш репозиторий GitHub. Теперь это фото сразу станет доступно для выбора при добавлении автомобиля!
+                              </p>
+                            </div>
                           </div>
                         </div>
 
