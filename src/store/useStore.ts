@@ -5,7 +5,7 @@
 
 import { create } from 'zustand';
 import { Car, Order, OrderStatus, TrackingStep, AppTexts, ManagerContact } from '../types';
-import { CARS_DATA, calculateFullCarPrice } from '../data/cars';
+import { CARS_DATA, calculateFullCarPrice, getCarImages } from '../data/cars';
 import { APP_CONFIG } from '../config';
 
 // Список всех статусов логистики по порядку
@@ -259,7 +259,7 @@ export const useStore = create<AppStore>((set, get) => {
         carId: car.id,
         carBrand: car.brand,
         carModel: car.model,
-        carImage: car.images[0],
+        carImage: getCarImages(car)[0],
         carYear: car.year,
         finalPriceRUB,
         customerName,

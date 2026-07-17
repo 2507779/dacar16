@@ -16,7 +16,7 @@ import {
   UserCheck, Save, Users, Calendar, Calculator
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CARS_DATA, calculateFullCarPrice, formatCurrency } from '../data/cars';
+import { CARS_DATA, calculateFullCarPrice, formatCurrency, getCarImages, getCarFeatures } from '../data/cars';
 
 // Помощник авто-исправления путей (для удобной работы с файлами из репозитория GitHub или Base64)
 export const getAutoCorrectedPath = (input: string) => {
@@ -195,6 +195,42 @@ export function AdminPanel() {
 
   // Эффект для динамической смены темы TMA (Функция №6 - Кастомизатор Темы)
   const [themePreset, setThemePreset] = useState(() => localStorage.getItem('dacar_tma_theme') || 'warm-gold');
+
+  // Динамические пресеты фотографий из папки /public/cars/
+  const [dynamicPresets, setDynamicPresets] = useState<{ path: string; name: string }[]>([]);
+  const [isLoadingPresets, setIsLoadingPresets] = useState(false);
+  const [showAllFormFields, setShowAllFormFields] = useState(true); // Режим "все поля на одном экране" по умолчанию для удобства
+  const [catalogSearch, setCatalogSearch] = useState(''); // Быстрый поиск по каталогу для удобства управления
+
+  const loadPresetsFromBackend = () => {
+    setIsLoadingPresets(true);
+    fetch('/api/presets')
+      .then((res) => {
+        if (!res.ok) throw new Error('API error');
+        return res.json();
+      })
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setDynamicPresets(data);
+        }
+      })
+      .catch((err) => {
+        console.warn('Fallback: failed to fetch presets from server:', err);
+        // Fallback-пресеты при ошибках сети или в статическом режиме
+        setDynamicPresets([
+          { path: '/cars/zeekr_001.jpg', name: 'Zeekr 001' },
+          { path: '/cars/geely_monjaro.jpg', name: 'Monjaro' },
+          { path: '/cars/li_l9.jpg', name: 'Li L9' }
+        ]);
+      })
+      .finally(() => {
+        setIsLoadingPresets(false);
+      });
+  };
+
+  useEffect(() => {
+    loadPresetsFromBackend();
+  }, []);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -379,9 +415,9 @@ export function AdminPanel() {
     setNewCustomsEUR(car.customsEUR || car.customsDutyEUR || 3500);
     setNewRecyclingRUB(car.recyclingRUB || car.recyclingFeeRUB || 3400);
     setNewCustomFinalPrice(car.customFinalPriceRUB || car.customFinalPrice || '');
-    setNewImgUrl(car.images?.join('\n') || '');
+    setNewImgUrl(getCarImages(car).join('\n') || '');
     setNewDesc(car.description || '');
-    setNewFeatures(car.features?.join(', ') || '');
+    setNewFeatures(getCarFeatures(car).join(', ') || '');
     setAdminTab('add');
   };
 
@@ -577,7 +613,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
     const targetCar = cars.find(c => c.id === carId);
     if (targetCar) {
       triggerHaptic('medium');
-      const updatedGallery = [...targetCar.images, correctedUrl];
+      const updatedGallery = [...getCarImages(targetCar), correctedUrl];
       editCar(carId, { ...targetCar, images: updatedGallery });
       setNewPhotoUrl('');
     }
@@ -586,12 +622,13 @@ export const CARS_DATA: Car[] = ${formattedCars};
   const handleRemovePhotoFromCar = (carId: string, imgIndex: number) => {
     const targetCar = cars.find(c => c.id === carId);
     if (targetCar) {
-      if (targetCar.images.length <= 1) {
+      const images = getCarImages(targetCar);
+      if (images.length <= 1) {
         alert('У автомобиля должна оставаться хотя бы одна фотография!');
         return;
       }
       triggerHaptic('medium');
-      const updatedGallery = targetCar.images.filter((_, idx) => idx !== imgIndex);
+      const updatedGallery = images.filter((_, idx) => idx !== imgIndex);
       editCar(carId, { ...targetCar, images: updatedGallery });
     }
   };
@@ -608,7 +645,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
         const targetCar = cars.find(c => c.id === carId);
         if (targetCar) {
           triggerHaptic('medium');
-          const updatedImages = [...targetCar.images];
+          const updatedImages = [...getCarImages(targetCar)];
           updatedImages[index] = reader.result;
           editCar(carId, { ...targetCar, images: updatedImages });
         }
@@ -629,7 +666,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
         const targetCar = cars.find(c => c.id === carId);
         if (targetCar) {
           triggerHaptic('medium');
-          const updatedGallery = [...targetCar.images, reader.result];
+          const updatedGallery = [...getCarImages(targetCar), reader.result];
           editCar(carId, { ...targetCar, images: updatedGallery });
         }
       }
@@ -641,7 +678,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
     const targetCar = cars.find(c => c.id === carId);
     if (targetCar) {
       triggerHaptic('medium');
-      const updatedGallery = [...targetCar.images, presetPath];
+      const updatedGallery = [...getCarImages(targetCar), presetPath];
       editCar(carId, { ...targetCar, images: updatedGallery });
     }
   };
@@ -689,7 +726,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
     const logMessages = [
       `[⏱️ ${new Date().toLocaleTimeString()}] Запуск автопостинга для ${targetCar.brand} ${targetCar.model}...`,
       `[⚙️ ${new Date().toLocaleTimeString()}] Чтение токена бота: ${tgBotToken ? 'Установлен (Real Integration)' : 'Используется Demo-эмуляция'}`,
-      `[🖼️ ${new Date().toLocaleTimeString()}] Загрузка фотографии: ${targetCar.images[0].substring(0, 50)}...`,
+      `[🖼️ ${new Date().toLocaleTimeString()}] Загрузка фотографии: ${(getCarImages(targetCar)[0] || '').substring(0, 50)}...`,
       `[✍️ ${new Date().toLocaleTimeString()}] Форматирование продающего поста и интеграция прайс-калькулятора...`,
       `[📤 ${new Date().toLocaleTimeString()}] Отправка POST запроса sendPhoto на api.telegram.org...`
     ];
@@ -717,7 +754,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               chat_id: tgChannelId,
-              photo: targetCar.images[0],
+              photo: getCarImages(targetCar)[0],
               caption: caption,
               parse_mode: 'Markdown'
             })
@@ -900,7 +937,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
     const targetCar = cars.find(c => c.id === selectedCarForSync);
     if (!targetCar) return;
     
-    const updatedImages = [...targetCar.images, photoUrl];
+    const updatedImages = [...getCarImages(targetCar), photoUrl];
     editCar(selectedCarForSync, { ...targetCar, images: updatedImages });
     triggerHaptic('success');
     alert(`✅ Фото успешно добавлено в галерею ${targetCar.brand} ${targetCar.model}!`);
@@ -1084,7 +1121,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
     let pitch = '';
     const priceFormatted = formatCurrency(calculateFullCarPrice(car).finalPriceRUB);
     if (vipPitchStyle === 'emotional') {
-      pitch = `✨ РОСКОШЬ, ДОСТУПНАЯ ВАМ: ${car.brand} ${car.model} ✨\n\nМечтали о премиальном авто без переплат дилерам РФ? 🚘\n\nЭтот шикарный ${car.brand} ${car.model} (${car.year} г.) готов к отправке напрямую из страны экспорта под ваш заказ.\n\n💥 Итоговая цена под ключ в РФ: **${priceFormatted}**\n*(Включает доставку в Казань, растаможку и утильсбор!)*\n\n🌟 Премиум опции:\n${car.features.slice(0, 4).map(f => `• ${f}`).join('\n')}\n\nСвяжитесь с нами прямо сейчас для бронирования подбора! 📲 @${vipContactsTG}`;
+      pitch = `✨ РОСКОШЬ, ДОСТУПНАЯ ВАМ: ${car.brand} ${car.model} ✨\n\nМечтали о премиальном авто без переплат дилерам РФ? 🚘\n\nЭтот шикарный ${car.brand} ${car.model} (${car.year} г.) готов к отправке напрямую из страны экспорта под ваш заказ.\n\n💥 Итоговая цена под ключ в РФ: **${priceFormatted}**\n*(Включает доставку в Казань, растаможку и утильсбор!)*\n\n🌟 Премиум опции:\n${getCarFeatures(car).slice(0, 4).map(f => `• ${f}`).join('\n')}\n\nСвяжитесь с нами прямо сейчас для бронирования подбора! 📲 @${vipContactsTG}`;
     } else if (vipPitchStyle === 'technical') {
       pitch = `📊 ТЕХНИЧЕСКИЙ ОТЧЕТ: ${car.brand} ${car.model} 📊\n\nКузов: ${car.bodyType}\nГод выпуска: ${car.year}\nПробег: ${car.mileage.toLocaleString()} км\nДвигатель: ${car.engineVolume} (${car.engineType === 'electric' ? 'Электро' : car.engineType === 'hybrid' ? 'Гибрид' : 'Турбо'}, ${car.power} л.с.)\nПривод: ${car.driveType}\nТрансмиссия: ${car.transmission}\nЦвет: ${car.color}\n\n💲 Полная калькуляция под ключ в РФ: **${priceFormatted}**\n\nПолная прозрачность сделки, подробный выездной видео-отчет перед покупкой! 📲 Заказать осмотр: @${vipContactsTG}`;
     } else {
@@ -1834,49 +1871,81 @@ export const CARS_DATA: Car[] = ${formattedCars};
                           )}
                         </div>
 
-                        {/* Компактный переключатель разделов формы для удобства на смартфонах */}
-                        <div className="flex bg-[#F1F5F9] p-0.5 rounded-xl border border-[#E2E8F0] overflow-x-auto scrollbar-none space-x-1 shrink-0 mb-3">
-                          <button
-                            type="button"
-                            onClick={() => { triggerHaptic('light'); setFormSection('basic'); }}
-                            className={`flex-1 py-2 px-2 text-center text-[10px] font-bold rounded-lg transition whitespace-nowrap ${
-                              formSection === 'basic' ? 'bg-[#C5A880] text-white shadow-sm' : 'text-[#64748B] hover:text-[#111827]'
-                            }`}
-                          >
-                            📝 Основное
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => { triggerHaptic('light'); setFormSection('tech'); }}
-                            className={`flex-1 py-2 px-2 text-center text-[10px] font-bold rounded-lg transition whitespace-nowrap ${
-                              formSection === 'tech' ? 'bg-[#C5A880] text-white shadow-sm' : 'text-[#64748B] hover:text-[#111827]'
-                            }`}
-                          >
-                            ⚙️ Техданные
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => { triggerHaptic('light'); setFormSection('pricing'); }}
-                            className={`flex-1 py-2 px-2 text-center text-[10px] font-bold rounded-lg transition whitespace-nowrap ${
-                              formSection === 'pricing' ? 'bg-[#C5A880] text-white shadow-sm' : 'text-[#64748B] hover:text-[#111827]'
-                            }`}
-                          >
-                            💰 Цена (₽)
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => { triggerHaptic('light'); setFormSection('media'); }}
-                            className={`flex-1 py-2 px-2 text-center text-[10px] font-bold rounded-lg transition whitespace-nowrap ${
-                              formSection === 'media' ? 'bg-[#C5A880] text-white shadow-sm' : 'text-[#64748B] hover:text-[#111827]'
-                            }`}
-                          >
-                            🖼️ Медиа & ИИ
-                          </button>
+                        {/* Компактный переключатель режима отображения формы */}
+                        <div className="flex bg-[#F1F5F9] p-1.5 rounded-2xl border border-[#E2E8F0] items-center justify-between gap-2 shrink-0 mb-3">
+                          <span className="text-[9px] font-black text-[#64748B] uppercase tracking-wide font-mono pl-1">
+                            Режим формы:
+                          </span>
+                          <div className="flex bg-white/60 p-0.5 rounded-xl border border-[#E2E8F0]/50 space-x-0.5 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => { triggerHaptic('light'); setShowAllFormFields(true); }}
+                              className={`py-1 px-2.5 text-center text-[9px] font-bold rounded-lg transition whitespace-nowrap cursor-pointer ${
+                                showAllFormFields ? 'bg-[#C5A880] text-white shadow-sm font-black' : 'text-[#64748B] hover:text-[#111827]'
+                              }`}
+                            >
+                              📋 Вся сразу
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => { triggerHaptic('light'); setShowAllFormFields(false); }}
+                              className={`py-1 px-2.5 text-center text-[9px] font-bold rounded-lg transition whitespace-nowrap cursor-pointer ${
+                                !showAllFormFields ? 'bg-[#C5A880] text-white shadow-sm font-black' : 'text-[#64748B] hover:text-[#111827]'
+                              }`}
+                            >
+                              🗂️ По шагам
+                            </button>
+                          </div>
                         </div>
 
+                        {/* Компактный переключатель разделов формы для удобства на смартфонах */}
+                        {!showAllFormFields && (
+                          <div className="flex bg-[#F1F5F9] p-0.5 rounded-xl border border-[#E2E8F0] overflow-x-auto scrollbar-none space-x-1 shrink-0 mb-3">
+                            <button
+                              type="button"
+                              onClick={() => { triggerHaptic('light'); setFormSection('basic'); }}
+                              className={`flex-1 py-2 px-2 text-center text-[10px] font-bold rounded-lg transition whitespace-nowrap ${
+                                formSection === 'basic' ? 'bg-[#C5A880] text-white shadow-sm' : 'text-[#64748B] hover:text-[#111827]'
+                              }`}
+                            >
+                              📝 Основное
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => { triggerHaptic('light'); setFormSection('tech'); }}
+                              className={`flex-1 py-2 px-2 text-center text-[10px] font-bold rounded-lg transition whitespace-nowrap ${
+                                formSection === 'tech' ? 'bg-[#C5A880] text-white shadow-sm' : 'text-[#64748B] hover:text-[#111827]'
+                              }`}
+                            >
+                              ⚙️ Техданные
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => { triggerHaptic('light'); setFormSection('pricing'); }}
+                              className={`flex-1 py-2 px-2 text-center text-[10px] font-bold rounded-lg transition whitespace-nowrap ${
+                                formSection === 'pricing' ? 'bg-[#C5A880] text-white shadow-sm' : 'text-[#64748B] hover:text-[#111827]'
+                              }`}
+                            >
+                              💰 Цена (₽)
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => { triggerHaptic('light'); setFormSection('media'); }}
+                              className={`flex-1 py-2 px-2 text-center text-[10px] font-bold rounded-lg transition whitespace-nowrap ${
+                                formSection === 'media' ? 'bg-[#C5A880] text-white shadow-sm' : 'text-[#64748B] hover:text-[#111827]'
+                              }`}
+                            >
+                              🖼️ Медиа & ИИ
+                            </button>
+                          </div>
+                        )}
+
                         {/* ШАГ 1: ОСНОВНЫЕ ПАРАМЕТРЫ */}
-                        {formSection === 'basic' && (
-                          <div className="space-y-3">
+                        {(showAllFormFields || formSection === 'basic') && (
+                          <div className="bg-[#F8FAFC] border border-[#E2E8F0] p-3 rounded-2xl space-y-3 shadow-sm mb-3">
+                            <h6 className="text-[9px] font-black text-[#C5A880] uppercase tracking-wide font-mono flex items-center space-x-1 border-b border-[#E2E8F0] pb-1.5 mb-2">
+                              <span>📝 1. Основные параметры автомобиля</span>
+                            </h6>
                             <div className="grid grid-cols-2 gap-2.5">
                               <div>
                                 <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Марка *</label>
@@ -1970,8 +2039,11 @@ export const CARS_DATA: Car[] = ${formattedCars};
                         )}
 
                         {/* ШАГ 2: ТЕХНИЧЕСКИЕ ДАННЫЕ */}
-                        {formSection === 'tech' && (
-                          <div className="space-y-3">
+                        {(showAllFormFields || formSection === 'tech') && (
+                          <div className="bg-[#F8FAFC] border border-[#E2E8F0] p-3 rounded-2xl space-y-3 shadow-sm mb-3">
+                            <h6 className="text-[9px] font-black text-[#C5A880] uppercase tracking-wide font-mono flex items-center space-x-1 border-b border-[#E2E8F0] pb-1.5 mb-2">
+                              <span>⚙️ 2. Технические характеристики</span>
+                            </h6>
                             <div className="grid grid-cols-2 gap-2.5">
                               <div>
                                 <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Двигатель</label>
@@ -2047,8 +2119,11 @@ export const CARS_DATA: Car[] = ${formattedCars};
                         )}
 
                         {/* ШАГ 3: ЦЕНООБРАЗОВАНИЕ */}
-                        {formSection === 'pricing' && (
-                          <div className="space-y-3">
+                        {(showAllFormFields || formSection === 'pricing') && (
+                          <div className="bg-[#F8FAFC] border border-[#E2E8F0] p-3 rounded-2xl space-y-3 shadow-sm mb-3">
+                            <h6 className="text-[9px] font-black text-[#C5A880] uppercase tracking-wide font-mono flex items-center space-x-1 border-b border-[#E2E8F0] pb-1.5 mb-2">
+                              <span>💰 3. Стоимость и расходы автомобиля</span>
+                            </h6>
                             <div className="bg-[#2563EB]/5 border border-[#2563EB]/15 p-3 rounded-2xl">
                               <label className="block text-[9px] text-[#2563EB] uppercase font-black font-mono mb-1.5">
                                 ⭐️ СТОИМОСТЬ ПОД КЛЮЧ (₽) — СВОЙ ВАРИАНТ
@@ -2102,8 +2177,11 @@ export const CARS_DATA: Car[] = ${formattedCars};
                         )}
 
                         {/* ШАГ 4: ФОТОГРАФИИ, ОПИСАНИЕ И ОПЦИИ */}
-                        {formSection === 'media' && (
-                          <div className="space-y-3.5">
+                        {(showAllFormFields || formSection === 'media') && (
+                          <div className="bg-[#F8FAFC] border border-[#E2E8F0] p-3 rounded-2xl space-y-3.5 shadow-sm mb-3">
+                            <h6 className="text-[9px] font-black text-[#C5A880] uppercase tracking-wide font-mono flex items-center space-x-1 border-b border-[#E2E8F0] pb-1.5 mb-2">
+                              <span>🖼️ 4. Медиа файлы, фотографии и описание авто</span>
+                            </h6>
                             {/* СЕКЦИЯ УПРАВЛЕНИЯ ФОТОГРАФИЯМИ */}
                             <div className="bg-[#F0EEEC] border border-[#E5E7EB] p-3 rounded-2xl space-y-3 shadow-inner">
                               <div className="flex justify-between items-center">
@@ -2189,29 +2267,41 @@ export const CARS_DATA: Car[] = ${formattedCars};
                               </div>
 
                               {/* БЫСТРЫЙ ВЫБОР ИЗ ПАПКИ GITHUB /PUBLIC/CARS/ */}
-                              <div className="bg-white border border-[#E5E7EB] p-2 rounded-xl space-y-1.5">
-                                <span className="text-[7.5px] font-black text-[#64748B] uppercase tracking-wide font-mono block">
-                                  📂 БЫСТРЫЙ ВЫБОР ИЗ ПАПКИ РЕПОЗИТОРИЯ (/public/cars/):
-                                </span>
-                                <div className="grid grid-cols-3 gap-1.5">
-                                  {[
-                                    { path: '/cars/zeekr_001.jpg', name: 'Zeekr 001' },
-                                    { path: '/cars/geely_monjaro.jpg', name: 'Monjaro' },
-                                    { path: '/cars/li_l9.jpg', name: 'Li L9' }
-                                  ].map((preset) => (
-                                    <button
-                                      key={preset.path}
-                                      type="button"
-                                      onClick={() => handleAddPresetForNewCar(preset.path)}
-                                      className="border border-[#E5E7EB] hover:border-blue-500 rounded-lg overflow-hidden transition text-left group bg-[#F0EEEC] active:scale-95"
-                                    >
-                                      <img src={preset.path} alt="" className="w-full h-8 object-cover" />
-                                      <div className="p-0.5 text-[6.5px] font-black text-center truncate text-stone-700 group-hover:text-blue-600">
-                                        + {preset.name}
-                                      </div>
-                                    </button>
-                                  ))}
+                              <div className="bg-white border border-[#E5E7EB] p-2.5 rounded-xl space-y-1.5 shadow-sm">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-[7.5px] font-black text-[#64748B] uppercase tracking-wide font-mono block">
+                                    📂 БЫСТРЫЙ ВЫБОР ИЗ ПАПКИ РЕПОЗИТОРИЯ (/public/cars/):
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={loadPresetsFromBackend}
+                                    className="text-[7.5px] text-blue-600 hover:underline font-bold flex items-center space-x-0.5 cursor-pointer"
+                                    title="Сканировать заново"
+                                  >
+                                    <RefreshCw className={`w-2 h-2 ${isLoadingPresets ? 'animate-spin' : ''}`} />
+                                    <span>Обновить ({dynamicPresets.length})</span>
+                                  </button>
                                 </div>
+
+                                {dynamicPresets.length === 0 ? (
+                                  <p className="text-[8.5px] text-stone-500 text-center py-1 font-medium bg-[#F9FAFB] rounded-lg">Папка пуста или загружается...</p>
+                                ) : (
+                                  <div className="grid grid-cols-3 gap-1.5 max-h-[140px] overflow-y-auto p-0.5 scrollbar-thin">
+                                    {dynamicPresets.map((preset) => (
+                                      <button
+                                        key={preset.path}
+                                        type="button"
+                                        onClick={() => handleAddPresetForNewCar(preset.path)}
+                                        className="border border-[#E5E7EB] hover:border-[#C5A880] rounded-lg overflow-hidden transition text-left group bg-[#F0EEEC] active:scale-95 shadow-sm"
+                                      >
+                                        <img src={preset.path} alt="" referrerPolicy="no-referrer" className="w-full h-8 object-cover" />
+                                        <div className="p-0.5 text-[6.5px] font-black text-center truncate text-stone-700 group-hover:text-[#C5A880]">
+                                          + {preset.name}
+                                        </div>
+                                      </button>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
 
                               {/* ТЕКСТОВОЕ ПОЛЕ ССЫЛОК ДЛЯ СОВМЕСТИМОСТИ */}
@@ -2266,7 +2356,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                         )}
 
                         {/* НАВИГАЦИОННАЯ КНОПКА ДАЛЕЕ ДЛЯ ТЕЛЕФОНОВ */}
-                        {formSection !== 'media' && (
+                        {!showAllFormFields && formSection !== 'media' && (
                           <button
                             type="button"
                             onClick={() => {
@@ -2316,15 +2406,40 @@ export const CARS_DATA: Car[] = ${formattedCars};
                           </button>
                         </div>
 
+                        {/* Быстрый поиск по списку авто */}
+                        <div className="bg-[#F8FAFC] border border-[#E2E8F0] p-2.5 rounded-2xl">
+                          <label className="block text-[8.5px] text-[#64748B] uppercase font-black font-mono mb-1">
+                            🔍 БЫСТРЫЙ ПОИСК И ФИЛЬТР ({cars.length} авто):
+                          </label>
+                          <input
+                            type="text"
+                            value={catalogSearch}
+                            onChange={(e) => setCatalogSearch(e.target.value)}
+                            placeholder="Введите марку или модель для мгновенной фильтрации..."
+                            className="w-full bg-white border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-xs outline-none focus:border-[#C5A880] text-[#111827] font-medium"
+                          />
+                        </div>
+
                         {/* Список авто */}
-                        <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1">
-                          {cars.map((c) => {
-                            const isPhotoEditorActive = activeCarPhotoEditorId === c.id;
-                            return (
+                        <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1 scrollbar-thin">
+                          {(() => {
+                            const filteredCars = cars.filter(c => 
+                              `${c.brand} ${c.model}`.toLowerCase().includes(catalogSearch.toLowerCase())
+                            );
+                            if (filteredCars.length === 0) {
+                              return (
+                                <p className="text-[10px] text-stone-500 text-center py-4 bg-[#F5F7FA] rounded-2xl border border-dashed border-stone-200 font-medium">
+                                  Ничего не найдено по запросу "{catalogSearch}"
+                                </p>
+                              );
+                            }
+                            return filteredCars.map((c) => {
+                              const isPhotoEditorActive = activeCarPhotoEditorId === c.id;
+                              return (
                               <div key={c.id} className="bg-[#F5F7FA] border border-[#E5E7EB]/60 p-3 rounded-2xl space-y-2.5">
                                 <div className="flex items-center space-x-3">
                                   <img 
-                                    src={c.images[0]} 
+                                    src={getCarImages(c)[0]} 
                                     alt="" 
                                     referrerPolicy="no-referrer"
                                     className="w-12 h-12 rounded-xl object-cover shrink-0 border border-[#E5E7EB]/40" 
@@ -2377,7 +2492,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                                     >
                                       <div className="flex justify-between items-center">
                                         <span className="text-[9px] font-black text-[#111827] uppercase tracking-wider font-mono">
-                                          📸 УПРАВЛЕНИЕ ФОТОГРАФИЯМИ ({c.images.length})
+                                          📸 УПРАВЛЕНИЕ ФОТОГРАФИЯМИ ({getCarImages(c).length})
                                         </span>
                                         <span className="text-[7.5px] font-medium text-[#64748B] leading-none">
                                           Для замены нажмите «Заменить» на фото
@@ -2386,7 +2501,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
 
                                       {/* Сетка фото с удалением и заменой */}
                                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                                        {c.images.map((img, idx) => (
+                                        {getCarImages(c).map((img, idx) => (
                                           <div key={idx} className="relative aspect-video rounded-xl overflow-hidden border border-[#E5E7EB] bg-stone-100 group shadow-sm">
                                             <img src={img} alt="" referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                                             
@@ -2427,28 +2542,40 @@ export const CARS_DATA: Car[] = ${formattedCars};
 
                                       {/* Быстрый выбор из папки /public/cars/ */}
                                       <div className="bg-white border border-[#E5E7EB] p-2.5 rounded-xl space-y-1.5 shadow-inner">
-                                        <span className="text-[7.5px] font-black text-[#64748B] uppercase tracking-wide font-mono block">
-                                          📂 Быстрый выбор из папки репозитория (/public/cars/):
-                                        </span>
-                                        <div className="grid grid-cols-3 gap-1.5">
-                                          {[
-                                            { path: '/cars/zeekr_001.jpg', name: 'Zeekr 001' },
-                                            { path: '/cars/geely_monjaro.jpg', name: 'Monjaro' },
-                                            { path: '/cars/li_l9.jpg', name: 'Li L9' }
-                                          ].map((preset) => (
-                                            <button
-                                              key={preset.path}
-                                              type="button"
-                                              onClick={() => handleAddPresetToCar(c.id, preset.path)}
-                                              className="border border-[#E5E7EB] hover:border-blue-500 rounded-lg overflow-hidden transition text-left group bg-[#F0EEEC] active:scale-95"
-                                            >
-                                              <img src={preset.path} alt="" className="w-full h-7 object-cover" />
-                                              <div className="p-0.5 text-[6.5px] font-black text-center truncate text-stone-700 group-hover:text-blue-600">
-                                                + {preset.name}
-                                              </div>
-                                            </button>
-                                          ))}
+                                        <div className="flex justify-between items-center">
+                                          <span className="text-[7.5px] font-black text-[#64748B] uppercase tracking-wide font-mono block">
+                                            📂 Быстрый выбор из папки репозитория (/public/cars/):
+                                          </span>
+                                          <button
+                                            type="button"
+                                            onClick={loadPresetsFromBackend}
+                                            className="text-[7.5px] text-blue-600 hover:underline font-bold flex items-center space-x-0.5 cursor-pointer"
+                                            title="Сканировать заново"
+                                          >
+                                            <RefreshCw className={`w-2 h-2 ${isLoadingPresets ? 'animate-spin' : ''}`} />
+                                            <span>Обновить ({dynamicPresets.length})</span>
+                                          </button>
                                         </div>
+
+                                        {dynamicPresets.length === 0 ? (
+                                          <p className="text-[8.5px] text-stone-500 text-center py-1 font-medium bg-[#F9FAFB] rounded-lg">Папка пуста или загружается...</p>
+                                        ) : (
+                                          <div className="grid grid-cols-3 gap-1.5 max-h-[140px] overflow-y-auto p-0.5 scrollbar-thin">
+                                            {dynamicPresets.map((preset) => (
+                                              <button
+                                                key={preset.path}
+                                                type="button"
+                                                onClick={() => handleAddPresetToCar(c.id, preset.path)}
+                                                className="border border-[#E5E7EB] hover:border-blue-500 rounded-lg overflow-hidden transition text-left group bg-[#F0EEEC] active:scale-95 shadow-sm"
+                                              >
+                                                <img src={preset.path} alt="" referrerPolicy="no-referrer" className="w-full h-7 object-cover" />
+                                                <div className="p-0.5 text-[6.5px] font-black text-center truncate text-stone-700 group-hover:text-blue-600">
+                                                  + {preset.name}
+                                                </div>
+                                              </button>
+                                            ))}
+                                          </div>
+                                        )}
                                       </div>
 
                                       {/* Форма добавления новой фотографии */}
@@ -2541,7 +2668,8 @@ export const CARS_DATA: Car[] = ${formattedCars};
                                 </AnimatePresence>
                               </div>
                             );
-                          })}
+                          })
+                        })()}
                         </div>
                       </div>
                     )}

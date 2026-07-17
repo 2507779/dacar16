@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useStore } from '../store/useStore';
-import { calculateFullCarPrice, formatCurrency, DELIVERY_CITIES } from '../data/cars';
+import { calculateFullCarPrice, formatCurrency, DELIVERY_CITIES, getCarImages } from '../data/cars';
 import { triggerHaptic } from '../utils/haptics';
 import { 
   X, Check, ChevronLeft, ChevronRight, Truck, Info, 
@@ -74,7 +74,8 @@ export default function VehicleStories() {
     if (!car) return;
     triggerHaptic('light');
     setProgress(0);
-    if (currentSlideIndex < car.images.length - 1) {
+    const images = getCarImages(car);
+    if (currentSlideIndex < images.length - 1) {
       setCurrentSlideIndex(prev => prev + 1);
     } else {
       // Переходим к следующей машине
@@ -178,7 +179,7 @@ export default function VehicleStories() {
           
           {/* Индикаторы прогресса */}
           <div className="flex space-x-1 w-full">
-            {car.images.map((_, idx) => (
+            {getCarImages(car).map((_, idx) => (
               <div key={idx} className="h-1 flex-1 bg-white/35 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-white transition-all duration-[50ms]" 
@@ -319,13 +320,13 @@ export default function VehicleStories() {
                 className="w-full h-40 rounded-2xl overflow-hidden shadow-lg border border-white z-10 relative"
               >
                 <img 
-                  src={car.images[currentSlideIndex]} 
+                  src={getCarImages(car)[currentSlideIndex] || getCarImages(car)[0]} 
                   alt={`${car.brand} ${car.model}`}
                   referrerPolicy="no-referrer"
                   className="w-full h-full object-cover"
                 />
                 <span className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-[8px] font-bold text-white px-1.5 py-0.5 rounded">
-                  Фото {currentSlideIndex + 1}/{car.images.length}
+                  Фото {currentSlideIndex + 1}/{getCarImages(car).length}
                 </span>
               </motion.div>
             </div>
@@ -533,7 +534,7 @@ export default function VehicleStories() {
                   {/* Описание выбранного авто */}
                   <div className="bg-[#F0EEEC] border border-[#EFEBE4] p-3 rounded-xl flex items-center space-x-3">
                     <img 
-                      src={car.images[0]} 
+                      src={getCarImages(car)[0]} 
                       alt="" 
                       referrerPolicy="no-referrer"
                       className="w-12 h-12 rounded-lg object-cover"
