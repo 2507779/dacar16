@@ -104,6 +104,7 @@ interface AppStore {
   editCar: (carId: string, updatedCar: Car) => void; // Редактирование автомобиля
   deleteCar: (carId: string) => void; // Удаление автомобиля
   setCars: (cars: Car[]) => void; // Массовое обновление автомобилей
+  loadCarsFromServer: () => Promise<void>; // Динамическая загрузка автомобилей с сервера
   updateOrderStatus: (orderId: string, status: OrderStatus) => void; // Обновление статуса CRM
   deleteOrder: (orderId: string) => void; // Удаление заказа/лида
   updateOrderNotes: (orderId: string, notes: string, budgetUSD?: number) => void; // Обновление комментов лида
@@ -348,6 +349,11 @@ export const useStore = create<AppStore>((set, get) => {
       const updatedCars = [...get().cars, newCar];
       localStorage.setItem('dacar_all_cars', JSON.stringify(updatedCars));
       set({ cars: updatedCars });
+      fetch('/api/cars', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedCars)
+      }).catch(err => console.error('Failed to sync added car to server:', err));
     },
 
     editCar: (carId, updatedCar) => {
@@ -359,17 +365,47 @@ export const useStore = create<AppStore>((set, get) => {
       });
       localStorage.setItem('dacar_all_cars', JSON.stringify(updatedCars));
       set({ cars: updatedCars });
+      fetch('/api/cars', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedCars)
+      }).catch(err => console.error('Failed to sync edited car to server:', err));
     },
 
     deleteCar: (carId) => {
       const updatedCars = get().cars.filter(c => c.id !== carId);
       localStorage.setItem('dacar_all_cars', JSON.stringify(updatedCars));
       set({ cars: updatedCars });
+      fetch('/api/cars', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedCars)
+      }).catch(err => console.error('Failed to sync deleted car to server:', err));
     },
 
     setCars: (newCars) => {
       localStorage.setItem('dacar_all_cars', JSON.stringify(newCars));
       set({ cars: newCars });
+      fetch('/api/cars', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newCars)
+      }).catch(err => console.error('Failed to sync updated cars to server:', err));
+    },
+
+    loadCarsFromServer: async () => {
+      try {
+        const res = await fetch('/api/cars');
+        if (res.ok) {
+          const fetchedCars = await res.json();
+          if (Array.isArray(fetchedCars) && fetchedCars.length > 0) {
+            localStorage.setItem('dacar_all_cars', JSON.stringify(fetchedCars));
+            set({ cars: fetchedCars });
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to load cars from server database:', err);
+      }
     },
 
     updateOrderStatus: (orderId, status) => {

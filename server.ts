@@ -2,9 +2,12 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
+import { CARS_DATA } from './src/data/cars';
 
 // Путь к файлу конфигурации Telegram и GitHub
 const CONFIG_PATH = path.join(process.cwd(), 'telegram_config.json');
+// Путь к файлу базы данных автомобилей
+const CARS_FILE_PATH = path.join(process.cwd(), 'cars.json');
 
 interface TelegramConfig {
   telegramBotToken: string;
@@ -44,6 +47,66 @@ function writeConfig(config: TelegramConfig) {
   }
 }
 
+// Вспомогательная функция для выгрузки файлов в GitHub репозиторий
+async function commitToGithub(filepath: string, contentBuffer: Buffer, commitMessage: string): Promise<boolean> {
+  const config = readConfig();
+  if (!config.githubToken || !config.githubRepo) {
+    console.log('[GitHub Sync] GitHub Token or Repo is not configured, skipping sync.');
+    return false;
+  }
+  try {
+    // Получаем относительный путь от корня проекта (например: public/cars/my_car.jpg или cars.json)
+    const relativePath = path.relative(process.cwd(), filepath).replace(/\\/g, '/');
+    const contentBase64 = contentBuffer.toString('base64');
+    const gitUrl = `https://api.github.com/repos/${config.githubRepo}/contents/${relativePath}`;
+    
+    // Проверяем существование файла на GitHub (чтобы получить sha на перезапись)
+    let sha: string | undefined = undefined;
+    const checkRes = await fetch(gitUrl, {
+      headers: {
+        'Authorization': `token ${config.githubToken}`,
+        'User-Agent': 'Dacar16-Integration',
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+    
+    if (checkRes.status === 200) {
+      const checkData = await checkRes.json() as any;
+      sha = checkData.sha;
+    }
+
+    const commitBody: any = {
+      message: commitMessage,
+      content: contentBase64,
+      branch: config.githubBranch || 'main'
+    };
+    if (sha) {
+      commitBody.sha = sha;
+    }
+
+    const commitRes = await fetch(gitUrl, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${config.githubToken}`,
+        'User-Agent': 'Dacar16-Integration',
+        'Content-Type': 'application/json',
+        'Accept': 'application/vnd.github.v3+json'
+      },
+      body: JSON.stringify(commitBody)
+    });
+
+    if (commitRes.ok) {
+      console.log(`[GitHub Sync] Successfully committed "${relativePath}" to GitHub!`);
+      return true;
+    } else {
+      console.error(`[GitHub Sync] Failed to commit "${relativePath}" to GitHub:`, await commitRes.text());
+    }
+  } catch (err) {
+    console.error(`[GitHub Sync] Exception committing "${filepath}" to GitHub:`, err);
+  }
+  return false;
+}
+
 // Транслитерация кириллических названий в безопасные имена файлов
 function transliterate(text: string): string {
   const rus = "абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
@@ -66,6 +129,16 @@ function transliterate(text: string): string {
     .replace(/[^a-z0-9_]/g, '_')
     .replace(/_+/g, '_')
     .replace(/^_+|_+$/g, '');
+}
+
+// Инициализируем локальный cars.json дефолтными данными из src/data/cars.ts, если его ещё нет
+try {
+  if (!fs.existsSync(CARS_FILE_PATH)) {
+    fs.writeFileSync(CARS_FILE_PATH, JSON.stringify(CARS_DATA, null, 2), 'utf-8');
+    console.log('[Server] Successfully initialized cars.json from CARS_DATA');
+  }
+} catch (e) {
+  console.error('[Server] Failed to initialize cars.json on startup:', e);
 }
 
 async function startServer() {
@@ -257,54 +330,13 @@ async function startServer() {
       let githubSuccess = false;
       let githubUrl = '';
       if (config.githubToken && config.githubRepo) {
-        try {
-          const contentBase64 = buffer.toString('base64');
-          const gitUrl = `https://api.github.com/repos/${config.githubRepo}/contents/public/cars/${filename}`;
-          
-          // Проверяем существование файла на GitHub (чтобы получить sha на перезапись)
-          let sha: string | undefined = undefined;
-          const checkRes = await fetch(gitUrl, {
-            headers: {
-              'Authorization': `token ${config.githubToken}`,
-              'User-Agent': 'Dacar16-Telegram-Integration',
-              'Accept': 'application/vnd.github.v3+json'
-            }
-          });
-          
-          if (checkRes.status === 200) {
-            const checkData = await checkRes.json() as any;
-            sha = checkData.sha;
-          }
-
-          const commitBody: any = {
-            message: `🤖 Загружено фото ${filename} через Telegram-бота от ChatID: ${chatId}`,
-            content: contentBase64,
-            branch: config.githubBranch || 'main'
-          };
-          if (sha) {
-            commitBody.sha = sha;
-          }
-
-          const commitRes = await fetch(gitUrl, {
-            method: 'PUT',
-            headers: {
-              'Authorization': `token ${config.githubToken}`,
-              'User-Agent': 'Dacar16-Telegram-Integration',
-              'Content-Type': 'application/json',
-              'Accept': 'application/vnd.github.v3+json'
-            },
-            body: JSON.stringify(commitBody)
-          });
-
-          if (commitRes.ok) {
-            githubSuccess = true;
-            githubUrl = `https://github.com/${config.githubRepo}/blob/${config.githubBranch || 'main'}/public/cars/${filename}`;
-            console.log(`[Telegram Bot] Committed photo successfully to GitHub: ${githubUrl}`);
-          } else {
-            console.error('[Telegram Bot] Failed to commit to GitHub:', await commitRes.text());
-          }
-        } catch (gitErr) {
-          console.error('[Telegram Bot] Exception during GitHub commit:', gitErr);
+        githubSuccess = await commitToGithub(
+          localFilePath,
+          buffer,
+          `🤖 Загружено фото ${filename} через Telegram-бота от ChatID: ${chatId}`
+        );
+        if (githubSuccess) {
+          githubUrl = `https://github.com/${config.githubRepo}/blob/${config.githubBranch || 'main'}/public/cars/${filename}`;
         }
       }
 
@@ -373,6 +405,52 @@ async function startServer() {
     } catch (err) {
       console.error('Error scanning cars folder:', err);
       res.status(500).json({ error: 'Failed to read preset images' });
+    }
+  });
+
+  // Получить текущий список автомобилей
+  app.get('/api/cars', (req, res) => {
+    try {
+      if (fs.existsSync(CARS_FILE_PATH)) {
+        const data = fs.readFileSync(CARS_FILE_PATH, 'utf-8');
+        return res.json(JSON.parse(data));
+      }
+      return res.json(CARS_DATA);
+    } catch (err) {
+      console.error('Error reading cars database:', err);
+      return res.json(CARS_DATA);
+    }
+  });
+
+  // Сохранить/обновить список автомобилей (синхронизируется локально и с GitHub)
+  app.post('/api/cars', async (req, res) => {
+    try {
+      const updatedCars = req.body;
+      if (!Array.isArray(updatedCars)) {
+        return res.status(400).json({ error: 'Data must be an array of cars' });
+      }
+
+      const contentString = JSON.stringify(updatedCars, null, 2);
+      
+      // 1. Сохраняем локально на сервере
+      fs.writeFileSync(CARS_FILE_PATH, contentString, 'utf-8');
+      console.log('[Server] Successfully saved cars.json locally.');
+
+      // 2. Синхронизируем с GitHub репозиторием
+      const gitSuccess = await commitToGithub(
+        CARS_FILE_PATH,
+        Buffer.from(contentString, 'utf-8'),
+        `🤖 Обновление каталога автомобилей dacar16 через Панель Администратора`
+      );
+
+      return res.json({ 
+        success: true, 
+        message: 'Каталог автомобилей успешно сохранен на сервере!', 
+        syncedWithGithub: gitSuccess 
+      });
+    } catch (err: any) {
+      console.error('Error saving cars database:', err);
+      return res.status(500).json({ error: err.message || 'Failed to save cars database' });
     }
   });
 
