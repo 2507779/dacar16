@@ -39,11 +39,11 @@ function readConfig(): TelegramConfig {
   }
 
   // Fallback to environment variables if not present in the configuration file
-  if (!config.telegramBotToken && process.env.TELEGRAM_BOT_TOKEN) {
-    config.telegramBotToken = process.env.TELEGRAM_BOT_TOKEN;
+  if (!config.telegramBotToken) {
+    config.telegramBotToken = process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_TOKEN || process.env.BOT_TOKEN || '';
   }
-  if (!config.githubToken && process.env.GITHUB_PAT) {
-    config.githubToken = process.env.GITHUB_PAT;
+  if (!config.githubToken) {
+    config.githubToken = process.env.GITHUB_PAT || process.env.GITHUB_TOKEN || process.env.GH_TOKEN || '';
   }
   
   return config;

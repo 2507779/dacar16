@@ -311,7 +311,8 @@ export function AdminPanel() {
         triggerHaptic('success');
       } else {
         const err = await res.json();
-        setTgGitStatus({ type: 'error', message: err.error || 'Ошибка регистрации Webhook.' });
+        const detailMsg = err.details?.description ? `: ${err.details.description}` : '';
+        setTgGitStatus({ type: 'error', message: `${err.error || 'Ошибка регистрации Webhook'}${detailMsg}` });
         triggerHaptic('error');
       }
     } catch (err) {
