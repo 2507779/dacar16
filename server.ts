@@ -9,6 +9,8 @@ const CONFIG_PATH = path.join(process.cwd(), 'telegram_config.json');
 // Путь к файлу базы данных автомобилей
 const CARS_FILE_PATH = path.join(process.cwd(), 'cars.json');
 
+let lastGithubError = '';
+
 interface TelegramConfig {
   telegramBotToken: string;
   githubToken: string;
@@ -62,6 +64,7 @@ async function commitToGithub(filepath: string, contentBuffer: Buffer, commitMes
   const config = readConfig();
   if (!config.githubToken || !config.githubRepo) {
     console.log('[GitHub Sync] GitHub Token or Repo is not configured, skipping sync.');
+    lastGithubError = 'Токен GitHub или репозиторий не указаны в настройках';
     return false;
   }
   try {
@@ -83,6 +86,17 @@ async function commitToGithub(filepath: string, contentBuffer: Buffer, commitMes
     if (checkRes.status === 200) {
       const checkData = await checkRes.json() as any;
       sha = checkData.sha;
+    } else if (checkRes.status === 401) {
+      lastGithubError = 'Ошибка авторизации GitHub (401 Bad credentials). Проверьте правильность токена.';
+      console.error(`[GitHub Sync] checkRes 401: Unauthorized`);
+      return false;
+    } else if (checkRes.status === 403) {
+      lastGithubError = 'Превышен лимит запросов или ограничен доступ (403 Forbidden). Проверьте права токена.';
+      console.error(`[GitHub Sync] checkRes 403: Forbidden`);
+      return false;
+    } else if (checkRes.status === 404) {
+      // Это нормально, если файла еще нет в репозитории, но это также может означать, что сам репозиторий не существует.
+      // Не прерываем, так как PUT попробует создать файл.
     }
 
     const commitBody: any = {
@@ -107,14 +121,59 @@ async function commitToGithub(filepath: string, contentBuffer: Buffer, commitMes
 
     if (commitRes.ok) {
       console.log(`[GitHub Sync] Successfully committed "${relativePath}" to GitHub!`);
+      lastGithubError = ''; // Сбрасываем ошибку при успешной записи
       return true;
     } else {
-      console.error(`[GitHub Sync] Failed to commit "${relativePath}" to GitHub:`, await commitRes.text());
+      const resText = await commitRes.text();
+      console.error(`[GitHub Sync] Failed to commit "${relativePath}" to GitHub:`, resText);
+      try {
+        const resJson = JSON.parse(resText);
+        lastGithubError = `GitHub API ошибка: ${resJson.message || resText}`;
+      } catch (e) {
+        lastGithubError = `GitHub код ${commitRes.status}: ${resText.slice(0, 150)}`;
+      }
     }
-  } catch (err) {
+  } catch (err: any) {
     console.error(`[GitHub Sync] Exception committing "${filepath}" to GitHub:`, err);
+    lastGithubError = `Исключение сети при связи с GitHub: ${err.message || err}`;
   }
   return false;
+}
+
+// Вспомогательная функция для получения актуального cars.json из GitHub при запуске сервера
+async function pullCarsFromGithub(): Promise<void> {
+  const config = readConfig();
+  if (!config.githubToken || !config.githubRepo) {
+    console.log('[GitHub Sync] GitHub Token/Repo not configured, skipping startup pull.');
+    return;
+  }
+  try {
+    const branch = config.githubBranch || 'main';
+    const gitUrl = `https://api.github.com/repos/${config.githubRepo}/contents/cars.json?ref=${branch}`;
+    console.log(`[GitHub Sync] Fetching cars.json from GitHub: ${gitUrl}`);
+    const res = await fetch(gitUrl, {
+      headers: {
+        'Authorization': `token ${config.githubToken}`,
+        'User-Agent': 'Dacar16-Integration',
+        'Accept': 'application/vnd.github.v3.raw'
+      }
+    });
+    if (res.ok) {
+      const content = await res.text();
+      // Проверяем корректность JSON перед сохранением
+      try {
+        JSON.parse(content);
+        fs.writeFileSync(CARS_FILE_PATH, content, 'utf-8');
+        console.log('[GitHub Sync] Successfully pulled and updated cars.json from GitHub on startup!');
+      } catch (jsonErr) {
+        console.error('[GitHub Sync] Pulled content is not valid JSON, skipping write.', jsonErr);
+      }
+    } else {
+      console.warn(`[GitHub Sync] Pull cars.json failed with status: ${res.status}`);
+    }
+  } catch (err) {
+    console.error('[GitHub Sync] Exception pulling cars.json on startup:', err);
+  }
 }
 
 // Транслитерация кириллических названий в безопасные имена файлов
@@ -268,6 +327,9 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  // Попытка стянуть актуальную базу автомобилей из GitHub при запуске сервера
+  await pullCarsFromGithub();
+
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
@@ -279,7 +341,8 @@ async function startServer() {
       ...config,
       telegramBotToken: config.telegramBotToken ? `${config.telegramBotToken.slice(0, 6)}...${config.telegramBotToken.slice(-4)}` : '',
       githubToken: config.githubToken ? `${config.githubToken.slice(0, 4)}...${config.githubToken.slice(-4)}` : '',
-      hasRawTokens: !!(config.telegramBotToken && config.githubToken)
+      hasRawTokens: !!(config.telegramBotToken && config.githubToken),
+      lastGithubError: lastGithubError
     });
   });
 
@@ -963,34 +1026,80 @@ async function startServer() {
     }
   });
 
-  // API для динамического сканирования фотографий в папке public/cars
-  app.get('/api/presets', (req, res) => {
+  // API для динамического сканирования фотографий в папке public/cars (локально + из GitHub)
+  app.get('/api/presets', async (req, res) => {
     try {
       const publicCarsDir = path.join(process.cwd(), 'public', 'cars');
       if (!fs.existsSync(publicCarsDir)) {
         fs.mkdirSync(publicCarsDir, { recursive: true });
       }
 
-      const files = fs.readdirSync(publicCarsDir);
-      const presets = files
-        .filter(file => {
-          const ext = path.extname(file).toLowerCase();
-          return ['.jpg', '.jpeg', '.png', '.webp', '.svg', '.gif', '.bmp'].includes(ext);
-        })
-        .map(file => {
-          const baseName = path.basename(file, path.extname(file));
-          // Превращаем snake_case/kebab-case в красивое название
-          const cleanName = baseName
-            .split(/[_-]+/)
-            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-            .join(' ');
+      // 1. Читаем локальные файлы
+      const localFiles = fs.readdirSync(publicCarsDir);
+      const presetMap = new Map<string, { path: string; name: string }>();
 
-          return {
-            path: `/cars/${file}`,
-            name: cleanName
-          };
+      const addPreset = (file: string) => {
+        const ext = path.extname(file).toLowerCase();
+        if (!['.jpg', '.jpeg', '.png', '.webp', '.svg', '.gif', '.bmp'].includes(ext)) {
+          return;
+        }
+        const baseName = path.basename(file, path.extname(file));
+        
+        // Превращаем слитые названия, camelCase, snake_case/kebab-case (например, toyotarav41) в красивое название
+        let cleanName = baseName
+          .replace(/([A-Z])/g, ' $1')    // Пробел перед заглавными буквами
+          .replace(/([0-9]+)/g, ' $1')   // Пробел перед цифрами
+          .trim()
+          .split(/[_-]+/)
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ')
+          .replace(/\s+/g, ' ');         // Убираем множественные пробелы
+
+        presetMap.set(file.toLowerCase(), {
+          path: `/cars/${file}`,
+          name: cleanName
         });
+      };
 
+      // Сначала добавляем локальные пресеты
+      localFiles.forEach(addPreset);
+
+      // 2. Если GitHub настроен, запрашиваем список файлов из GitHub API
+      const config = readConfig();
+      if (config.githubToken && config.githubRepo) {
+        try {
+          const branch = config.githubBranch || 'main';
+          const gitUrl = `https://api.github.com/repos/${config.githubRepo}/contents/public/cars?ref=${branch}`;
+          console.log(`[Presets Sync] Fetching dynamic presets list from GitHub: ${gitUrl}`);
+          
+          const githubRes = await fetch(gitUrl, {
+            headers: {
+              'Authorization': `token ${config.githubToken}`,
+              'User-Agent': 'Dacar16-Integration'
+            }
+          });
+
+          if (githubRes.ok) {
+            const items = await githubRes.json();
+            if (Array.isArray(items)) {
+              items.forEach(item => {
+                if (item.type === 'file' && item.name) {
+                  // Добавляем пресет из гитхаба (если локально его еще нет, он запишется)
+                  addPreset(item.name);
+                }
+              });
+              console.log(`[Presets Sync] Successfully merged and loaded presets from GitHub! Total combined: ${presetMap.size}`);
+            }
+          } else {
+            console.warn(`[Presets Sync] GitHub returned status ${githubRes.status} for presets fetch.`);
+          }
+        } catch (gitErr) {
+          console.error('[Presets Sync] Failed to fetch presets from GitHub:', gitErr);
+        }
+      }
+
+      // Превращаем Map в отсортированный массив пресетов
+      const presets = Array.from(presetMap.values()).sort((a, b) => a.name.localeCompare(b.name));
       res.json(presets);
     } catch (err) {
       console.error('Error scanning cars folder:', err);
@@ -1036,7 +1145,8 @@ async function startServer() {
       return res.json({ 
         success: true, 
         message: 'Каталог автомобилей успешно сохранен на сервере!', 
-        syncedWithGithub: gitSuccess 
+        syncedWithGithub: gitSuccess,
+        lastGithubError: lastGithubError
       });
     } catch (err: any) {
       console.error('Error saving cars database:', err);
@@ -1092,6 +1202,68 @@ async function startServer() {
       console.error('Error handling upload:', err);
       return res.status(500).json({ error: err.message || 'Failed to handle file upload' });
     }
+  });
+
+  // Прокси-маршрут для автоматической подгрузки фотографий автомобилей из GitHub, если их нет на текущем сервере (например, после перезапуска контейнера)
+  app.get('/cars/:filename', async (req, res, next) => {
+    try {
+      const filename = req.params.filename;
+      const localFilePath = path.join(process.cwd(), 'public', 'cars', filename);
+
+      // Если файл физически есть на диске сервера, отдаем его сразу
+      if (fs.existsSync(localFilePath)) {
+        return res.sendFile(localFilePath);
+      }
+
+      // Если файла нет локально, проверяем конфигурацию GitHub
+      const config = readConfig();
+      if (!config.githubToken || !config.githubRepo) {
+        console.log(`[Image Proxy] File ${filename} not found locally, and GitHub is not configured.`);
+        return next();
+      }
+
+      const branch = config.githubBranch || 'main';
+      const gitUrl = `https://api.github.com/repos/${config.githubRepo}/contents/public/cars/${filename}?ref=${branch}`;
+      
+      console.log(`[Image Proxy] File "${filename}" not found locally. Pulling from GitHub: ${gitUrl}`);
+      
+      const response = await fetch(gitUrl, {
+        headers: {
+          'Authorization': `token ${config.githubToken}`,
+          'User-Agent': 'Dacar16-Integration',
+          'Accept': 'application/vnd.github.v3.raw'
+        }
+      });
+
+      if (response.ok) {
+        const arrayBuffer = await response.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+
+        // Сохраняем скачанный файл на локальный диск сервера для быстродействия последующих запросов
+        const publicCarsDir = path.dirname(localFilePath);
+        if (!fs.existsSync(publicCarsDir)) {
+          fs.mkdirSync(publicCarsDir, { recursive: true });
+        }
+        fs.writeFileSync(localFilePath, buffer);
+        console.log(`[Image Proxy] Cached fetched photo locally: ${filename}`);
+
+        // Устанавливаем корректные Content-Type заголовки
+        const ext = path.extname(filename).toLowerCase();
+        let contentType = 'image/jpeg';
+        if (ext === '.png') contentType = 'image/png';
+        if (ext === '.gif') contentType = 'image/gif';
+        if (ext === '.webp') contentType = 'image/webp';
+
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Cache-Control', 'public, max-age=31536000'); // Браузерное кеширование на 1 год
+        return res.send(buffer);
+      } else {
+        console.warn(`[Image Proxy] GitHub response failed for "${filename}" with status: ${response.status}`);
+      }
+    } catch (err) {
+      console.error('[Image Proxy] Error fetching photo from GitHub:', err);
+    }
+    next();
   });
 
   // Настройка Vite middleware в режиме разработки

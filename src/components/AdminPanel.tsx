@@ -79,6 +79,7 @@ export function AdminPanel() {
   const [isPhotoUploading, setIsPhotoUploading] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [lastGithubError, setLastGithubError] = useState('');
 
   const handleManualSync = async () => {
     setIsSyncing(true);
@@ -91,19 +92,29 @@ export function AdminPanel() {
         body: JSON.stringify(cars)
       });
       if (res.ok) {
-        setSyncStatus('success');
-        triggerHaptic('success');
-        setTimeout(() => setSyncStatus('idle'), 4000);
+        const data = await res.json();
+        if (data.syncedWithGithub) {
+          setSyncStatus('success');
+          triggerHaptic('success');
+          setLastGithubError('');
+        } else {
+          setSyncStatus('error');
+          triggerHaptic('error');
+          if (data.lastGithubError) {
+            setLastGithubError(data.lastGithubError);
+          }
+        }
+        setTimeout(() => setSyncStatus('idle'), 5000);
       } else {
         setSyncStatus('error');
         triggerHaptic('error');
-        setTimeout(() => setSyncStatus('idle'), 4000);
+        setTimeout(() => setSyncStatus('idle'), 5000);
       }
     } catch (err) {
       console.error(err);
       setSyncStatus('error');
       triggerHaptic('error');
-      setTimeout(() => setSyncStatus('idle'), 4000);
+      setTimeout(() => setSyncStatus('idle'), 5000);
     } finally {
       setIsSyncing(false);
     }
@@ -258,6 +269,9 @@ export function AdminPanel() {
         setTgGitGithubBranch(data.githubBranch || 'main');
         setTgGitAllowedChatIds(data.allowedChatIds || '');
         setTgGitWebhookRegistered(data.webhookRegistered || false);
+        if (data.lastGithubError) {
+          setLastGithubError(data.lastGithubError);
+        }
       }
     } catch (err) {
       console.error('Failed to fetch tg/git config:', err);
@@ -1634,6 +1648,18 @@ export const CARS_DATA: Car[] = ${formattedCars};
                       </button>
                     </div>
                   </div>
+
+                  {lastGithubError && (
+                    <div className="bg-red-50 border border-red-200 text-red-800 p-3 rounded-2xl text-[9.5px] font-medium leading-normal space-y-1">
+                      <div className="font-bold flex items-center space-x-1">
+                        <span>⚠️ Ошибка связи с GitHub:</span>
+                      </div>
+                      <p className="font-mono text-[9px] bg-red-100 p-1.5 rounded-lg border border-red-200 break-all">{lastGithubError}</p>
+                      <p className="text-[8.5px] text-red-600 font-sans mt-1">
+                        Перейдите во вкладку <b>🔌 TELEGRAM & GITHUB</b> ниже, чтобы проверить настройки. Убедитесь, что ваш <b>GitHub Personal Access Token</b> указан правильно, репозиторий существует и токен имеет галочку <code>repo</code> или <code>public_repo</code> в настройках GitHub.
+                      </p>
+                    </div>
+                  )}
 
                   {/* Навигационные табы панели */}
                   <div className="flex bg-[#F5F7FA] p-1 rounded-xl border border-[#E5E7EB]/40 overflow-x-auto scrollbar-none space-x-1">
