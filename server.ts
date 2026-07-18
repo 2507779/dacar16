@@ -29,6 +29,16 @@ const DEFAULT_CONFIG: TelegramConfig = {
   webhookRegistered: false
 };
 
+function cleanRepoString(repo: string): string {
+  if (!repo) return '';
+  let cleaned = repo.trim();
+  // Remove https://github.com/ or http://github.com/ or github.com/
+  cleaned = cleaned.replace(/^(https?:\/\/)?(www\.)?github\.com\//i, '');
+  // Remove trailing slash or .git
+  cleaned = cleaned.replace(/\/$/, '').replace(/\.git$/i, '');
+  return cleaned;
+}
+
 function readConfig(): TelegramConfig {
   let config = { ...DEFAULT_CONFIG };
   try {
@@ -40,6 +50,11 @@ function readConfig(): TelegramConfig {
     console.error('Error reading telegram config:', e);
   }
 
+  // Clean the repo string if it exists
+  if (config.githubRepo) {
+    config.githubRepo = cleanRepoString(config.githubRepo);
+  }
+
   // Fallback to environment variables if not present in the configuration file
   if (!config.telegramBotToken) {
     config.telegramBotToken = process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_TOKEN || process.env.BOT_TOKEN || '';
@@ -47,12 +62,24 @@ function readConfig(): TelegramConfig {
   if (!config.githubToken) {
     config.githubToken = process.env.GITHUB_PAT || process.env.GITHUB_TOKEN || process.env.GH_TOKEN || '';
   }
+  if (!config.githubRepo || config.githubRepo === '2507779/dacar16') {
+    config.githubRepo = cleanRepoString(process.env.GITHUB_REPO || process.env.GH_REPO || config.githubRepo || '2507779/dacar16');
+  }
+  if (!config.githubBranch || config.githubBranch === 'main') {
+    config.githubBranch = process.env.GITHUB_BRANCH || process.env.GH_BRANCH || config.githubBranch || 'main';
+  }
+  if (!config.allowedChatIds) {
+    config.allowedChatIds = process.env.ALLOWED_CHAT_IDS || process.env.TELEGRAM_ALLOWED_CHAT_IDS || '';
+  }
   
   return config;
 }
 
 function writeConfig(config: TelegramConfig) {
   try {
+    if (config.githubRepo) {
+      config.githubRepo = cleanRepoString(config.githubRepo);
+    }
     fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2), 'utf-8');
   } catch (e) {
     console.error('Error writing telegram config:', e);
@@ -125,10 +152,16 @@ async function commitToGithub(filepath: string, contentBuffer: Buffer, commitMes
       return true;
     } else {
       const resText = await commitRes.text();
-      console.error(`[GitHub Sync] Failed to commit "${relativePath}" to GitHub:`, resText);
+      const singleLineText = resText.replace(/\s+/g, ' ');
+      console.error(`[GitHub Sync] Failed to commit "${relativePath}" to GitHub: ${singleLineText}`);
       try {
         const resJson = JSON.parse(resText);
-        lastGithubError = `GitHub API ошибка: ${resJson.message || resText}`;
+        let errorMsg = resJson.message || singleLineText;
+        if (resJson.errors && Array.isArray(resJson.errors)) {
+          const detail = resJson.errors.map((e: any) => e.message || JSON.stringify(e)).join(', ');
+          errorMsg += ` (${detail})`;
+        }
+        lastGithubError = `GitHub API ошибка: ${errorMsg}`;
       } catch (e) {
         lastGithubError = `GitHub код ${commitRes.status}: ${resText.slice(0, 150)}`;
       }
@@ -165,11 +198,35 @@ async function pullCarsFromGithub(): Promise<void> {
         JSON.parse(content);
         fs.writeFileSync(CARS_FILE_PATH, content, 'utf-8');
         console.log('[GitHub Sync] Successfully pulled and updated cars.json from GitHub on startup!');
+        lastGithubError = '';
       } catch (jsonErr) {
         console.error('[GitHub Sync] Pulled content is not valid JSON, skipping write.', jsonErr);
+        lastGithubError = 'Ошибка: данные cars.json в репозитории GitHub повреждены (невалидный JSON)';
       }
     } else {
       console.warn(`[GitHub Sync] Pull cars.json failed with status: ${res.status}`);
+      if (res.status === 404) {
+        console.log('[GitHub Sync] cars.json not found on GitHub. Initializing GitHub repository with local cars.json...');
+        if (fs.existsSync(CARS_FILE_PATH)) {
+          const fileContent = fs.readFileSync(CARS_FILE_PATH);
+          const success = await commitToGithub(CARS_FILE_PATH, fileContent, 'Initialize cars.json from local database');
+          if (success) {
+            console.log('[GitHub Sync] Successfully initialized cars.json on GitHub!');
+            lastGithubError = '';
+          } else {
+            console.error('[GitHub Sync] Failed to initialize cars.json on GitHub.');
+            // commitToGithub will set a descriptive lastGithubError
+          }
+        } else {
+          lastGithubError = 'База cars.json отсутствует локально и не найдена на GitHub (404)';
+        }
+      } else if (res.status === 401) {
+        lastGithubError = 'Ошибка авторизации GitHub (401 Bad credentials). Проверьте правильность токена.';
+      } else if (res.status === 403) {
+        lastGithubError = 'Превышен лимит запросов или ограничен доступ GitHub (403 Forbidden). Проверьте права токена.';
+      } else {
+        lastGithubError = `Не удалось загрузить cars.json с GitHub. Код ответа: ${res.status}`;
+      }
     }
   } catch (err) {
     console.error('[GitHub Sync] Exception pulling cars.json on startup:', err);
