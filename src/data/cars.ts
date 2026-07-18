@@ -1051,9 +1051,8 @@ export function getCarImages(car: any): string[] {
   }
   
   return [
-    'https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=800&q=80'
-  ];
+  '/cars/no-image.jpg'
+];
 }
 
 // Безопасное получение списка характеристик/опций
