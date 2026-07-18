@@ -1045,15 +1045,47 @@ async function startServer() {
         }
         const baseName = path.basename(file, path.extname(file));
         
-        // Превращаем слитые названия, camelCase, snake_case/kebab-case (например, toyotarav41) в красивое название
-        let cleanName = baseName
+        const COMMON_BRANDS = [
+          'toyota', 'lexus', 'zeekr', 'geely', 'changan', 'lixiang', 'bmw', 
+          'mercedes', 'audi', 'porsche', 'hyundai', 'kia', 'byd', 'voyah', 
+          'aito', 'honda', 'nissan', 'mazda', 'subaru', 'mitsubishi', 'tesla',
+          'volkswagen', 'volvo', 'landrover', 'jaguar', 'chevrolet', 'ford'
+        ];
+
+        let fileLower = baseName.toLowerCase();
+        let brandPrefix = '';
+        for (const brand of COMMON_BRANDS) {
+          if (fileLower.startsWith(brand)) {
+            brandPrefix = brand;
+            break;
+          }
+        }
+
+        let rest = baseName;
+        if (brandPrefix) {
+          rest = baseName.substring(brandPrefix.length);
+          // Убираем ведущие разделители, если они есть
+          rest = rest.replace(/^[-_\s]+/, '');
+        }
+
+        const formattedBrand = brandPrefix 
+          ? (brandPrefix === 'bmw' ? 'BMW' : brandPrefix === 'byd' ? 'BYD' : brandPrefix.charAt(0).toUpperCase() + brandPrefix.slice(1)) 
+          : '';
+
+        // Форматируем оставшуюся часть названия
+        let cleanRest = rest
           .replace(/([A-Z])/g, ' $1')    // Пробел перед заглавными буквами
           .replace(/([0-9]+)/g, ' $1')   // Пробел перед цифрами
           .trim()
           .split(/[_-]+/)
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .map(word => {
+            if (word.toLowerCase() === 'rav4') return 'RAV4';
+            return word.charAt(0).toUpperCase() + word.slice(1);
+          })
           .join(' ')
           .replace(/\s+/g, ' ');         // Убираем множественные пробелы
+
+        let cleanName = formattedBrand ? `${formattedBrand} ${cleanRest}`.trim() : cleanRest;
 
         presetMap.set(file.toLowerCase(), {
           path: `/cars/${file}`,
