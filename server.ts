@@ -154,16 +154,21 @@ async function commitToGithub(filepath: string, contentBuffer: Buffer, commitMes
       const resText = await commitRes.text();
       const singleLineText = resText.replace(/\s+/g, ' ');
       console.error(`[GitHub Sync] Failed to commit "${relativePath}" to GitHub: ${singleLineText}`);
-      try {
-        const resJson = JSON.parse(resText);
-        let errorMsg = resJson.message || singleLineText;
-        if (resJson.errors && Array.isArray(resJson.errors)) {
-          const detail = resJson.errors.map((e: any) => e.message || JSON.stringify(e)).join(', ');
-          errorMsg += ` (${detail})`;
+      
+      if (commitRes.status === 404) {
+        lastGithubError = `Репозиторий "${config.githubRepo}" или ветка "${config.githubBranch || 'main'}" не найдены на GitHub.\n\nПожалуйста:\n1. Убедитесь, что репозиторий "${config.githubRepo}" существует в аккаунте GitHub.\n2. В настройках вашего Fine-grained Personal Access Token во вкладке "Repository access" выберите "All repositories" либо предоставьте доступ к репозиторию "${config.githubRepo}".\n3. Проверьте права токена: Permissions -> Repository permissions -> Contents -> Read and Write.`;
+      } else {
+        try {
+          const resJson = JSON.parse(resText);
+          let errorMsg = resJson.message || singleLineText;
+          if (resJson.errors && Array.isArray(resJson.errors)) {
+            const detail = resJson.errors.map((e: any) => e.message || JSON.stringify(e)).join(', ');
+            errorMsg += ` (${detail})`;
+          }
+          lastGithubError = `GitHub API ошибка: ${errorMsg}`;
+        } catch (e) {
+          lastGithubError = `GitHub код ${commitRes.status}: ${resText.slice(0, 150)}`;
         }
-        lastGithubError = `GitHub API ошибка: ${errorMsg}`;
-      } catch (e) {
-        lastGithubError = `GitHub код ${commitRes.status}: ${resText.slice(0, 150)}`;
       }
     }
   } catch (err: any) {
