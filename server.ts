@@ -6,8 +6,8 @@ import { CARS_DATA } from './src/data/cars';
 
 // Путь к файлу конфигурации Telegram и GitHub
 const CONFIG_PATH = path.join(process.cwd(), 'telegram_config.json');
-// Путь к файлу секретов (токены), исключенному из Git
-const SECRETS_PATH = path.join(process.cwd(), 'telegram_secrets.json');
+// Путь к файлу секретов (токены), полностью вынесенному за пределы репозитория для безопасности и корректного экспорта в AI Studio
+const SECRETS_PATH = path.join(process.cwd(), '..', 'telegram_secrets.json');
 // Путь к файлу базы данных автомобилей
 const CARS_FILE_PATH = path.join(process.cwd(), 'cars.json');
 
