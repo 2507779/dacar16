@@ -143,6 +143,22 @@ function writeConfig(config: TelegramConfig) {
 
     fs.writeFileSync(CONFIG_PATH, JSON.stringify(nonSensitiveConfig, null, 2), 'utf-8');
     fs.writeFileSync(SECRETS_PATH, JSON.stringify(sensitiveSecrets, null, 2), 'utf-8');
+
+    // Автоматически выгружаем обновленный telegram_config.json в GitHub репозиторий (без токенов и секретов)
+    // Запускаем асинхронно, чтобы не задерживать ответ сервера
+    setTimeout(() => {
+      commitToGithub(CONFIG_PATH, Buffer.from(JSON.stringify(nonSensitiveConfig, null, 2), 'utf-8'), 'Update telegram_config.json settings via Admin Panel')
+        .then(success => {
+          if (success) {
+            console.log('[GitHub Sync] Automatically pushed updated telegram_config.json to GitHub repository!');
+          } else {
+            console.warn('[GitHub Sync] Could not auto-push telegram_config.json to GitHub:', lastGithubError);
+          }
+        })
+        .catch(err => {
+          console.error('[GitHub Sync] Exception in auto-pushing telegram_config.json:', err);
+        });
+    }, 100);
   } catch (e) {
     console.error('Error writing telegram config/secrets:', e);
   }
