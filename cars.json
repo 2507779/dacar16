@@ -16,8 +16,8 @@
     "transmission": "Automatic",
     "color": "Белый жемчуг (White Pearl)",
     "images": [
-      "https://images.unsplash.com/photo-1603386329225-868f9b1ee6c9?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1567818735868-e71b99932e29?auto=format&fit=crop&w=800&q=80"
+      "/cars/rav41.jpg",
+      "/cars/rav42.jpg"
     ],
     "priceUSD": 28500,
     "recyclingFeeRUB": 3400,
@@ -49,8 +49,8 @@
     "transmission": "Automatic",
     "color": "Темно-серый металлик",
     "images": [
-      "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80"
+      "/cars/highlander1.jpg",
+      "/cars/highlander2.jpg"
     ],
     "priceUSD": 44000,
     "recyclingFeeRUB": 3400,
@@ -82,8 +82,8 @@
     "transmission": "Automatic",
     "color": "Серый матовый (Space Grey)",
     "images": [
-      "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=800&q=80"
+      "/cars/gacs71.jpg",
+      "/cars/gacs72.jpg"
     ],
     "priceUSD": 31000,
     "recyclingFeeRUB": 3400,
@@ -115,8 +115,8 @@
     "transmission": "Robotic",
     "color": "Серебристый металлик",
     "images": [
-      "https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?auto=format&fit=crop&w=800&q=80"
+      "/cars/tiguanlpro1.jpg",
+      "/cars/tiguanlpro2.jpg"
     ],
     "priceUSD": 33500,
     "recyclingFeeRUB": 3400,
@@ -148,8 +148,8 @@
     "transmission": "Robotic",
     "color": "Красный спорт (Tango Red)",
     "images": [
-      "https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=800&q=80"
+      "/cars/audiq31.jpg",
+      "/cars/audiq32.jpg"
     ],
     "priceUSD": 29800,
     "recyclingFeeRUB": 3400,
@@ -181,8 +181,8 @@
     "transmission": "Robotic",
     "color": "Серый кварц (Daytona Grey)",
     "images": [
-      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=800&q=80"
+      "/cars/audiq51.jpg",
+      "/cars/audiq52.jpg"
     ],
     "priceUSD": 38500,
     "recyclingFeeRUB": 3400,
@@ -214,8 +214,8 @@
     "transmission": "Automatic",
     "color": "Серый графит (Graphite Grey)",
     "images": [
-      "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=800&q=80"
+      "/cars/glccoupe1.jpg",
+      "/cars/glccoupe2.jpg"
     ],
     "priceUSD": 44500,
     "recyclingFeeRUB": 3400,
@@ -247,8 +247,8 @@
     "transmission": "Automatic",
     "color": "Черный карбон (Carbon Black)",
     "images": [
-      "https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=800&q=80"
+      "/cars/bmwx51.jpg",
+      "/cars/bmwx52.jpg"
     ],
     "priceUSD": 59000,
     "recyclingFeeRUB": 3400,
@@ -280,8 +280,8 @@
     "transmission": "Automatic",
     "color": "Ярко-красный (Soul Red Crystal)",
     "images": [
-      "https://images.unsplash.com/photo-1514316454349-750a7fd3da3a?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1562613512-bc78b19bd69c?auto=format&fit=crop&w=800&q=80"
+      "/cars/cx5comfort1.jpg",
+      "/cars/cx5comfort2.jpg"
     ],
     "priceUSD": 22000,
     "recyclingFeeRUB": 3400,
@@ -313,8 +313,8 @@
     "transmission": "Automatic",
     "color": "Темно-серый металлик (Machine Grey)",
     "images": [
-      "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=800&q=80"
+      "/cars/cx5premium1.jpg",
+      "/cars/cx5premium2.jpg"
     ],
     "priceUSD": 25500,
     "recyclingFeeRUB": 3400,
@@ -346,8 +346,8 @@
     "transmission": "Automatic",
     "color": "Ярко-оранжевый / Черный верх",
     "images": [
-      "https://images.unsplash.com/photo-1525609004556-c46c7d6cf0a3?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=800&q=80"
+      "/cars/kiakx11.jpg",
+      "/cars/kiakx12.jpg"
     ],
     "priceUSD": 14500,
     "recyclingFeeRUB": 3400,
@@ -379,8 +379,8 @@
     "transmission": "Robotic",
     "color": "Небесно-голубой (Sky Blue)",
     "images": [
-      "https://images.unsplash.com/photo-1542282088-fe8426682b8f?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=800&q=80"
+      "/cars/tharuxr1.jpg",
+      "/cars/tharuxr2.jpg"
     ],
     "priceUSD": 18500,
     "recyclingFeeRUB": 3400,
@@ -412,8 +412,8 @@
     "transmission": "Automatic",
     "color": "Бронзовый металлик",
     "images": [
-      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=800&q=80"
+      "/cars/c5x1.jpg",
+      "/cars/c5x2.jpg"
     ],
     "priceUSD": 24800,
     "recyclingFeeRUB": 3400,
@@ -445,8 +445,8 @@
     "transmission": "Robotic",
     "color": "Серый металлик (Monsoon Grey)",
     "images": [
-      "https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80"
+      "/cars/audiq3used1.jpg",
+      "/cars/audiq3used2.jpg"
     ],
     "priceUSD": 22000,
     "recyclingFeeRUB": 5200,
@@ -478,8 +478,8 @@
     "transmission": "Automatic",
     "color": "Темно-синий металлик",
     "images": [
-      "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1616422285623-13ff0162193c?auto=format&fit=crop&w=800&q=80"
+      "/cars/audia31.jpg",
+      "/cars/audia32.jpg"
     ],
     "priceUSD": 18900,
     "recyclingFeeRUB": 5200,
@@ -511,8 +511,8 @@
     "transmission": "Automatic",
     "color": "Белый минерал (Mineral White)",
     "images": [
-      "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1518987186305-42f155551744?auto=format&fit=crop&w=800&q=80"
+      "/cars/bmwx11.jpg",
+      "/cars/bmwx12.jpg"
     ],
     "priceUSD": 21500,
     "recyclingFeeRUB": 5200,
@@ -544,8 +544,8 @@
     "transmission": "Automatic",
     "color": "Синий фитоник (Phytonic Blue)",
     "images": [
-      "https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=800&q=80"
+      "/cars/bmwx31.jpg",
+      "/cars/bmwx32.jpg"
     ],
     "priceUSD": 32000,
     "recyclingFeeRUB": 5200,
@@ -577,8 +577,8 @@
     "transmission": "Automatic",
     "color": "Черный обсидиан (Obsidian Black)",
     "images": [
-      "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80"
+      "/cars/gle1.jpg",
+      "/cars/gle2.jpg"
     ],
     "priceUSD": 51000,
     "recyclingFeeRUB": 5200,
@@ -610,8 +610,8 @@
     "transmission": "Robotic",
     "color": "Полярный серебристый металлик",
     "images": [
-      "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=800&q=80"
+      "/cars/a1801.jpg",
+      "/cars/a1802.jpg"
     ],
     "priceUSD": 16500,
     "recyclingFeeRUB": 5200,
@@ -643,8 +643,8 @@
     "transmission": "Automatic",
     "color": "Черный обсидиан",
     "images": [
-      "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80"
+      "/cars/eclass1.jpg",
+      "/cars/eclass2.jpg"
     ],
     "priceUSD": 28900,
     "recyclingFeeRUB": 5200,
@@ -676,8 +676,8 @@
     "transmission": "Robotic",
     "color": "Серый дельфин (Dolphin Grey)",
     "images": [
-      "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=800&q=80"
+      "/cars/golf81.jpg",
+      "/cars/golf82.jpg"
     ],
     "priceUSD": 15500,
     "recyclingFeeRUB": 5200,
@@ -709,8 +709,8 @@
     "transmission": "Robotic",
     "color": "Белый жемчуг (Onyx White)",
     "images": [
-      "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80"
+      "/cars/tayron1.jpg",
+      "/cars/tayron2.jpg"
     ],
     "priceUSD": 19800,
     "recyclingFeeRUB": 5200,
@@ -742,8 +742,8 @@
     "transmission": "Automatic",
     "color": "Мятно-зеленый (Mint Green)",
     "images": [
-      "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=800&q=80"
+      "/cars/tcross1.jpg",
+      "/cars/tcross2.jpg"
     ],
     "priceUSD": 12800,
     "recyclingFeeRUB": 5200,
@@ -775,8 +775,8 @@
     "transmission": "Robotic",
     "color": "Желтый металлик с черной крышей",
     "images": [
-      "https://images.unsplash.com/photo-1606016159991-dfe4f2746ad5?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=800&q=80"
+      "/cars/troc1.jpg",
+      "/cars/troc2.jpg"
     ],
     "priceUSD": 14500,
     "recyclingFeeRUB": 5200,
@@ -808,9 +808,9 @@
     "transmission": "Automatic",
     "color": "Черный изумруд",
     "images": [
-      "https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=800&q=80"
+      "/cars/lil91.jpg",
+      "/cars/lil92.jpg",
+      "/cars/lil93.jpg"
     ],
     "priceUSD": 46500,
     "recyclingFeeRUB": 3400,
@@ -843,8 +843,8 @@
     "transmission": "Single-speed",
     "color": "Серый матовый (Phantom)",
     "images": [
-      "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1532581291347-9c39cf10a73c?auto=format&fit=crop&w=800&q=80"
+      "/cars/zeekr0011.jpg",
+      "/cars/zeekr0012.jpg"
     ],
     "priceUSD": 42000,
     "recyclingFeeRUB": 3400,
@@ -877,8 +877,8 @@
     "transmission": "Automatic",
     "color": "Белый жемчуг",
     "images": [
-      "https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1603386329225-868f9b1ee6c9?auto=format&fit=crop&w=800&q=80"
+      "/cars/palisade1.jpg",
+      "/cars/palisade2.jpg"
     ],
     "priceUSD": 31800,
     "recyclingFeeRUB": 5200,
@@ -911,8 +911,8 @@
     "transmission": "Automatic",
     "color": "Темно-синий металлик",
     "images": [
-      "https://images.unsplash.com/photo-1590362891991-f776e747a588?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=800&q=80"
+      "/cars/carnival1.jpg",
+      "/cars/carnival2.jpg"
     ],
     "priceUSD": 28500,
     "recyclingFeeRUB": 5200,
@@ -944,8 +944,8 @@
     "transmission": "Automatic",
     "color": "Королевский Синий матовый",
     "images": [
-      "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=800&q=80"
+      "/cars/gv801.jpg",
+      "/cars/gv802.jpg"
     ],
     "priceUSD": 41500,
     "recyclingFeeRUB": 5200,
@@ -978,8 +978,8 @@
     "transmission": "Single-speed",
     "color": "Aqua Blue (Синий аквамарин)",
     "images": [
-      "https://images.unsplash.com/photo-1532581291347-9c39cf10a73c?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=800&q=80"
+      "/cars/su71.jpg",
+      "/cars/su72.jpg"
     ],
     "priceUSD": 39500,
     "recyclingFeeRUB": 3400,
@@ -1012,8 +1012,8 @@
     "transmission": "Automatic",
     "color": "Изумрудный металлик (Emerald)",
     "images": [
-      "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=800&q=80"
+      "/cars/monjaro1.jpg",
+      "/cars/monjaro2.jpg"
     ],
     "priceUSD": 22800,
     "recyclingFeeRUB": 5200,
@@ -1045,8 +1045,8 @@
     "transmission": "Automatic",
     "color": "Серебристый металлик",
     "images": [
-      "https://images.unsplash.com/photo-1550355291-bbee04a92027?auto=format&fit=crop&w=800&q=80",
-      "https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=800&q=80"
+      "/cars/camry1.jpg",
+      "/cars/camry2.jpg"
     ],
     "priceUSD": 21500,
     "recyclingFeeRUB": 5200,
