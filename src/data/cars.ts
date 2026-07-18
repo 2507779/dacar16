@@ -1056,12 +1056,30 @@ export function getCarImages(car: any): string[] {
 }
 
 // Безопасное получение списка характеристик/опций
-export function getCarFeatures(car: any): string[] {
-  if (!car) return [];
-  if (Array.isArray(car.features)) {
-    return car.features.filter(f => typeof f === 'string' && f.trim().length > 0);
-  } else if (typeof car.features === 'string' && car.features.trim().length > 0) {
-    return car.features.split(/[,;]+/).map(f => f.trim()).filter(Boolean);
+export function getCarImages(car: any): string[] {
+  if (!car) return ['/cars/no-image.jpg'];
+
+  if (Array.isArray(car.images)) {
+    return car.images
+      .filter((img): img is string => typeof img === 'string')
+      .map(img => img.trim())
+      .filter(Boolean);
   }
-  return [];
+
+  if (typeof car.images === 'string') {
+    return car.images
+      .split(/[\n,;]+/)
+      .map(img => img.trim())
+      .filter(Boolean);
+  }
+
+  if (typeof car.image === 'string' && car.image.trim()) {
+    return [car.image.trim()];
+  }
+
+  if (typeof car.photo === 'string' && car.photo.trim()) {
+    return [car.photo.trim()];
+  }
+
+  return ['/cars/no-image.jpg'];
 }
