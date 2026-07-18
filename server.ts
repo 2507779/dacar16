@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import { CARS_DATA } from './src/data/cars';
+import { commitToGithubWithOctokit, pullFromGithubWithOctokit } from './src/utils/github';
 
 // Путь к файлу конфигурации Telegram и GitHub
 const CONFIG_PATH = path.join(process.cwd(), 'telegram_config.json');
@@ -147,7 +148,7 @@ function writeConfig(config: TelegramConfig) {
   }
 }
 
-// Вспомогательная функция для выгрузки файлов в GitHub репозиторий
+// Вспомогательная функция для выгрузки файлов в GitHub репозиторий с использованием Octokit
 async function commitToGithub(filepath: string, contentBuffer: Buffer, commitMessage: string): Promise<boolean> {
   const config = readConfig();
   if (!config.githubToken || !config.githubRepo) {
@@ -155,147 +156,70 @@ async function commitToGithub(filepath: string, contentBuffer: Buffer, commitMes
     lastGithubError = 'Токен GitHub или репозиторий не указаны в настройках';
     return false;
   }
-  try {
-    // Получаем относительный путь от корня проекта (например: public/cars/my_car.jpg или cars.json)
-    const relativePath = path.relative(process.cwd(), filepath).replace(/\\/g, '/');
-    const contentBase64 = contentBuffer.toString('base64');
-    const gitUrl = `https://api.github.com/repos/${config.githubRepo}/contents/${relativePath}`;
-    
-    // Проверяем существование файла на GitHub (чтобы получить sha на перезапись)
-    let sha: string | undefined = undefined;
-    const checkRes = await fetch(gitUrl, {
-      headers: {
-        'Authorization': `token ${config.githubToken}`,
-        'User-Agent': 'Dacar16-Integration',
-        'Accept': 'application/vnd.github.v3+json'
-      }
-    });
-    
-    if (checkRes.status === 200) {
-      const checkData = await checkRes.json() as any;
-      sha = checkData.sha;
-    } else if (checkRes.status === 401) {
-      lastGithubError = 'Ошибка авторизации GitHub (401 Bad credentials). Проверьте правильность токена.';
-      console.error(`[GitHub Sync] checkRes 401: Unauthorized`);
-      return false;
-    } else if (checkRes.status === 403) {
-      lastGithubError = 'Превышен лимит запросов или ограничен доступ (403 Forbidden). Проверьте права токена.';
-      console.error(`[GitHub Sync] checkRes 403: Forbidden`);
-      return false;
-    } else if (checkRes.status === 404) {
-      // Это нормально, если файла еще нет в репозитории, но это также может означать, что сам репозиторий не существует.
-      // Не прерываем, так как PUT попробует создать файл.
-    }
+  const relativePath = path.relative(process.cwd(), filepath).replace(/\\/g, '/');
+  const result = await commitToGithubWithOctokit(
+    config.githubRepo,
+    config.githubBranch || 'main',
+    config.githubToken,
+    relativePath,
+    contentBuffer,
+    commitMessage
+  );
 
-    const commitBody: any = {
-      message: commitMessage,
-      content: contentBase64,
-      branch: config.githubBranch || 'main'
-    };
-    if (sha) {
-      commitBody.sha = sha;
-    }
-
-    const commitRes = await fetch(gitUrl, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `token ${config.githubToken}`,
-        'User-Agent': 'Dacar16-Integration',
-        'Content-Type': 'application/json',
-        'Accept': 'application/vnd.github.v3+json'
-      },
-      body: JSON.stringify(commitBody)
-    });
-
-    if (commitRes.ok) {
-      console.log(`[GitHub Sync] Successfully committed "${relativePath}" to GitHub!`);
-      lastGithubError = ''; // Сбрасываем ошибку при успешной записи
-      return true;
-    } else {
-      const resText = await commitRes.text();
-      const singleLineText = resText.replace(/\s+/g, ' ');
-      console.error(`[GitHub Sync] Failed to commit "${relativePath}" to GitHub: ${singleLineText}`);
-      
-      if (commitRes.status === 404) {
-        lastGithubError = `Репозиторий "${config.githubRepo}" или ветка "${config.githubBranch || 'main'}" не найдены на GitHub.\n\nПожалуйста:\n1. Убедитесь, что репозиторий "${config.githubRepo}" существует в аккаунте GitHub.\n2. В настройках вашего Fine-grained Personal Access Token во вкладке "Repository access" выберите "All repositories" либо предоставьте доступ к репозиторию "${config.githubRepo}".\n3. Проверьте права токена: Permissions -> Repository permissions -> Contents -> Read and Write.`;
-      } else {
-        try {
-          const resJson = JSON.parse(resText);
-          let errorMsg = resJson.message || singleLineText;
-          if (resJson.errors && Array.isArray(resJson.errors)) {
-            const detail = resJson.errors.map((e: any) => e.message || JSON.stringify(e)).join(', ');
-            errorMsg += ` (${detail})`;
-          }
-          lastGithubError = `GitHub API ошибка: ${errorMsg}`;
-        } catch (e) {
-          lastGithubError = `GitHub код ${commitRes.status}: ${resText.slice(0, 150)}`;
-        }
-      }
-    }
-  } catch (err: any) {
-    console.error(`[GitHub Sync] Exception committing "${filepath}" to GitHub:`, err);
-    lastGithubError = `Исключение сети при связи с GitHub: ${err.message || err}`;
+  if (result.success) {
+    lastGithubError = '';
+    return true;
+  } else {
+    lastGithubError = result.error || 'Неизвестная ошибка синхронизации с GitHub';
+    return false;
   }
-  return false;
 }
 
-// Вспомогательная функция для получения актуального cars.json из GitHub при запуске сервера
+// Вспомогательная функция для получения актуального cars.json из GitHub при запуске сервера с использованием Octokit
 async function pullCarsFromGithub(): Promise<void> {
   const config = readConfig();
   if (!config.githubToken || !config.githubRepo) {
     console.log('[GitHub Sync] GitHub Token/Repo not configured, skipping startup pull.');
     return;
   }
-  try {
-    const branch = config.githubBranch || 'main';
-    const gitUrl = `https://api.github.com/repos/${config.githubRepo}/contents/cars.json?ref=${branch}`;
-    console.log(`[GitHub Sync] Fetching cars.json from GitHub: ${gitUrl}`);
-    const res = await fetch(gitUrl, {
-      headers: {
-        'Authorization': `token ${config.githubToken}`,
-        'User-Agent': 'Dacar16-Integration',
-        'Accept': 'application/vnd.github.v3.raw'
-      }
-    });
-    if (res.ok) {
-      const content = await res.text();
-      // Проверяем корректность JSON перед сохранением
-      try {
-        JSON.parse(content);
-        fs.writeFileSync(CARS_FILE_PATH, content, 'utf-8');
-        console.log('[GitHub Sync] Successfully pulled and updated cars.json from GitHub on startup!');
-        lastGithubError = '';
-      } catch (jsonErr) {
-        console.error('[GitHub Sync] Pulled content is not valid JSON, skipping write.', jsonErr);
-        lastGithubError = 'Ошибка: данные cars.json в репозитории GitHub повреждены (невалидный JSON)';
+  const branch = config.githubBranch || 'main';
+  console.log(`[GitHub Sync] Fetching cars.json from GitHub using Octokit (branch: ${branch})`);
+  const result = await pullFromGithubWithOctokit(
+    config.githubRepo,
+    branch,
+    config.githubToken,
+    'cars.json'
+  );
+
+  if (result.success && result.content) {
+    try {
+      JSON.parse(result.content);
+      fs.writeFileSync(CARS_FILE_PATH, result.content, 'utf-8');
+      console.log('[GitHub Sync] Successfully pulled and updated cars.json from GitHub on startup!');
+      lastGithubError = '';
+    } catch (jsonErr) {
+      console.error('[GitHub Sync] Pulled content is not valid JSON, skipping write.', jsonErr);
+      lastGithubError = 'Ошибка: данные cars.json в репозитории GitHub повреждены (невалидный JSON)';
+    }
+  } else {
+    console.warn(`[GitHub Sync] Pull cars.json failed: ${result.error}`);
+    if (result.error && result.error.includes('404')) {
+      console.log('[GitHub Sync] cars.json not found on GitHub. Initializing GitHub repository with local cars.json...');
+      if (fs.existsSync(CARS_FILE_PATH)) {
+        const fileContent = fs.readFileSync(CARS_FILE_PATH);
+        const success = await commitToGithub(CARS_FILE_PATH, fileContent, 'Initialize cars.json from local database');
+        if (success) {
+          console.log('[GitHub Sync] Successfully initialized cars.json on GitHub!');
+          lastGithubError = '';
+        } else {
+          console.error('[GitHub Sync] Failed to initialize cars.json on GitHub.');
+        }
+      } else {
+        lastGithubError = 'База cars.json отсутствует локально и не найдена на GitHub (404)';
       }
     } else {
-      console.warn(`[GitHub Sync] Pull cars.json failed with status: ${res.status}`);
-      if (res.status === 404) {
-        console.log('[GitHub Sync] cars.json not found on GitHub. Initializing GitHub repository with local cars.json...');
-        if (fs.existsSync(CARS_FILE_PATH)) {
-          const fileContent = fs.readFileSync(CARS_FILE_PATH);
-          const success = await commitToGithub(CARS_FILE_PATH, fileContent, 'Initialize cars.json from local database');
-          if (success) {
-            console.log('[GitHub Sync] Successfully initialized cars.json on GitHub!');
-            lastGithubError = '';
-          } else {
-            console.error('[GitHub Sync] Failed to initialize cars.json on GitHub.');
-            // commitToGithub will set a descriptive lastGithubError
-          }
-        } else {
-          lastGithubError = 'База cars.json отсутствует локально и не найдена на GitHub (404)';
-        }
-      } else if (res.status === 401) {
-        lastGithubError = 'Ошибка авторизации GitHub (401 Bad credentials). Проверьте правильность токена.';
-      } else if (res.status === 403) {
-        lastGithubError = 'Превышен лимит запросов или ограничен доступ GitHub (403 Forbidden). Проверьте права токена.';
-      } else {
-        lastGithubError = `Не удалось загрузить cars.json с GitHub. Код ответа: ${res.status}`;
-      }
+      lastGithubError = result.error || 'Не удалось загрузить cars.json с GitHub.';
     }
-  } catch (err) {
-    console.error('[GitHub Sync] Exception pulling cars.json on startup:', err);
   }
 }
 
