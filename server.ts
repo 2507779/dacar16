@@ -6,6 +6,8 @@ import { CARS_DATA } from './src/data/cars';
 
 // Путь к файлу конфигурации Telegram и GitHub
 const CONFIG_PATH = path.join(process.cwd(), 'telegram_config.json');
+// Путь к файлу секретов (токены), исключенному из Git
+const SECRETS_PATH = path.join(process.cwd(), 'telegram_secrets.json');
 // Путь к файлу базы данных автомобилей
 const CARS_FILE_PATH = path.join(process.cwd(), 'cars.json');
 
@@ -41,13 +43,54 @@ function cleanRepoString(repo: string): string {
 
 function readConfig(): TelegramConfig {
   let config = { ...DEFAULT_CONFIG };
+  let configLoaded = false;
   try {
     if (fs.existsSync(CONFIG_PATH)) {
       const content = fs.readFileSync(CONFIG_PATH, 'utf-8');
       config = { ...config, ...JSON.parse(content) };
+      configLoaded = true;
     }
   } catch (e) {
     console.error('Error reading telegram config:', e);
+  }
+
+  // Считываем секреты из telegram_secrets.json, если они есть
+  let secretsLoaded = false;
+  try {
+    if (fs.existsSync(SECRETS_PATH)) {
+      const secretsContent = fs.readFileSync(SECRETS_PATH, 'utf-8');
+      const secrets = JSON.parse(secretsContent);
+      if (secrets.telegramBotToken) config.telegramBotToken = secrets.telegramBotToken;
+      if (secrets.githubToken) config.githubToken = secrets.githubToken;
+      secretsLoaded = true;
+    }
+  } catch (e) {
+    console.error('Error reading telegram secrets:', e);
+  }
+
+  // Авто-миграция: если у нас есть секреты в telegram_config.json, но нет в telegram_secrets.json,
+  // то сохраняем их в telegram_secrets.json и зачищаем в telegram_config.json
+  if (configLoaded && !secretsLoaded && (config.telegramBotToken || config.githubToken)) {
+    try {
+      const sensitiveSecrets = {
+        telegramBotToken: config.telegramBotToken,
+        githubToken: config.githubToken
+      };
+      fs.writeFileSync(SECRETS_PATH, JSON.stringify(sensitiveSecrets, null, 2), 'utf-8');
+      
+      const nonSensitiveConfig = {
+        githubRepo: config.githubRepo,
+        githubBranch: config.githubBranch,
+        allowedChatIds: config.allowedChatIds,
+        webhookRegistered: config.webhookRegistered,
+        telegramBotToken: '',
+        githubToken: ''
+      };
+      fs.writeFileSync(CONFIG_PATH, JSON.stringify(nonSensitiveConfig, null, 2), 'utf-8');
+      console.log('[Auto-Migration] Successfully migrated credentials to telegram_secrets.json and cleared telegram_config.json');
+    } catch (err) {
+      console.error('[Auto-Migration] Failed to migrate credentials:', err);
+    }
   }
 
   // Clean the repo string if it exists
@@ -80,9 +123,27 @@ function writeConfig(config: TelegramConfig) {
     if (config.githubRepo) {
       config.githubRepo = cleanRepoString(config.githubRepo);
     }
-    fs.writeFileSync(CONFIG_PATH, JSON.stringify(config, null, 2), 'utf-8');
+
+    // Сохраняем нечувствительные поля в telegram_config.json
+    const nonSensitiveConfig = {
+      githubRepo: config.githubRepo,
+      githubBranch: config.githubBranch,
+      allowedChatIds: config.allowedChatIds,
+      webhookRegistered: config.webhookRegistered,
+      telegramBotToken: '', // заменяем на пустую строку в отслеживаемом файле
+      githubToken: ''       // заменяем на пустую строку в отслеживаемом файле
+    };
+
+    // Сохраняем чувствительные токены в telegram_secrets.json (который игнорируется гитом)
+    const sensitiveSecrets = {
+      telegramBotToken: config.telegramBotToken,
+      githubToken: config.githubToken
+    };
+
+    fs.writeFileSync(CONFIG_PATH, JSON.stringify(nonSensitiveConfig, null, 2), 'utf-8');
+    fs.writeFileSync(SECRETS_PATH, JSON.stringify(sensitiveSecrets, null, 2), 'utf-8');
   } catch (e) {
-    console.error('Error writing telegram config:', e);
+    console.error('Error writing telegram config/secrets:', e);
   }
 }
 
