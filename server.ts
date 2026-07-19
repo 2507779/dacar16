@@ -10,6 +10,7 @@ const CONFIG_PATH = path.join(process.cwd(), 'telegram_config.json');
 const SECRETS_PATH = path.join(process.cwd(), '..', 'telegram_secrets.json');
 // Путь к файлу базы данных автомобилей
 const CARS_FILE_PATH = path.join(process.cwd(), 'cars.json');
+const PUBLIC_CARS_FILE_PATH = path.join(process.cwd(), 'public', 'cars.json');
 
 let lastGithubError = '';
 
@@ -210,6 +211,7 @@ async function pullCarsFromGithub(): Promise<void> {
     try {
       JSON.parse(result.content);
       fs.writeFileSync(CARS_FILE_PATH, result.content, 'utf-8');
+      fs.writeFileSync(PUBLIC_CARS_FILE_PATH, result.content, 'utf-8');
       console.log('[GitHub Sync] Successfully pulled and updated cars.json from GitHub on startup!');
       lastGithubError = '';
     } catch (jsonErr: any) {
@@ -278,7 +280,9 @@ function readCars(): any[] {
 // Запись списка автомобилей в базу данных
 function writeCars(cars: any[]): boolean {
   try {
-    fs.writeFileSync(CARS_FILE_PATH, JSON.stringify(cars, null, 2), 'utf-8');
+    const content = JSON.stringify(cars, null, 2);
+    fs.writeFileSync(CARS_FILE_PATH, content, 'utf-8');
+    fs.writeFileSync(PUBLIC_CARS_FILE_PATH, content, 'utf-8');
     return true;
   } catch (err) {
     console.error('Error writing cars file:', err);
@@ -1227,7 +1231,8 @@ async function startServer() {
       
       // 1. Сохраняем локально на сервере
       fs.writeFileSync(CARS_FILE_PATH, contentString, 'utf-8');
-      console.log('[Server] Successfully saved cars.json locally.');
+      fs.writeFileSync(PUBLIC_CARS_FILE_PATH, contentString, 'utf-8');
+      console.log('[Server] Successfully saved cars.json locally and in public directory.');
 
       // 2. Синхронизируем с GitHub репозиторием
       const gitSuccess = await commitToGithub(

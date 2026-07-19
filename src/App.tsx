@@ -19,13 +19,14 @@ import { playEngineStartupSound, playStartupSound } from './utils/engineSound';
 import { triggerHaptic } from './utils/haptics';
 
 export default function App() {
-  const { currentTab, activeCarId, loadCarsFromServer } = useStore();
+  const { currentTab, activeCarId, loadCarsFromServer, fetchCars } = useStore();
   const [isSplash, setIsSplash] = useState(true);
   const [loadingDone, setLoadingDone] = useState(false);
 
   useEffect(() => {
     // Загружаем актуальную базу автомобилей с сервера для мгновенного отображения всем посетителям
     loadCarsFromServer();
+    fetchCars();
 
     // Инициализация Telegram WebApp API
     const tg = (window as any).Telegram?.WebApp;

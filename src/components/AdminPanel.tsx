@@ -1038,7 +1038,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
             `• Пробег: ${targetCar.mileage} км\n` +
             `• Двигатель: ${targetCar.engineType} (${targetCar.power} л.с.)\n` +
             `• Привод: ${targetCar.driveType}\n\n` +
-            `🔥 Стоимость под ключ во Владивостоке: от $${targetCar.priceUSD.toLocaleString()}\n` +
+            `🔥 Стоимость под ключ: от ${formatCurrency(calculateFullCarPrice(targetCar).finalPriceRUB)}\n` +
             `📍 Доставка до Москвы/Казани под ключ со всеми сборами!\n\n` +
             `📲 Для заказа и подбора пишите менеджеру воронки.`;
 

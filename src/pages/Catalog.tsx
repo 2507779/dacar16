@@ -170,12 +170,15 @@ export default function Catalog() {
       // 5. Фильтр по марке
       if (filters.brand && car.brand !== filters.brand) return false;
 
-      // 6. Фильтр по максимальной цене в USD
-      if (filters.priceMax && car.priceUSD > filters.priceMax) return false;
+      // 6. Фильтр по максимальной цене в RUB
+      if (filters.priceMax) {
+        const finalPriceRUB = calculateFullCarPrice(car, selectedCity).finalPriceRUB;
+        if (finalPriceRUB > filters.priceMax) return false;
+      }
 
       return true;
     });
-  }, [cars, searchQuery, filters]);
+  }, [cars, searchQuery, filters, selectedCity]);
 
   // Сортировка данных (useMemo)
   const sortedCars = React.useMemo(() => {
@@ -694,11 +697,11 @@ export default function Catalog() {
                   </div>
                 </div>
 
-                {/* 5. Максимальный бюджет (USD) */}
+                {/* 5. Максимальный бюджет (RUB) */}
                 <div>
                   <h4 className="text-[10px] font-bold uppercase tracking-wider text-[#78716C] mb-2.5">Максимальный бюджет</h4>
                   <div className="grid grid-cols-3 gap-2">
-                    {[25000, 35000, 50000].map((budget) => (
+                    {[2500000, 4000000, 6000000].map((budget) => (
                       <button
                         key={budget}
                         onClick={() => {
@@ -711,13 +714,10 @@ export default function Catalog() {
                             : 'bg-white border-[#EFEBE4] text-[#1C1917]'
                         }`}
                       >
-                        до ${budget.toLocaleString()}
+                        до {budget === 2500000 ? '2.5 млн ₽' : budget === 4000000 ? '4 млн ₽' : '6 млн ₽'}
                       </button>
                     ))}
                   </div>
-                  <p className="text-[10px] text-[#78716C] mt-2 font-mono text-center">
-                    Курс ЦБ РФ: $1 = {EXCHANGE_RATES.USD_to_RUB} ₽
-                  </p>
                 </div>
               </div>
 

@@ -107,6 +107,7 @@ interface AppStore {
   deleteCar: (carId: string) => void; // Удаление автомобиля
   setCars: (cars: Car[]) => void; // Массовое обновление автомобилей
   loadCarsFromServer: () => Promise<void>; // Динамическая загрузка автомобилей с сервера
+  fetchCars: () => Promise<void>; // Динамическая загрузка cars.json из public
   updateOrderStatus: (orderId: string, status: OrderStatus) => void; // Обновление статуса CRM
   deleteOrder: (orderId: string) => void; // Удаление заказа/лида
   updateOrderNotes: (orderId: string, notes: string, budgetUSD?: number) => void; // Обновление комментов лида
@@ -407,6 +408,32 @@ export const useStore = create<AppStore>((set, get) => {
         }
       } catch (err) {
         console.warn('Failed to load cars from server database:', err);
+      }
+    },
+
+    fetchCars: async () => {
+      try {
+        const res = await fetch(`/public/cars.json?timestamp=${Date.now()}`);
+        if (!res.ok) {
+          // Fallback to /cars.json in case public directory content is mapped on root (Vite behavior)
+          const fallbackRes = await fetch(`/cars.json?timestamp=${Date.now()}`);
+          if (fallbackRes.ok) {
+            const fetchedCars = await fallbackRes.json();
+            if (Array.isArray(fetchedCars) && fetchedCars.length > 0) {
+              localStorage.setItem('dacar_all_cars', JSON.stringify(fetchedCars));
+              set({ cars: fetchedCars });
+            }
+            return;
+          }
+          throw new Error(`Failed to fetch cars.json: ${res.statusText}`);
+        }
+        const fetchedCars = await res.json();
+        if (Array.isArray(fetchedCars) && fetchedCars.length > 0) {
+          localStorage.setItem('dacar_all_cars', JSON.stringify(fetchedCars));
+          set({ cars: fetchedCars });
+        }
+      } catch (err) {
+        console.warn('Failed to fetch cars from public/cars.json:', err);
       }
     },
 

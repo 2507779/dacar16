@@ -404,14 +404,14 @@ export default function VehicleDetails() {
             <div className="flex justify-between text-[#78716C] font-medium">
               <span>Стоимость авто ({car.country})</span>
               <span className="font-mono font-bold text-[#1C1917]">
-                ${car.priceUSD.toLocaleString()} (~{formatCurrency(calculated.carBasePriceRUB)})
+                {formatCurrency(calculated.carBasePriceRUB)}
               </span>
             </div>
             
             <div className="flex justify-between text-[#78716C] font-medium">
               <span>Таможенная пошлина РФ</span>
               <span className="font-mono font-bold text-[#1C1917]">
-                €{car.customsDutyEUR.toLocaleString()} (~{formatCurrency(calculated.customsDutyRUB)})
+                {formatCurrency(calculated.customsDutyRUB)}
               </span>
             </div>
 
