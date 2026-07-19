@@ -4,7 +4,7 @@
     "brand": "Volkswagen",
     "model": "Tharu 300 TSI",
     "generation": "I Facelift",
-    "year": 2026,
+    "year": 2024,
     "mileage": 0,
     "condition": "new",
     "country": "Китай",
@@ -18,7 +18,8 @@
     "images": [
       "/cars/vw_tharu_1.jpg",
       "/cars/vw_tharu_2.jpg",
-      "/cars/vw_tharu_3.jpg"
+      "/cars/vw_tharu_3.jpg",
+      "/cars/vw_tharu_4.jpg"
     ],
     "priceUSD": 21500,
     "recyclingFeeRUB": 3400,
@@ -52,7 +53,8 @@
     "images": [
       "/cars/toyota_rav4_1.jpg",
       "/cars/toyota_rav4_2.jpg",
-      "/cars/toyota_rav4_3.jpg"
+      "/cars/toyota_rav4_3.jpg",
+      "/cars/toyota_rav4_4.jpg"
     ],
     "priceUSD": 28500,
     "recyclingFeeRUB": 3400,
@@ -85,7 +87,9 @@
     "color": "Черный обсидиан (Black)",
     "images": [
       "/cars/toyota_highlander_1.jpg",
-      "/cars/toyota_highlander_2.jpg"
+      "/cars/toyota_highlander_2.jpg",
+      "/cars/toyota_highlander_3.jpg",
+      "/cars/toyota_highlander_4.jpg"
     ],
     "priceUSD": 44000,
     "recyclingFeeRUB": 3400,
@@ -118,7 +122,9 @@
     "color": "Серый матовый (Space Grey)",
     "images": [
       "/cars/gac_s7_1.jpg",
-      "/cars/gac_s7_2.jpg"
+      "/cars/gac_s7_2.jpg",
+      "/cars/gac_s7_3.jpg",
+      "/cars/gac_s7_4.jpg"
     ],
     "priceUSD": 31000,
     "recyclingFeeRUB": 3400,
@@ -151,7 +157,9 @@
     "color": "Красный перламутр (Fiery Red)",
     "images": [
       "/cars/vw_lamando_1.jpg",
-      "/cars/vw_lamando_2.jpg"
+      "/cars/vw_lamando_2.jpg",
+      "/cars/vw_lamando_3.jpg",
+      "/cars/vw_lamando_4.jpg"
     ],
     "priceUSD": 23000,
     "recyclingFeeRUB": 3400,
@@ -184,7 +192,9 @@
     "color": "Темно-синий металлик (Navarra Blue)",
     "images": [
       "/cars/audi_q3_1.jpg",
-      "/cars/audi_q3_2.jpg"
+      "/cars/audi_q3_2.jpg",
+      "/cars/audi_q3_3.jpg",
+      "/cars/audi_q3_4.jpg"
     ],
     "priceUSD": 32500,
     "recyclingFeeRUB": 3400,
@@ -217,7 +227,9 @@
     "color": "Светло-зеленый (Quantum Grey)",
     "images": [
       "/cars/audi_q2_1.jpg",
-      "/cars/audi_q2_2.jpg"
+      "/cars/audi_q2_2.jpg",
+      "/cars/audi_q2_3.jpg",
+      "/cars/audi_q2_4.jpg"
     ],
     "priceUSD": 25500,
     "recyclingFeeRUB": 3400,
@@ -250,7 +262,9 @@
     "color": "Черный миф (Mythos Black)",
     "images": [
       "/cars/audi_q5_1.jpg",
-      "/cars/audi_q5_2.jpg"
+      "/cars/audi_q5_2.jpg",
+      "/cars/audi_q5_3.jpg",
+      "/cars/audi_q5_4.jpg"
     ],
     "priceUSD": 41500,
     "recyclingFeeRUB": 3400,
@@ -283,7 +297,9 @@
     "color": "Белый полярный (Polar White)",
     "images": [
       "/cars/mercedes_glc_coupe_1.jpg",
-      "/cars/mercedes_glc_coupe_2.jpg"
+      "/cars/mercedes_glc_coupe_2.jpg",
+      "/cars/mercedes_glc_coupe_3.jpg",
+      "/cars/mercedes_glc_coupe_4.jpg"
     ],
     "priceUSD": 51000,
     "recyclingFeeRUB": 3400,
@@ -316,7 +332,9 @@
     "color": "Черный карбон (Carbon Black)",
     "images": [
       "/cars/bmw_x5_1.jpg",
-      "/cars/bmw_x5_2.jpg"
+      "/cars/bmw_x5_2.jpg",
+      "/cars/bmw_x5_3.jpg",
+      "/cars/bmw_x5_4.jpg"
     ],
     "priceUSD": 63000,
     "recyclingFeeRUB": 3400,
@@ -349,7 +367,9 @@
     "color": "Красный фирменный (Soul Red Crystal)",
     "images": [
       "/cars/mazda_cx5_1.jpg",
-      "/cars/mazda_cx5_2.jpg"
+      "/cars/mazda_cx5_2.jpg",
+      "/cars/mazda_cx5_3.jpg",
+      "/cars/mazda_cx5_4.jpg"
     ],
     "priceUSD": 23800,
     "recyclingFeeRUB": 3400,
@@ -382,7 +402,9 @@
     "color": "Серый металлик (Machine Grey)",
     "images": [
       "/cars/mazda_cx5_max_1.jpg",
-      "/cars/mazda_cx5_max_2.jpg"
+      "/cars/mazda_cx5_max_2.jpg",
+      "/cars/mazda_cx5_max_3.jpg",
+      "/cars/mazda_cx5_max_4.jpg"
     ],
     "priceUSD": 26900,
     "recyclingFeeRUB": 3400,
@@ -415,7 +437,9 @@
     "color": "Черный жемчуг (Aurora Black)",
     "images": [
       "/cars/kia_k5_1.jpg",
-      "/cars/kia_k5_2.jpg"
+      "/cars/kia_k5_2.jpg",
+      "/cars/kia_k5_3.jpg",
+      "/cars/kia_k5_4.jpg"
     ],
     "priceUSD": 27500,
     "recyclingFeeRUB": 3400,
@@ -448,7 +472,9 @@
     "color": "Голубой перламутр (Ice Blue)",
     "images": [
       "/cars/vw_tiguan_l_pro_1.jpg",
-      "/cars/vw_tiguan_l_pro_2.jpg"
+      "/cars/vw_tiguan_l_pro_2.jpg",
+      "/cars/vw_tiguan_l_pro_3.jpg",
+      "/cars/vw_tiguan_l_pro_4.jpg"
     ],
     "priceUSD": 34500,
     "recyclingFeeRUB": 3400,
@@ -481,7 +507,9 @@
     "color": "Фирменный Амазонит (Amazonite Grey)",
     "images": [
       "/cars/citroen_c5x_1.jpg",
-      "/cars/citroen_c5x_2.jpg"
+      "/cars/citroen_c5x_2.jpg",
+      "/cars/citroen_c5x_3.jpg",
+      "/cars/citroen_c5x_4.jpg"
     ],
     "priceUSD": 25000,
     "recyclingFeeRUB": 3400,
@@ -514,7 +542,9 @@
     "color": "Белый (Pure White)",
     "images": [
       "/cars/vw_tiguan_xr_1.jpg",
-      "/cars/vw_tiguan_xr_2.jpg"
+      "/cars/vw_tiguan_xr_2.jpg",
+      "/cars/vw_tiguan_xr_3.jpg",
+      "/cars/vw_tiguan_xr_4.jpg"
     ],
     "priceUSD": 23500,
     "recyclingFeeRUB": 3400,
@@ -547,7 +577,9 @@
     "color": "Серый металлик (Chronos Grey)",
     "images": [
       "/cars/audi_q3_used_1.jpg",
-      "/cars/audi_q3_used_2.jpg"
+      "/cars/audi_q3_used_2.jpg",
+      "/cars/audi_q3_used_3.jpg",
+      "/cars/audi_q3_used_4.jpg"
     ],
     "priceUSD": 24500,
     "recyclingFeeRUB": 5200,
@@ -580,7 +612,9 @@
     "color": "Черный перламутр (Mythos Black)",
     "images": [
       "/cars/audi_a3_used_1.jpg",
-      "/cars/audi_a3_used_2.jpg"
+      "/cars/audi_a3_used_2.jpg",
+      "/cars/audi_a3_used_3.jpg",
+      "/cars/audi_a3_used_4.jpg"
     ],
     "priceUSD": 20500,
     "recyclingFeeRUB": 5200,
@@ -613,7 +647,9 @@
     "color": "Белый минерал (Mineral White)",
     "images": [
       "/cars/bmw_x1_used_1.jpg",
-      "/cars/bmw_x1_used_2.jpg"
+      "/cars/bmw_x1_used_2.jpg",
+      "/cars/bmw_x1_used_3.jpg",
+      "/cars/bmw_x1_used_4.jpg"
     ],
     "priceUSD": 23500,
     "recyclingFeeRUB": 5200,
@@ -646,7 +682,9 @@
     "color": "Серый Софисто (Sophisto Grey)",
     "images": [
       "/cars/bmw_x3_used_1.jpg",
-      "/cars/bmw_x3_used_2.jpg"
+      "/cars/bmw_x3_used_2.jpg",
+      "/cars/bmw_x3_used_3.jpg",
+      "/cars/bmw_x3_used_4.jpg"
     ],
     "priceUSD": 33500,
     "recyclingFeeRUB": 5200,
@@ -679,7 +717,9 @@
     "color": "Синий Портимао (Portimao Blue)",
     "images": [
       "/cars/bmw_320_used_1.jpg",
-      "/cars/bmw_320_used_2.jpg"
+      "/cars/bmw_320_used_2.jpg",
+      "/cars/bmw_320_used_3.jpg",
+      "/cars/bmw_320_used_4.jpg"
     ],
     "priceUSD": 27000,
     "recyclingFeeRUB": 5200,
@@ -712,7 +752,9 @@
     "color": "Темно-серый селенит (Selenite Grey)",
     "images": [
       "/cars/mercedes_gle_350_used_1.jpg",
-      "/cars/mercedes_gle_350_used_2.jpg"
+      "/cars/mercedes_gle_350_used_2.jpg",
+      "/cars/mercedes_gle_350_used_3.jpg",
+      "/cars/mercedes_gle_350_used_4.jpg"
     ],
     "priceUSD": 49000,
     "recyclingFeeRUB": 5200,
@@ -745,7 +787,9 @@
     "color": "Черный обсидиан (Obsidian Black)",
     "images": [
       "/cars/mercedes_s180_used_1.jpg",
-      "/cars/mercedes_s180_used_2.jpg"
+      "/cars/mercedes_s180_used_2.jpg",
+      "/cars/mercedes_s180_used_3.jpg",
+      "/cars/mercedes_s180_used_4.jpg"
     ],
     "priceUSD": 46000,
     "recyclingFeeRUB": 5200,
@@ -778,7 +822,9 @@
     "color": "Черный металлик (Obsidian Black)",
     "images": [
       "/cars/mercedes_eclass_used_1.jpg",
-      "/cars/mercedes_eclass_used_2.jpg"
+      "/cars/mercedes_eclass_used_2.jpg",
+      "/cars/mercedes_eclass_used_3.jpg",
+      "/cars/mercedes_eclass_used_4.jpg"
     ],
     "priceUSD": 32800,
     "recyclingFeeRUB": 5200,
@@ -811,7 +857,9 @@
     "color": "Темно-серый (Interstellar Grey)",
     "images": [
       "/cars/kia_k5_used_1.jpg",
-      "/cars/kia_k5_used_2.jpg"
+      "/cars/kia_k5_used_2.jpg",
+      "/cars/kia_k5_used_3.jpg",
+      "/cars/kia_k5_used_4.jpg"
     ],
     "priceUSD": 18500,
     "recyclingFeeRUB": 5200,
@@ -844,7 +892,9 @@
     "color": "Синий металлик (Mineral Blue)",
     "images": [
       "/cars/kia_k3_used_1.jpg",
-      "/cars/kia_k3_used_2.jpg"
+      "/cars/kia_k3_used_2.jpg",
+      "/cars/kia_k3_used_3.jpg",
+      "/cars/kia_k3_used_4.jpg"
     ],
     "priceUSD": 14500,
     "recyclingFeeRUB": 5200,
@@ -877,7 +927,9 @@
     "color": "Мятный (Aquamarine Mint)",
     "images": [
       "/cars/kia_ray_1.jpg",
-      "/cars/kia_ray_2.jpg"
+      "/cars/kia_ray_2.jpg",
+      "/cars/kia_ray_3.jpg",
+      "/cars/kia_ray_4.jpg"
     ],
     "priceUSD": 16000,
     "recyclingFeeRUB": 3400,
@@ -910,7 +962,9 @@
     "color": "Оранжевый двухцветный (Orange/Black)",
     "images": [
       "/cars/kia_kx1_1.jpg",
-      "/cars/kia_kx1_2.jpg"
+      "/cars/kia_kx1_2.jpg",
+      "/cars/kia_kx1_3.jpg",
+      "/cars/kia_kx1_4.jpg"
     ],
     "priceUSD": 16900,
     "recyclingFeeRUB": 3400,
@@ -943,7 +997,9 @@
     "color": "Серый матовый (Magnetic Grey)",
     "images": [
       "/cars/hyundai_sonata_avante_1.jpg",
-      "/cars/hyundai_sonata_avante_2.jpg"
+      "/cars/hyundai_sonata_avante_2.jpg",
+      "/cars/hyundai_sonata_avante_3.jpg",
+      "/cars/hyundai_sonata_avante_4.jpg"
     ],
     "priceUSD": 23500,
     "recyclingFeeRUB": 3400,
@@ -976,7 +1032,9 @@
     "color": "Зеленый матовый (Earthy Brass Matte)",
     "images": [
       "/cars/hyundai_santafe_1.jpg",
-      "/cars/hyundai_santafe_2.jpg"
+      "/cars/hyundai_santafe_2.jpg",
+      "/cars/hyundai_santafe_3.jpg",
+      "/cars/hyundai_santafe_4.jpg"
     ],
     "priceUSD": 45000,
     "recyclingFeeRUB": 3400,
@@ -1009,7 +1067,9 @@
     "color": "Серый нардо (Nardo Grey)",
     "images": [
       "/cars/vw_golf_1.jpg",
-      "/cars/vw_golf_2.jpg"
+      "/cars/vw_golf_2.jpg",
+      "/cars/vw_golf_3.jpg",
+      "/cars/vw_golf_4.jpg"
     ],
     "priceUSD": 21800,
     "recyclingFeeRUB": 3400,
@@ -1042,7 +1102,9 @@
     "color": "Золотистый двухцветный (Curcuma Yellow)",
     "images": [
       "/cars/vw_troc_1.jpg",
-      "/cars/vw_troc_2.jpg"
+      "/cars/vw_troc_2.jpg",
+      "/cars/vw_troc_3.jpg",
+      "/cars/vw_troc_4.jpg"
     ],
     "priceUSD": 22000,
     "recyclingFeeRUB": 3400,
@@ -1075,7 +1137,9 @@
     "color": "Бирюзовый (Turquoise)",
     "images": [
       "/cars/vw_tcross_1.jpg",
-      "/cars/vw_tcross_2.jpg"
+      "/cars/vw_tcross_2.jpg",
+      "/cars/vw_tcross_3.jpg",
+      "/cars/vw_tcross_4.jpg"
     ],
     "priceUSD": 18900,
     "recyclingFeeRUB": 3400,
@@ -1108,7 +1172,9 @@
     "color": "Черный обсидиан (Deep Black)",
     "images": [
       "/cars/vw_teramont_1.jpg",
-      "/cars/vw_teramont_2.jpg"
+      "/cars/vw_teramont_2.jpg",
+      "/cars/vw_teramont_3.jpg",
+      "/cars/vw_teramont_4.jpg"
     ],
     "priceUSD": 48500,
     "recyclingFeeRUB": 3400,
@@ -1141,7 +1207,9 @@
     "color": "Светло-синий (Starry Blue)",
     "images": [
       "/cars/vw_lavida_1.jpg",
-      "/cars/vw_lavida_2.jpg"
+      "/cars/vw_lavida_2.jpg",
+      "/cars/vw_lavida_3.jpg",
+      "/cars/vw_lavida_4.jpg"
     ],
     "priceUSD": 19500,
     "recyclingFeeRUB": 3400,
@@ -1174,7 +1242,9 @@
     "color": "Платиновый серый (Platinum Grey)",
     "images": [
       "/cars/jetta_vs7_1.jpg",
-      "/cars/jetta_vs7_2.jpg"
+      "/cars/jetta_vs7_2.jpg",
+      "/cars/jetta_vs7_3.jpg",
+      "/cars/jetta_vs7_4.jpg"
     ],
     "priceUSD": 21800,
     "recyclingFeeRUB": 3400,
@@ -1207,7 +1277,9 @@
     "color": "Ярко-синий (Azure Blue)",
     "images": [
       "/cars/jetta_vs5_1.jpg",
-      "/cars/jetta_vs5_2.jpg"
+      "/cars/jetta_vs5_2.jpg",
+      "/cars/jetta_vs5_3.jpg",
+      "/cars/jetta_vs5_4.jpg"
     ],
     "priceUSD": 19500,
     "recyclingFeeRUB": 3400,
@@ -1240,7 +1312,9 @@
     "color": "Золотистый металлик (Champagne Gold)",
     "images": [
       "/cars/jetta_vs8_1.jpg",
-      "/cars/jetta_vs8_2.jpg"
+      "/cars/jetta_vs8_2.jpg",
+      "/cars/jetta_vs8_3.jpg",
+      "/cars/jetta_vs8_4.jpg"
     ],
     "priceUSD": 23200,
     "recyclingFeeRUB": 3400,
