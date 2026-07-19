@@ -130,33 +130,7 @@ export function formatCurrency(value: number): string {
 export function getCarImages(car: any): string[] {
   if (!car) return [];
   
-  // 1. Вычисляем последовательные картинки по порядковому номеру машины в каталоге
-  let seqImages: string[] = [];
-  let carsList: any[] = [];
-  if (typeof window !== 'undefined') {
-    const localCars = localStorage.getItem('dacar_all_cars');
-    if (localCars) {
-      try {
-        carsList = JSON.parse(localCars);
-      } catch (e) {}
-    }
-  }
-  if (carsList.length === 0) {
-    carsList = CARS_DATA_JSON as any[];
-  }
-
-  const carIndex = carsList.findIndex(c => c.id === car.id);
-  if (carIndex >= 0) {
-    const startNum = carIndex * 4 + 1;
-    seqImages = [
-      `/cars/${startNum}.jpg`,
-      `/cars/${startNum + 1}.jpg`,
-      `/cars/${startNum + 2}.jpg`,
-      `/cars/${startNum + 3}.jpg`
-    ];
-  }
-
-  // 2. Получаем список явно заданных картинок из car.images или fallback
+  // 1. Получаем список явно заданных картинок из car.images или fallback
   let rawImages: string[] = [];
   if (Array.isArray(car.images)) {
     rawImages = car.images.filter(img => typeof img === 'string' && img.trim().length > 0);
@@ -169,7 +143,39 @@ export function getCarImages(car: any): string[] {
     }
   }
 
-  // Если список пуст, используем дефолтные заглушки
+  // Если список пуст, пытаемся использовать последовательные картинки по порядковому номеру машины в каталоге
+  if (rawImages.length === 0) {
+    let seqImages: string[] = [];
+    let carsList: any[] = [];
+    if (typeof window !== 'undefined') {
+      const localCars = localStorage.getItem('dacar_all_cars');
+      if (localCars) {
+        try {
+          carsList = JSON.parse(localCars);
+        } catch (e) {}
+      }
+    }
+    if (carsList.length === 0) {
+      carsList = CARS_DATA_JSON as any[];
+    }
+
+    const carIndex = carsList.findIndex(c => c.id === car.id);
+    if (carIndex >= 0) {
+      const startNum = carIndex * 4 + 1;
+      seqImages = [
+        `/cars/${startNum}.jpg`,
+        `/cars/${startNum + 1}.jpg`,
+        `/cars/${startNum + 2}.jpg`,
+        `/cars/${startNum + 3}.jpg`
+      ];
+    }
+
+    if (seqImages.length > 0) {
+      rawImages = seqImages;
+    }
+  }
+
+  // Если и теперь список пуст, используем дефолтные заглушки
   if (rawImages.length === 0) {
     rawImages = [
       '/cars/zeekr_001.jpg',
@@ -178,25 +184,10 @@ export function getCarImages(car: any): string[] {
     ];
   }
 
-  // 3. Объединяем оба списка без дубликатов: сначала идут последовательные номера, затем кастомные
-  const combined: string[] = [];
-  
-  seqImages.forEach(img => {
-    if (!combined.includes(img)) {
-      combined.push(img);
-    }
-  });
-
-  rawImages.forEach(img => {
-    if (!combined.includes(img)) {
-      combined.push(img);
-    }
-  });
-
   // Добавляем кэш-бастер при наличии в localStorage для предотвращения показа старых фото
   const buster = typeof window !== 'undefined' ? localStorage.getItem('dacar_cache_buster') : null;
   if (buster) {
-    return combined.map(img => {
+    return rawImages.map(img => {
       if (img.startsWith('/') && !img.includes('?')) {
         return `${img}?cb=${buster}`;
       }
@@ -204,7 +195,7 @@ export function getCarImages(car: any): string[] {
     });
   }
 
-  return combined;
+  return rawImages;
 }
 
 // Безопасное получение списка характеристик/опций
