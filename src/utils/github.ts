@@ -27,7 +27,7 @@ function handleGithubError(err: any, repoString: string, branch: string): string
   const status = err.status || err.statusCode;
   const message = err.message || '';
 
-  console.error(`[GitHub Service Error] status=${status}, message=${message}`, err);
+  console.warn(`[GitHub Service Warning] status=${status}, message=${message}`);
 
   if (status === 401) {
     return 'Ошибка авторизации GitHub (401 Bad credentials). Проверьте правильность токена.';

@@ -279,6 +279,7 @@ export default function Profile() {
             </button>
           </div>
 
+
           {/* Очистка кэша изображений */}
           <div className="flex flex-col border-t border-[#EFEBE4]/50 pt-3.5 space-y-2">
             <div className="flex items-center justify-between">

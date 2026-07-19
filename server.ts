@@ -155,7 +155,7 @@ function writeConfig(config: TelegramConfig) {
           }
         })
         .catch(err => {
-          console.error('[GitHub Sync] Exception in auto-pushing telegram_config.json:', err);
+          console.warn('[GitHub Sync] Exception in auto-pushing telegram_config.json:', err.message || err);
         });
     }, 100);
   } catch (e) {
@@ -212,8 +212,8 @@ async function pullCarsFromGithub(): Promise<void> {
       fs.writeFileSync(CARS_FILE_PATH, result.content, 'utf-8');
       console.log('[GitHub Sync] Successfully pulled and updated cars.json from GitHub on startup!');
       lastGithubError = '';
-    } catch (jsonErr) {
-      console.error('[GitHub Sync] Pulled content is not valid JSON, skipping write.', jsonErr);
+    } catch (jsonErr: any) {
+      console.warn('[GitHub Sync] Pulled content is not valid JSON, skipping write.', jsonErr.message || jsonErr);
       lastGithubError = 'Ошибка: данные cars.json в репозитории GitHub повреждены (невалидный JSON)';
     }
   } else {
@@ -227,7 +227,7 @@ async function pullCarsFromGithub(): Promise<void> {
           console.log('[GitHub Sync] Successfully initialized cars.json on GitHub!');
           lastGithubError = '';
         } else {
-          console.error('[GitHub Sync] Failed to initialize cars.json on GitHub.');
+          console.warn('[GitHub Sync] Failed to initialize cars.json on GitHub.');
         }
       } else {
         lastGithubError = 'База cars.json отсутствует локально и не найдена на GitHub (404)';
@@ -389,8 +389,8 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  // Попытка стянуть актуальную базу автомобилей из GitHub при запуске сервера
-  await pullCarsFromGithub();
+  // Попытка стянуть актуальную базу автомобилей из GitHub при запуске сервера (асинхронно, не блокируя запуск сервера)
+  pullCarsFromGithub().catch(e => console.error('[Server] Failed to pull cars from github on startup:', e));
 
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ limit: '50mb', extended: true }));

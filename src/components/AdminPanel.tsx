@@ -3609,6 +3609,36 @@ export const CARS_DATA: Car[] = ${formattedCars};
                               </p>
                             </div>
                           )}
+
+                          {/* Порядковые номера фото шпаргалка */}
+                          <div className="mt-3 bg-emerald-50 border border-emerald-200/50 rounded-xl p-3.5 space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider font-mono flex items-center space-x-1">
+                                <span>💡 Автоматическая привязка фото по номерам</span>
+                              </span>
+                              <span className="px-2 py-0.5 text-[8px] font-bold rounded uppercase tracking-wider bg-emerald-600 text-white shadow-sm">
+                                Активно автоматически 🟢
+                              </span>
+                            </div>
+                            <p className="text-[9px] text-emerald-700 leading-normal font-medium">
+                              Приложение автоматически поддерживает как явные ссылки на фото, так и порядковые номера. Вы можете просто загрузить фотографии в репозиторий (в папку <code className="bg-emerald-100/50 px-1 py-0.5 rounded text-emerald-800 text-[8px] font-mono">public/cars</code>) под номерами ниже:
+                            </p>
+                            <div className="max-h-[140px] overflow-y-auto space-y-1.5 bg-white border border-emerald-100/50 rounded-lg p-2.5">
+                              {cars.map((c, index) => {
+                                const startNum = index * 4 + 1;
+                                return (
+                                  <div key={c.id} className="flex justify-between items-center text-[9px] text-neutral-700 border-b border-neutral-100 pb-1.5 last:border-0 last:pb-0 font-mono">
+                                    <span className="truncate max-w-[160px] font-bold text-neutral-800">
+                                      {index + 1}. {c.brand} {c.model}
+                                    </span>
+                                    <span className="text-emerald-700 font-extrabold shrink-0 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">
+                                      {startNum}.jpg — {startNum + 3}.jpg
+                                    </span>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </div>
                         </div>
 
                         {/* ФУНКЦИЯ 3: Контакты дилера в CMS */}
