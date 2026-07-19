@@ -171,7 +171,7 @@ export default function App() {
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 bg-[#F0EEEC] z-50 flex flex-col items-center justify-between py-12 px-6 select-none overflow-hidden"
+            className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-between py-12 px-6 select-none overflow-hidden"
           >
             {/* Top glowing ambient background effect */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[300px] bg-[#C5A880]/8 blur-[120px] rounded-full pointer-events-none" />
@@ -220,7 +220,7 @@ export default function App() {
                     initial={{ width: "0%" }}
                     animate={{ width: "100%" }}
                     transition={{ duration: 2.0, ease: "easeInOut" }}
-                    className="h-full bg-gradient-to-r from-[#C5A880] via-[#EFEBE4] to-[#C5A880] rounded-full"
+                    className="h-full bg-gradient-to-r from-[#C5A880] via-white to-[#C5A880] rounded-full"
                   />
                 </div>
                 <span className="text-[9px] font-mono tracking-wider text-[#78716C] uppercase">
