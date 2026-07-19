@@ -128,24 +128,39 @@ export function formatCurrency(value: number): string {
 // Безопасное получение списка изображений автомобиля (строго локальные пути по умолчанию)
 export function getCarImages(car: any): string[] {
   if (!car) return [];
+  
+  let rawImages: string[] = [];
   if (Array.isArray(car.images)) {
-    const valid = car.images.filter(img => typeof img === 'string' && img.trim().length > 0);
-    if (valid.length > 0) return valid;
+    rawImages = car.images.filter(img => typeof img === 'string' && img.trim().length > 0);
   } else if (typeof car.images === 'string' && car.images.trim().length > 0) {
-    const split = car.images.split(/[\n,;]+/).map(s => s.trim()).filter(Boolean);
-    if (split.length > 0) return split;
+    rawImages = car.images.split(/[\n,;]+/).map(s => s.trim()).filter(Boolean);
+  } else {
+    const fallback = car.image || car.photo;
+    if (fallback && typeof fallback === 'string') {
+      rawImages = [fallback];
+    }
   }
-  
-  const fallback = car.image || car.photo;
-  if (fallback && typeof fallback === 'string') {
-    return [fallback];
+
+  if (rawImages.length === 0) {
+    rawImages = [
+      '/cars/zeekr_001.jpg',
+      '/cars/geely_monjaro.jpg',
+      '/cars/li_l9.jpg'
+    ];
   }
-  
-  return [
-    '/cars/zeekr_001.jpg',
-    '/cars/geely_monjaro.jpg',
-    '/cars/li_l9.jpg'
-  ];
+
+  // Добавляем кэш-бастер при наличии в localStorage для предотвращения показа старых фото
+  const buster = typeof window !== 'undefined' ? localStorage.getItem('dacar_cache_buster') : null;
+  if (buster) {
+    return rawImages.map(img => {
+      if (img.startsWith('/') && !img.includes('?')) {
+        return `${img}?cb=${buster}`;
+      }
+      return img;
+    });
+  }
+
+  return rawImages;
 }
 
 // Безопасное получение списка характеристик/опций

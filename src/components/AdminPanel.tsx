@@ -98,6 +98,73 @@ export function AdminPanel() {
   const [syncStatus, setSyncStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [lastGithubError, setLastGithubError] = useState('');
 
+  // Локальный проводник картинок из GitHub (public/cars)
+  const [githubPhotos, setGithubPhotos] = useState<Array<{ name: string; path: string; downloadUrl: string }>>([]);
+  const [isLoadingGithubPhotos, setIsLoadingGithubPhotos] = useState(false);
+  const [syncingPhotoName, setSyncingPhotoName] = useState<string | null>(null);
+
+  const fetchGithubPhotos = async () => {
+    setIsLoadingGithubPhotos(true);
+    try {
+      const res = await fetch('/api/github/list-photos');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.files)) {
+          setGithubPhotos(data.files);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load GitHub photos:', err);
+    } finally {
+      setIsLoadingGithubPhotos(false);
+    }
+  };
+
+  const syncPhotoFromServer = async (photo: { name: string; downloadUrl: string }) => {
+    setSyncingPhotoName(photo.name);
+    try {
+      const res = await fetch('/api/github/sync-photo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: photo.name, downloadUrl: photo.downloadUrl })
+      });
+      if (res.ok) {
+        triggerHaptic('success');
+        alert(`✅ Фотография ${photo.name} успешно сохранена на сервере!`);
+      } else {
+        alert('⚠️ Не удалось скачать файл с GitHub на сервер.');
+      }
+    } catch (err) {
+      console.error('Failed to sync photo:', err);
+      alert('⚠️ Ошибка при синхронизации фотографии.');
+    } finally {
+      setSyncingPhotoName(null);
+    }
+  };
+
+  const appendImageToCar = (carId: string, imagePath: string) => {
+    const targetCar = cars.find(c => c.id === carId);
+    if (!targetCar) {
+      alert('⚠️ Сначала выберите автомобиль!');
+      return;
+    }
+    // Проверим, нет ли уже этой картинки в галерее автомобиля
+    if (getCarImages(targetCar).includes(imagePath)) {
+      alert('⚠️ Данное фото уже присутствует в галерее этого автомобиля.');
+      return;
+    }
+    const updatedImages = [...getCarImages(targetCar), imagePath];
+    editCar(carId, { ...targetCar, images: updatedImages });
+    triggerHaptic('success');
+    alert(`✅ Фотография ${imagePath} успешно добавлена в галерею ${targetCar.brand} ${targetCar.model}!`);
+  };
+
+  useEffect(() => {
+    if (adminTab === 'vip') {
+      fetchGithubPhotos();
+    }
+  }, [adminTab]);
+
   const handleManualSync = async () => {
     setIsSyncing(true);
     setSyncStatus('loading');
@@ -3434,6 +3501,114 @@ export const CARS_DATA: Car[] = ${formattedCars};
                               <span>Применить новые фото к каталогу</span>
                             </button>
                           </div>
+                        </div>
+
+                        {/* ФУНКЦИЯ 2.1: Проводник картинок из GitHub (public/cars) */}
+                        <div className="bg-[#F5F7FA] p-3.5 rounded-2xl border border-[#E5E7EB] space-y-3">
+                          <div className="flex items-center justify-between">
+                            <h6 className="text-[10px] font-bold text-amber-600 uppercase tracking-wide flex items-center space-x-1 font-mono">
+                              <Database className="w-4 h-4 text-amber-500" />
+                              <span>2.1. Репозиторий фото на GitHub (public/cars)</span>
+                            </h6>
+                            <button
+                              onClick={fetchGithubPhotos}
+                              className="px-2 py-1 bg-[#2563EB]/10 hover:bg-[#2563EB]/20 text-[#2563EB] text-[8px] font-bold rounded flex items-center space-x-1 cursor-pointer transition"
+                            >
+                              <RefreshCw className={`w-2.5 h-2.5 ${isLoadingGithubPhotos ? 'animate-spin' : ''}`} />
+                              <span>Обновить список</span>
+                            </button>
+                          </div>
+                          <p className="text-[9px] text-[#64748B] leading-normal font-medium">
+                            Сканирует папку <code className="bg-neutral-200 px-1 py-0.5 rounded text-neutral-800 text-[8px] font-mono">public/cars</code> в вашем GitHub-репозитории. Привязывайте загруженные файлы к автомобилям без ручного копирования ссылок!
+                          </p>
+
+                          {isLoadingGithubPhotos ? (
+                            <div className="flex items-center justify-center py-6 space-x-2">
+                              <Loader2 className="w-4 h-4 text-blue-600 animate-spin" />
+                              <span className="text-[10px] text-neutral-500 font-bold font-mono">Сканирование репозитория...</span>
+                            </div>
+                          ) : githubPhotos.length === 0 ? (
+                            <div className="bg-white rounded-xl p-4 border border-[#E5E7EB] text-center space-y-1.5">
+                              <p className="text-[10px] text-neutral-500 font-medium">В репозитории GitHub (в папке <code className="font-mono">public/cars</code>) не найдено фотографий или не настроены токены.</p>
+                              <button
+                                onClick={fetchGithubPhotos}
+                                className="px-3 py-1.5 bg-blue-600 text-white text-[9px] font-bold rounded-lg hover:bg-blue-700 transition"
+                              >
+                                Сканировать повторно
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="space-y-2.5">
+                              <div className="max-h-[220px] overflow-y-auto space-y-2 pr-1.5 border border-[#E5E7EB] bg-white rounded-xl p-2.5">
+                                {githubPhotos.map((photo) => (
+                                  <div key={photo.name} className="flex items-center justify-between p-2 rounded-lg bg-neutral-50 border border-neutral-100 hover:border-neutral-200 transition">
+                                    <div className="flex items-center space-x-2 min-w-0 flex-1">
+                                      <div className="w-10 h-10 rounded-md bg-neutral-200 overflow-hidden shrink-0 border border-neutral-200/50 flex items-center justify-center">
+                                        <img
+                                          src={photo.downloadUrl}
+                                          alt={photo.name}
+                                          referrerPolicy="no-referrer"
+                                          className="w-full h-full object-cover"
+                                          onError={(e) => {
+                                            (e.target as HTMLImageElement).src = '/cars/zeekr_001.jpg';
+                                          }}
+                                        />
+                                      </div>
+                                      <div className="min-w-0 flex-1">
+                                        <p className="text-[10px] font-bold text-neutral-800 truncate leading-tight">{photo.name}</p>
+                                        <p className="text-[8px] font-mono text-neutral-400 truncate mt-0.5">{photo.path}</p>
+                                      </div>
+                                    </div>
+
+                                    <div className="flex items-center space-x-1.5 shrink-0 ml-2">
+                                      {/* Скачать на сервер */}
+                                      <button
+                                        onClick={() => syncPhotoFromServer(photo)}
+                                        disabled={syncingPhotoName === photo.name}
+                                        title="Скачать и сохранить локально на сервере"
+                                        className="p-1.5 bg-green-500/10 hover:bg-green-500/20 text-green-700 rounded transition disabled:opacity-50 cursor-pointer"
+                                      >
+                                        {syncingPhotoName === photo.name ? (
+                                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                        ) : (
+                                          <Download className="w-3.5 h-3.5" />
+                                        )}
+                                      </button>
+
+                                      {/* Выбор автомобиля для привязки */}
+                                      <div className="flex items-center space-x-1 bg-white border border-neutral-200 rounded-md px-1 py-0.5">
+                                        <select
+                                          id={`attach-car-${photo.name.replace(/[^a-zA-Z0-9]/g, '_')}`}
+                                          className="bg-transparent text-[9px] font-bold outline-none text-neutral-700 max-w-[80px]"
+                                        >
+                                          <option value="">Привязать к...</option>
+                                          {cars.map(c => (
+                                            <option key={c.id} value={c.id}>{c.brand} {c.model}</option>
+                                          ))}
+                                        </select>
+                                        <button
+                                          onClick={() => {
+                                            const selEl = document.getElementById(`attach-car-${photo.name.replace(/[^a-zA-Z0-9]/g, '_')}`) as HTMLSelectElement;
+                                            if (!selEl || !selEl.value) {
+                                              alert('⚠️ Выберите автомобиль для привязки!');
+                                              return;
+                                            }
+                                            appendImageToCar(selEl.value, photo.path);
+                                          }}
+                                          className="p-1 bg-blue-600 hover:bg-blue-700 text-white rounded transition cursor-pointer font-bold text-[8px]"
+                                        >
+                                          ➕
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                              <p className="text-[8px] text-[#64748B] text-right leading-tight italic">
+                                * Если фото не отображается в галерее, нажмите кнопку со значком скачивания для кэширования локально.
+                              </p>
+                            </div>
+                          )}
                         </div>
 
                         {/* ФУНКЦИЯ 3: Контакты дилера в CMS */}

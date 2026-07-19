@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
-import { commitToGithubWithOctokit, pullFromGithubWithOctokit } from './src/utils/github';
+import { commitToGithubWithOctokit, pullFromGithubWithOctokit, listGithubPhotosWithOctokit } from './src/utils/github';
 
 // Путь к файлу конфигурации Telegram и GitHub
 const CONFIG_PATH = path.join(process.cwd(), 'telegram_config.json');
@@ -1245,6 +1245,69 @@ async function startServer() {
     } catch (err: any) {
       console.error('Error saving cars database:', err);
       return res.status(500).json({ error: err.message || 'Failed to save cars database' });
+    }
+  });
+
+  // Ручная синхронизация базы с GitHub
+  app.post('/api/cars/pull', async (req, res) => {
+    try {
+      await pullCarsFromGithub();
+      return res.json({ success: true, message: 'Данные каталога успешно синхронизированы с GitHub!' });
+    } catch (err: any) {
+      console.error('Error pulling cars database:', err);
+      return res.status(500).json({ error: err.message || 'Failed to pull cars database' });
+    }
+  });
+
+  // Список всех фото из папки public/cars в репозитории GitHub
+  app.get('/api/github/list-photos', async (req, res) => {
+    try {
+      const config = readConfig();
+      if (!config.githubToken || !config.githubRepo) {
+        return res.json({ success: false, files: [] });
+      }
+      
+      const result = await listGithubPhotosWithOctokit(
+        config.githubToken,
+        config.githubRepo,
+        config.githubBranch || 'main'
+      );
+      
+      return res.json(result);
+    } catch (err: any) {
+      console.error('Error listing github photos:', err);
+      return res.status(500).json({ error: err.message || 'Failed to list github photos' });
+    }
+  });
+
+  // Скачивание конкретного файла из GitHub репозитория и сохранение его локально
+  app.post('/api/github/sync-photo', async (req, res) => {
+    try {
+      const { filename, downloadUrl } = req.body;
+      if (!filename || !downloadUrl) {
+        return res.status(400).json({ error: 'Filename and downloadUrl are required' });
+      }
+
+      const publicCarsDir = path.join(process.cwd(), 'public', 'cars');
+      if (!fs.existsSync(publicCarsDir)) {
+        fs.mkdirSync(publicCarsDir, { recursive: true });
+      }
+
+      const localFilePath = path.join(publicCarsDir, filename);
+      
+      // Скачиваем файл по downloadUrl
+      const response = await fetch(downloadUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to download from GitHub: ${response.statusText}`);
+      }
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      fs.writeFileSync(localFilePath, buffer);
+
+      return res.json({ success: true, path: `/cars/${filename}` });
+    } catch (err: any) {
+      console.error('Error syncing photo from GitHub:', err);
+      return res.status(500).json({ error: err.message || 'Failed to sync photo' });
     }
   });
 

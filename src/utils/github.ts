@@ -147,3 +147,46 @@ export async function pullFromGithubWithOctokit(
     return { success: false, error: errorText };
   }
 }
+
+/**
+ * Lists all photos inside public/cars folder in the GitHub repository.
+ */
+export async function listGithubPhotosWithOctokit(
+  token: string,
+  repoString: string,
+  branch: string
+): Promise<{ success: boolean; files: Array<{ name: string; path: string; downloadUrl: string }>; error?: string }> {
+  try {
+    const { owner, repo } = parseRepo(repoString);
+    const octokit = new Octokit({ auth: token });
+
+    const { data } = await octokit.rest.repos.getContent({
+      owner,
+      repo,
+      path: 'public/cars',
+      ref: branch,
+      request: {
+        timeout: 15000
+      }
+    });
+
+    if (Array.isArray(data)) {
+      const files = data
+        .filter(item => item.type === 'file' && /\.(jpg|jpeg|png|webp|gif)$/i.test(item.name))
+        .map(item => ({
+          name: item.name,
+          path: `/cars/${item.name}`,
+          downloadUrl: item.download_url || ''
+        }));
+      return { success: true, files };
+    }
+
+    return { success: true, files: [] };
+  } catch (err: any) {
+    if (err.status === 404) {
+      return { success: true, files: [] };
+    }
+    const errorText = handleGithubError(err, repoString, branch);
+    return { success: false, files: [], error: errorText };
+  }
+}

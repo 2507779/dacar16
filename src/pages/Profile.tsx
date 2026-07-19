@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
 import { triggerHaptic } from '../utils/haptics';
 import { APP_CONFIG } from '../config';
-import { MessageSquare, Phone, MapPin, ShieldAlert, BadgeCheck, ChevronDown } from 'lucide-react';
+import { MessageSquare, Phone, MapPin, ShieldAlert, BadgeCheck, ChevronDown, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AdminPanel } from '../components/AdminPanel';
 
@@ -277,6 +277,51 @@ export default function Profile() {
             >
               <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-transform shadow-sm ${clicksEnabled ? 'right-1' : 'left-1'}`} />
             </button>
+          </div>
+
+          {/* Очистка кэша изображений */}
+          <div className="flex flex-col border-t border-[#EFEBE4]/50 pt-3.5 space-y-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-xs font-bold text-[#1C1917]">Сброс кэша изображений</h4>
+                <p className="text-[10px] text-[#78716C] mt-0.5 font-medium leading-tight">Принудительно обновляет все фото автомобилей из репозитория GitHub</p>
+              </div>
+              <button
+                onClick={async () => {
+                  triggerHaptic('success');
+                  try {
+                    // Устанавливаем новый таймстамп кэш-бастера
+                    const newBuster = Date.now().toString();
+                    localStorage.setItem('dacar_cache_buster', newBuster);
+                    
+                    // Удаляем локальный кэш автомобилей
+                    localStorage.removeItem('dacar_all_cars');
+                    
+                    // Показываем индикатор загрузки / оповещение
+                    alert('⏳ Запрос на синхронизацию отправлен на сервер...');
+                    
+                    // Делаем pull с сервера
+                    const res = await fetch('/api/cars/pull', { method: 'POST' });
+                    if (res.ok) {
+                      // Загружаем заново в стор
+                      await useStore.getState().loadCarsFromServer();
+                      alert('✅ Кэш очищен, база данных успешно обновлена с GitHub!');
+                      // Перезагрузим окно для полной перезагрузки картинок браузером
+                      window.location.reload();
+                    } else {
+                      alert('⚠️ Ошибка синхронизации с сервером, но локальный кэш браузера был сброшен.');
+                    }
+                  } catch (err) {
+                    console.error(err);
+                    alert('⚠️ Ошибка при сбросе кэша.');
+                  }
+                }}
+                className="px-3.5 py-2 bg-[#C5A880] hover:bg-[#B0936B] text-white text-[10px] font-black uppercase tracking-wider rounded-xl transition active:scale-95 cursor-pointer shadow-sm flex items-center space-x-1"
+              >
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: '4s' }} />
+                <span>Очистить кэш</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
