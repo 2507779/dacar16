@@ -2,7 +2,6 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
-import { CARS_DATA } from './src/data/cars';
 import { commitToGithubWithOctokit, pullFromGithubWithOctokit } from './src/utils/github';
 
 // Путь к файлу конфигурации Telegram и GitHub
@@ -273,7 +272,7 @@ function readCars(): any[] {
   } catch (err) {
     console.error('Error reading cars file:', err);
   }
-  return CARS_DATA;
+  return [];
 }
 
 // Запись списка автомобилей в базу данных
@@ -376,11 +375,11 @@ function parseCarFromMessage(text: string): any | null {
   return hasData ? result : null;
 }
 
-// Инициализируем локальный cars.json дефолтными данными из src/data/cars.ts, если его ещё нет
+// Инициализируем локальный cars.json дефолтными данными, если его ещё нет
 try {
   if (!fs.existsSync(CARS_FILE_PATH)) {
-    fs.writeFileSync(CARS_FILE_PATH, JSON.stringify(CARS_DATA, null, 2), 'utf-8');
-    console.log('[Server] Successfully initialized cars.json from CARS_DATA');
+    fs.writeFileSync(CARS_FILE_PATH, JSON.stringify([], null, 2), 'utf-8');
+    console.log('[Server] Successfully initialized empty cars.json');
   }
 } catch (e) {
   console.error('[Server] Failed to initialize cars.json on startup:', e);
@@ -1209,10 +1208,10 @@ async function startServer() {
         const data = fs.readFileSync(CARS_FILE_PATH, 'utf-8');
         return res.json(JSON.parse(data));
       }
-      return res.json(CARS_DATA);
+      return res.json([]);
     } catch (err) {
       console.error('Error reading cars database:', err);
-      return res.json(CARS_DATA);
+      return res.json([]);
     }
   });
 
@@ -1299,41 +1298,200 @@ async function startServer() {
     }
   });
 
+// Вспомогательная мап-таблица названий файлов в GitHub репозитории
+const FILE_MAPPING_DB: Record<string, string> = {
+  'audi_a3_used_1.jpg': 'audia31.jpg',
+  'audi_a3_used_2.jpg': 'audia32.jpg',
+  'audi_q3_1.jpg': 'audiq31.jpg',
+  'audi_q3_2.jpg': 'audiq32.jpg',
+  'audi_q3_used_1.jpg': 'audiq3used1.jpg',
+  'audi_q3_used_2.jpg': 'audiq3used2.jpg',
+  'audi_q5_1.jpg': 'audiq51.jpg',
+  'audi_q5_2.jpg': 'audiq52.jpg',
+  'bmw_x1_used_1.jpg': 'bmwx11.jpg',
+  'bmw_x1_used_2.jpg': 'bmwx12.jpg',
+  'bmw_x3_used_1.jpg': 'bmwx31.jpg',
+  'bmw_x3_used_2.jpg': 'bmwx32.jpg',
+  'bmw_x5_1.jpg': 'bmwx51.jpg',
+  'bmw_x5_2.jpg': 'bmwx52.jpg',
+  'citroen_c5x_1.jpg': 'c5x1.jpg',
+  'citroen_c5x_2.jpg': 'c5x2.jpg',
+  'gac_s7_1.jpg': 'gacs71.jpg',
+  'gac_s7_2.jpg': 'gacs72.jpg',
+  'geely_monjaro_2.jpg': 'monjaro2.jpg',
+  'genesis_gv80_1.jpg': 'gv801.jpg',
+  'genesis_gv80_2.jpg': 'gv802.jpg',
+  'hyundai_palisade_1.jpg': 'palisade1.jpg',
+  'hyundai_palisade_2.jpg': 'palisade2.jpg',
+  'kia_carnival_1.jpg': 'carnival1.jpg',
+  'kia_carnival_2.jpg': 'carnival2.jpg',
+  'kia_kx1_1.jpg': 'kiakx11.jpg',
+  'kia_kx1_2.jpg': 'kiakx12.jpg',
+  'li_l9_2.jpg': 'lil92.jpg',
+  'mazda_cx5_comfort_1.jpg': 'cx5comfort1.jpg',
+  'mazda_cx5_comfort_2.jpg': 'cx5comfort2.jpg',
+  'mazda_cx5_premium_1.jpg': 'cx5premium1.jpg',
+  'mazda_cx5_premium_2.jpg': 'cx5premium2.jpg',
+  'mercedes_a180_used_1.jpg': 'a1801.jpg',
+  'mercedes_a180_used_2.jpg': 'a1802.jpg',
+  'mercedes_e260l_used_1.jpg': 'eclass1.jpg',
+  'mercedes_e260l_used_2.jpg': 'eclass2.jpg',
+  'mercedes_glc_coupe_1.jpg': 'glccoupe1.jpg',
+  'mercedes_glc_coupe_2.jpg': 'glccoupe2.jpg',
+  'mercedes_gle_used_1.jpg': 'gle1.jpg',
+  'mercedes_gle_used_2.jpg': 'gle2.jpg',
+  'toyota_camry_1.jpg': 'camry1.jpg',
+  'toyota_camry_2.jpg': 'camry2.jpg',
+  'toyota_highlander_1.jpg': 'highlander1.jpg',
+  'toyota_highlander_2.jpg': 'highlander2.jpg',
+  'toyota_rav4_1.jpg': 'rav41.jpg',
+  'toyota_rav4_2.jpg': 'rav42.jpg',
+  'vw_golf_used_1.jpg': 'golf81.jpg',
+  'vw_golf_used_2.jpg': 'golf82.jpg',
+  'vw_tayron_used_1.jpg': 'tayron1.jpg',
+  'vw_tayron_used_2.jpg': 'tayron2.jpg',
+  'vw_tcross_used_1.jpg': 'tcross1.jpg',
+  'vw_tcross_used_2.jpg': 'tcross2.jpg',
+  'vw_tharu_xr_1.jpg': 'tharuxr1.jpg',
+  'vw_tharu_xr_2.jpg': 'tharuxr2.jpg',
+  'vw_tiguan_l_pro_1.jpg': 'tiguanlpro1.jpg',
+  'vw_tiguan_l_pro_2.jpg': 'tiguanlpro2.jpg',
+  'vw_troc_used_1.jpg': 'troc1.jpg',
+  'vw_troc_used_2.jpg': 'troc2.jpg',
+  'xiaomi_su7_max_1.jpg': 'su71.jpg',
+  'xiaomi_su7_max_2.jpg': 'su72.jpg',
+  'zeekr_001_2.jpg': 'zeekr0012.jpg'
+};
+
+function getCarInfoFromFilename(filename: string) {
+  const base = filename.replace(/\.[^/.]+$/, "");
+  let words = base.split(/[_-]+/).filter(Boolean);
+  if (words.length > 1 && !isNaN(Number(words[words.length - 1]))) {
+    words.pop();
+  }
+  words = words.filter(w => w !== 'used' && w !== 'new');
+  if (words.length === 0) return { brand: 'DACAR', model: 'PREMIUM SELECTION' };
+  const brand = words[0].charAt(0).toUpperCase() + words[0].slice(1);
+  const model = words.slice(1).map(w => w.toUpperCase()).join(' ') || 'SUV';
+  return { brand, model };
+}
+
+function generateSVGPlaceholder(brand: string, model: string): string {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="100%">
+    <defs>
+      <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#1E1B18" />
+        <stop offset="100%" stop-color="#0F0E0D" />
+      </linearGradient>
+      <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(197, 168, 128, 0.05)" stroke-width="1" />
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#bg)" />
+    <rect width="100%" height="100%" fill="url(#grid)" />
+    <rect x="20" y="20" width="760" height="460" rx="12" fill="none" stroke="rgba(197, 168, 128, 0.15)" stroke-width="1.5" />
+    <path d="M 15 35 L 15 15 L 35 15" fill="none" stroke="#C5A880" stroke-width="2" />
+    <path d="M 785 35 L 785 15 L 765 15" fill="none" stroke="#C5A880" stroke-width="2" />
+    <path d="M 15 465 L 15 485 L 35 485" fill="none" stroke="#C5A880" stroke-width="2" />
+    <path d="M 785 465 L 785 485 L 765 485" fill="none" stroke="#C5A880" stroke-width="2" />
+    <g transform="translate(200, 110) scale(0.8)" opacity="0.85">
+      <line x1="-50" y1="280" x2="550" y2="280" stroke="rgba(197, 168, 128, 0.3)" stroke-width="2" stroke-dasharray="5,5" />
+      <path d="M 0 240 Q 20 200, 60 190 Q 90 190, 120 150 Q 180 90, 260 85 Q 360 80, 410 140 Q 450 160, 480 200 Q 510 220, 520 240 L 520 260 Q 510 265, 490 265 Q 450 215, 410 265 L 110 265 Q 70 215, 30 265 L 0 265 Z" fill="none" stroke="#C5A880" stroke-width="3.5" stroke-linejoin="round" />
+      <circle cx="70" cy="265" r="40" fill="#131110" stroke="#C5A880" stroke-width="3" />
+      <circle cx="70" cy="265" r="18" fill="none" stroke="#C5A880" stroke-width="2" />
+      <circle cx="450" cy="265" r="40" fill="#131110" stroke="#C5A880" stroke-width="3" />
+      <circle cx="450" cy="265" r="18" fill="none" stroke="#C5A880" stroke-width="2" />
+      <path d="M 120 150 L 260 145 L 260 90 Z" fill="none" stroke="rgba(197, 168, 128, 0.5)" stroke-width="1.5" />
+      <path d="M 280 90 L 280 145 L 390 145 Z" fill="none" stroke="rgba(197, 168, 128, 0.5)" stroke-width="1.5" />
+      <line x1="260" y1="145" x2="280" y2="145" stroke="rgba(197, 168, 128, 0.5)" stroke-width="1.5" />
+    </g>
+    <text x="50" y="80" font-family="'Inter', system-ui, sans-serif" font-size="20" font-weight="600" fill="#C5A880" letter-spacing="4" opacity="0.6">DACAR PREMIUM</text>
+    <text x="50" y="415" font-family="'Inter', system-ui, sans-serif" font-size="44" font-weight="700" fill="#FFFFFF" letter-spacing="1">${brand}</text>
+    <text x="50" y="450" font-family="'Inter', system-ui, sans-serif" font-size="22" font-weight="400" fill="#C5A880" letter-spacing="1" opacity="0.9">${model}</text>
+    <text x="750" y="450" font-family="'JetBrains Mono', monospace" font-size="12" fill="rgba(197, 168, 128, 0.4)" text-anchor="end" letter-spacing="1">PREMIUM SELECTION • SPECIFICATION BLUEPRINT</text>
+  </svg>`;
+}
+
   // Прокси-маршрут для автоматической подгрузки фотографий автомобилей из GitHub, если их нет на текущем сервере (например, после перезапуска контейнера)
   app.get('/cars/:filename', async (req, res, next) => {
     try {
       const filename = req.params.filename;
       const localFilePath = path.join(process.cwd(), 'public', 'cars', filename);
 
-      // Если файл физически есть на диске сервера, отдаем его сразу
+      // Если файл физически есть на диске сервера и он не пустой (size > 0), отдаем его сразу
       if (fs.existsSync(localFilePath)) {
-        return res.sendFile(localFilePath);
-      }
-
-      // Если файла нет локально, проверяем конфигурацию GitHub
-      const config = readConfig();
-      if (!config.githubToken || !config.githubRepo) {
-        console.log(`[Image Proxy] File ${filename} not found locally, and GitHub is not configured.`);
-        return next();
-      }
-
-      const branch = config.githubBranch || 'main';
-      const gitUrl = `https://api.github.com/repos/${config.githubRepo}/contents/public/cars/${filename}?ref=${branch}`;
-      
-      console.log(`[Image Proxy] File "${filename}" not found locally. Pulling from GitHub: ${gitUrl}`);
-      
-      const response = await fetch(gitUrl, {
-        headers: {
-          'Authorization': `token ${config.githubToken}`,
-          'User-Agent': 'Dacar16-Integration',
-          'Accept': 'application/vnd.github.v3.raw'
+        const stats = fs.statSync(localFilePath);
+        if (stats.size > 0) {
+          return res.sendFile(localFilePath);
         }
-      });
+      }
 
-      if (response.ok) {
-        const arrayBuffer = await response.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
+      // Если файла нет локально или он пустой (0 байт), проверяем конфигурацию GitHub
+      const config = readConfig();
+      const gitFilename = FILE_MAPPING_DB[filename.toLowerCase()] || filename;
+      let success = false;
+      let buffer: Buffer | null = null;
 
+      if (config.githubRepo) {
+        const branch = config.githubBranch || 'main';
+        const candidates = [gitFilename];
+        if (gitFilename !== filename) {
+          candidates.push(filename);
+        }
+
+        for (const targetName of candidates) {
+          const rawUrl = `https://raw.githubusercontent.com/${config.githubRepo}/${branch}/public/cars/${targetName}`;
+          const gitApiUrl = `https://api.github.com/repos/${config.githubRepo}/contents/public/cars/${targetName}?ref=${branch}`;
+          
+          console.log(`[Image Proxy] Attempting raw download from GitHub CDN for "${targetName}": ${rawUrl}`);
+          try {
+            const rawRes = await fetch(rawUrl, {
+              headers: {
+                'User-Agent': 'Dacar16-Integration'
+              }
+            });
+            if (rawRes.ok) {
+              const ab = await rawRes.arrayBuffer();
+              const tempBuf = Buffer.from(ab);
+              if (tempBuf.length > 0) {
+                buffer = tempBuf;
+                success = true;
+                console.log(`[Image Proxy] Successfully fetched "${targetName}" from raw CDN!`);
+                break;
+              }
+            }
+          } catch (rawErr) {
+            console.warn(`[Image Proxy] Raw fetch failed for "${targetName}":`, rawErr);
+          }
+
+          if (!success && config.githubToken) {
+            console.log(`[Image Proxy] Trying authenticated API fetch for "${targetName}": ${gitApiUrl}`);
+            try {
+              const apiRes = await fetch(gitApiUrl, {
+                headers: {
+                  'Authorization': `token ${config.githubToken}`,
+                  'User-Agent': 'Dacar16-Integration',
+                  'Accept': 'application/vnd.github.v3.raw'
+                }
+              });
+              if (apiRes.ok) {
+                const ab = await apiRes.arrayBuffer();
+                const tempBuf = Buffer.from(ab);
+                if (tempBuf.length > 0) {
+                  buffer = tempBuf;
+                  success = true;
+                  console.log(`[Image Proxy] Successfully fetched "${targetName}" via authenticated API!`);
+                  break;
+                }
+              }
+            } catch (apiErr) {
+              console.error(`[Image Proxy] Authenticated API fetch failed for "${targetName}":`, apiErr);
+            }
+          }
+        }
+      }
+
+      if (success && buffer && buffer.length > 0) {
         // Сохраняем скачанный файл на локальный диск сервера для быстродействия последующих запросов
         const publicCarsDir = path.dirname(localFilePath);
         if (!fs.existsSync(publicCarsDir)) {
@@ -1353,12 +1511,27 @@ async function startServer() {
         res.setHeader('Cache-Control', 'public, max-age=31536000'); // Браузерное кеширование на 1 год
         return res.send(buffer);
       } else {
-        console.warn(`[Image Proxy] GitHub response failed for "${filename}" with status: ${response.status}`);
+        console.warn(`[Image Proxy] Could not fetch real image "${filename}". Falling back to premium SVG blueprint.`);
       }
     } catch (err) {
       console.error('[Image Proxy] Error fetching photo from GitHub:', err);
     }
-    next();
+
+    // --- ФИНАЛЬНЫЙ ФЭЛБЕК (FALLBACK) ---
+    // Если изображение отсутствует или имеет размер 0 байт, динамически отдаем роскошный SVG-чертеж автомобиля
+    try {
+      const filename = req.params.filename;
+      const { brand, model } = getCarInfoFromFilename(filename);
+      const svgString = generateSVGPlaceholder(brand, model);
+      const svgBuffer = Buffer.from(svgString, 'utf-8');
+
+      res.setHeader('Content-Type', 'image/svg+xml');
+      res.setHeader('Cache-Control', 'public, max-age=31536000'); // Кеш 1 год
+      return res.send(svgBuffer);
+    } catch (fallbackErr) {
+      console.error('[Image Proxy] Critical failure in fallback placeholder generation:', fallbackErr);
+      next();
+    }
   });
 
   // Настройка Vite middleware в режиме разработки

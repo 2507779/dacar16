@@ -66,83 +66,191 @@ export default function Catalog() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortOption, setSortOption] = useState<'price_asc' | 'price_desc' | 'year_desc'>('year_desc');
   const [isLoading, setIsLoading] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(8);
 
   React.useEffect(() => {
     setIsLoading(true);
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 400);
+    }, 300);
     return () => clearTimeout(timer);
   }, [searchQuery, JSON.stringify(filters), sortOption]);
 
+  // Сброс видимого лимита при изменении критериев
+  React.useEffect(() => {
+    setVisibleCount(8);
+  }, [searchQuery, JSON.stringify(filters), sortOption]);
+
   // Уникальные бренды в нашем каталоге
-  const allBrands = Array.from(new Set(cars.map(c => c.brand)));
+  const allBrands = React.useMemo(() => {
+    return Array.from(new Set(cars.map(c => c.brand)));
+  }, [cars]);
 
-  // Фильтрация данных
-  const filteredCars = cars.filter((car) => {
-    // 1. Поиск по строке (бренд или модель)
-    if (searchQuery.trim() !== '') {
-      const query = searchQuery.toLowerCase();
-      const matchBrand = car.brand.toLowerCase().includes(query);
-      const matchModel = car.model.toLowerCase().includes(query);
-      if (!matchBrand && !matchModel) return false;
+  // Словарь русских транслитераций для умного поиска уровня мобильного приложения
+  const CYRILLIC_BRAND_MAP: Record<string, string> = {
+    'тойота': 'toyota',
+    'бмв': 'bmw',
+    'мерседес': 'mercedes',
+    'ауди': 'audi',
+    'киа': 'kia',
+    'зикр': 'zeekr',
+    'ли': 'lixiang',
+    'лисиан': 'lixiang',
+    'джили': 'geely',
+    'фольксваген': 'volkswagen',
+    'фольц': 'volkswagen',
+    'фолькс': 'volkswagen',
+    'хендай': 'hyundai',
+    'хёндай': 'hyundai',
+    'гак': 'gac',
+    'мазда': 'mazda',
+    'ситроен': 'citroen',
+    'сяоми': 'xiaomi',
+    'шаоми': 'xiaomi',
+    'генезис': 'genesis'
+  };
+
+  // Фильтрация данных (useMemo)
+  const filteredCars = React.useMemo(() => {
+    return cars.filter((car) => {
+      // 1. Умный поиск по строке (бренд, модель, год или транслитерация)
+      if (searchQuery.trim() !== '') {
+        const query = searchQuery.toLowerCase().trim();
+        
+        // Прямое сопоставление
+        let match = car.brand.toLowerCase().includes(query) || car.model.toLowerCase().includes(query);
+        
+        // Русская транслитерация брендов
+        if (!match) {
+          for (const [cyr, lat] of Object.entries(CYRILLIC_BRAND_MAP)) {
+            if (query.includes(cyr)) {
+              const translatedQuery = query.replace(cyr, lat);
+              if (
+                car.brand.toLowerCase().includes(lat) ||
+                car.model.toLowerCase().includes(lat) ||
+                car.brand.toLowerCase().includes(translatedQuery) ||
+                car.model.toLowerCase().includes(translatedQuery)
+              ) {
+                match = true;
+                break;
+              }
+            }
+          }
+        }
+        
+        // Поиск по нескольким словам по отдельности (например, "тойота рав4" или "zeekr 001")
+        if (!match) {
+          const queryWords = query.split(/\s+/).filter(Boolean);
+          if (queryWords.length > 1) {
+            const allWordsMatch = queryWords.every(word => {
+              const mappedWord = CYRILLIC_BRAND_MAP[word] || word;
+              return (
+                car.brand.toLowerCase().includes(word) ||
+                car.model.toLowerCase().includes(word) ||
+                car.brand.toLowerCase().includes(mappedWord) ||
+                car.model.toLowerCase().includes(mappedWord)
+              );
+            });
+            if (allWordsMatch) match = true;
+          }
+        }
+        
+        if (!match) return false;
+      }
+
+      // 2. Фильтр по стране
+      if (filters.country && car.country !== filters.country) return false;
+
+      // 3. Фильтр по состоянию (новые / с пробегом)
+      if (filters.condition && car.condition !== filters.condition) return false;
+
+      // 4. Фильтр по типу двигателя
+      if (filters.fuel && car.engineType !== filters.fuel) return false;
+
+      // 5. Фильтр по марке
+      if (filters.brand && car.brand !== filters.brand) return false;
+
+      // 6. Фильтр по максимальной цене в USD
+      if (filters.priceMax && car.priceUSD > filters.priceMax) return false;
+
+      return true;
+    });
+  }, [cars, searchQuery, filters]);
+
+  // Сортировка данных (useMemo)
+  const sortedCars = React.useMemo(() => {
+    return [...filteredCars].sort((a, b) => {
+      const aPrice = calculateFullCarPrice(a, selectedCity).finalPriceRUB;
+      const bPrice = calculateFullCarPrice(b, selectedCity).finalPriceRUB;
+
+      if (sortOption === 'price_asc') return aPrice - bPrice;
+      if (sortOption === 'price_desc') return bPrice - aPrice;
+      if (sortOption === 'year_desc') return b.year - a.year;
+      return 0;
+    });
+  }, [filteredCars, sortOption, selectedCity]);
+
+  // Предзагрузка изображения первого авто в списке для идеального Lighthouse LCP
+  React.useEffect(() => {
+    if (sortedCars.length > 0) {
+      const firstCar = sortedCars[0];
+      const images = getCarImages(firstCar);
+      if (images.length > 0) {
+        const link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = 'image';
+        link.href = images[0];
+        document.head.appendChild(link);
+        return () => {
+          document.head.removeChild(link);
+        };
+      }
     }
+  }, [sortedCars]);
 
-    // 2. Фильтр по стране
-    if (filters.country && car.country !== filters.country) return false;
+  // Триггер дозагрузки (бесконечный скролл / ленивая подгрузка)
+  const loadMoreRef = React.useRef<HTMLDivElement>(null);
 
-    // 3. Фильтр по состоянию (новые / с пробегом)
-    if (filters.condition && car.condition !== filters.condition) return false;
+  React.useEffect(() => {
+    if (!loadMoreRef.current) return;
+    
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setVisibleCount((prev) => Math.min(prev + 8, sortedCars.length));
+      }
+    }, { threshold: 0.1, rootMargin: '150px' });
 
-    // 4. Фильтр по типу двигателя
-    if (filters.fuel && car.engineType !== filters.fuel) return false;
+    observer.observe(loadMoreRef.current);
 
-    // 5. Фильтр по марке
-    if (filters.brand && car.brand !== filters.brand) return false;
+    return () => {
+      observer.disconnect();
+    };
+  }, [sortedCars.length]);
 
-    // 6. Фильтр по максимальной цене в USD
-    if (filters.priceMax && car.priceUSD > filters.priceMax) return false;
-
-    return true;
-  });
-
-  // Сортировка данных
-  const sortedCars = [...filteredCars].sort((a, b) => {
-    const aPrice = calculateFullCarPrice(a, selectedCity).finalPriceRUB;
-    const bPrice = calculateFullCarPrice(b, selectedCity).finalPriceRUB;
-
-    if (sortOption === 'price_asc') return aPrice - bPrice;
-    if (sortOption === 'price_desc') return bPrice - aPrice;
-    if (sortOption === 'year_desc') return b.year - a.year;
-    return 0;
-  });
-
-  const handleOpenFilters = () => {
+  const handleOpenFilters = React.useCallback(() => {
     triggerHaptic('light');
     setIsFilterOpen(true);
-  };
+  }, []);
 
-  const handleCloseFilters = () => {
+  const handleCloseFilters = React.useCallback(() => {
     triggerHaptic('light');
     setIsFilterOpen(false);
-  };
+  }, []);
 
-  const toggleSort = () => {
+  const toggleSort = React.useCallback(() => {
     triggerHaptic('light');
-    if (sortOption === 'year_desc') {
-      setSortOption('price_asc');
-    } else if (sortOption === 'price_asc') {
-      setSortOption('price_desc');
-    } else {
-      setSortOption('year_desc');
-    }
-  };
+    setSortOption((prev) => {
+      if (prev === 'year_desc') return 'price_asc';
+      if (prev === 'price_asc') return 'price_desc';
+      return 'year_desc';
+    });
+  }, []);
 
-  const handleToggleFav = (e: React.MouseEvent, id: string) => {
+  const handleToggleFav = React.useCallback((e: React.MouseEvent, id: string) => {
     e.stopPropagation();
     triggerHaptic('medium');
     toggleFavorite(id);
-  };
+  }, [toggleFavorite]);
 
   return (
     <div className="flex flex-col text-[#1C1917] pb-12 select-none bg-[#F0EEEC]">
@@ -283,7 +391,7 @@ export default function Catalog() {
             {isLoading ? (
               Array.from({ length: 4 }).map((_, idx) => <SkeletonCard key={idx} />)
             ) : (
-              sortedCars.map((car) => {
+              sortedCars.slice(0, visibleCount).map((car) => {
                 const calculated = calculateFullCarPrice(car, selectedCity);
                 const isFav = favorites.includes(car.id);
                 return (
@@ -357,7 +465,7 @@ export default function Catalog() {
             {isLoading ? (
               Array.from({ length: 3 }).map((_, idx) => <SkeletonRow key={idx} />)
 ) : (
-              sortedCars.map((car) => {
+              sortedCars.slice(0, visibleCount).map((car) => {
                 const calculated = calculateFullCarPrice(car, selectedCity);
                 const isFav = favorites.includes(car.id);
                 return (
@@ -433,6 +541,17 @@ export default function Catalog() {
                 );
               })
             )}
+          </div>
+        )}
+
+        {/* Элегантный ленивый загрузчик при скролле */}
+        {sortedCars.length > visibleCount && (
+          <div ref={loadMoreRef} className="py-8 flex justify-center items-center">
+            <div className="flex space-x-2 items-center">
+              <span className="w-2 h-2 rounded-full bg-[#C5A880] animate-bounce [animation-delay:-0.3s]"></span>
+              <span className="w-2 h-2 rounded-full bg-[#C5A880] animate-bounce [animation-delay:-0.15s]"></span>
+              <span className="w-2 h-2 rounded-full bg-[#C5A880] animate-bounce"></span>
+            </div>
           </div>
         )}
       </div>

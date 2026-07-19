@@ -16,7 +16,24 @@ import {
   UserCheck, Save, Users, Calendar, Calculator
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CARS_DATA, calculateFullCarPrice, formatCurrency, getCarImages, getCarFeatures } from '../data/cars';
+import { calculateFullCarPrice, formatCurrency, getCarImages, getCarFeatures } from '../data/cars';
+import CARS_DATA_JSON from '../../cars.json';
+const CARS_DATA = CARS_DATA_JSON as any[];
+
+export const FACTORY_COLORS = [
+  'Черный металлик',
+  'Белый перламутр',
+  'Серый металлик',
+  'Серебристый',
+  'Темно-синий',
+  'Мокрый асфальт',
+  'Бордовый',
+  'Изумрудно-зеленый',
+  'Золотистый',
+  'Красный металлик',
+  'Двухцветный (Черный кузов / Белая крыша)',
+  'Двухцветный (Серый кузов / Черная крыша)',
+];
 
 // Помощник авто-исправления путей (для удобной работы с файлами из репозитория GitHub или Base64)
 export const getAutoCorrectedPath = (input: string) => {
@@ -1347,7 +1364,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
     const urls = textLines
       .split('\n')
       .map(u => u.trim())
-      .filter(u => u.length > 0 && (u.startsWith('http') || u.startsWith('https') || u.includes('file')));
+      .filter(u => u.length > 0);
     if (urls.length === 0) {
       alert('⚠️ Не обнаружено корректных ссылок!');
       return;
@@ -2002,50 +2019,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                             />
                           </div>
 
-                          {/* ФУНКЦИЯ 8: Кастомизатор Темы TMA */}
-                          <div className="bg-white border border-[#EFEBE4] rounded-2xl p-3.5 space-y-2.5 shadow-md">
-                            <h6 className="text-[11px] font-black text-[#1C1917] flex items-center">
-                              <span className="w-4 h-4 bg-[#C5A880]/15 rounded flex items-center justify-center text-[9px] font-black text-[#C5A880] mr-1">8</span>
-                              <span>Кастомизатор Темы TMA</span>
-                            </h6>
-                            <p className="text-[9px] text-[#78716C] leading-normal">
-                              Выберите визуальный стиль Mini App. Изменение цвета мгновенно применится ко всему приложению.
-                            </p>
-                            <div className="grid grid-cols-2 gap-2">
-                              <button
-                                type="button"
-                                onClick={() => { triggerHaptic('light'); setThemePreset('warm-gold'); }}
-                                className={`py-1.5 px-2 rounded-xl text-[9px] font-black transition text-left flex items-center space-x-1.5 border ${themePreset === 'warm-gold' ? 'bg-[#C5A880]/15 border-[#C5A880] text-[#1C1917]' : 'bg-white border-[#EFEBE4] text-[#78716C]'}`}
-                              >
-                                <span className="w-2.5 h-2.5 bg-[#C5A880] rounded-full inline-block"></span>
-                                <span>Премиум Золото 🏆</span>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => { triggerHaptic('light'); setThemePreset('cosmic-blue'); }}
-                                className={`py-1.5 px-2 rounded-xl text-[9px] font-black transition text-left flex items-center space-x-1.5 border ${themePreset === 'cosmic-blue' ? 'bg-blue-500/10 border-blue-500 text-[#1C1917]' : 'bg-white border-[#EFEBE4] text-[#78716C]'}`}
-                              >
-                                <span className="w-2.5 h-2.5 bg-blue-600 rounded-full inline-block"></span>
-                                <span>Космический Синий 🌌</span>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => { triggerHaptic('light'); setThemePreset('emerald-lux'); }}
-                                className={`py-1.5 px-2 rounded-xl text-[9px] font-black transition text-left flex items-center space-x-1.5 border ${themePreset === 'emerald-lux' ? 'bg-emerald-500/10 border-emerald-500 text-[#1C1917]' : 'bg-white border-[#EFEBE4] text-[#78716C]'}`}
-                              >
-                                <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full inline-block"></span>
-                                <span>Изумрудный Люкс 🍏</span>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => { triggerHaptic('light'); setThemePreset('sport-red'); }}
-                                className={`py-1.5 px-2 rounded-xl text-[9px] font-black transition text-left flex items-center space-x-1.5 border ${themePreset === 'sport-red' ? 'bg-red-500/10 border-red-500 text-[#1C1917]' : 'bg-white border-[#EFEBE4] text-[#78716C]'}`}
-                              >
-                                <span className="w-2.5 h-2.5 bg-red-500 rounded-full inline-block"></span>
-                                <span>Красный Спорт 🏎️</span>
-                              </button>
-                            </div>
-                          </div>
+                          {/* ФУНКЦИЯ 8: Кастомизатор Темы TMA удален по запросу */}
 
                           {/* ФУНКЦИЯ 9: Автоматическая конвертация валют */}
                           <div className="bg-white border border-[#EFEBE4] rounded-2xl p-3.5 space-y-2.5 shadow-md">
@@ -2375,13 +2349,16 @@ export const CARS_DATA: Car[] = ${formattedCars};
                             </div>
 
                             <div>
-                              <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Цвет кузова</label>
-                              <input
-                                type="text"
+                              <label className="block text-[8px] text-[#64748B] uppercase font-bold font-mono mb-1">Цвет кузова (Заводской)</label>
+                              <select
                                 value={newColor}
                                 onChange={(e) => setNewColor(e.target.value)}
-                                className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-xs outline-none text-[#111827]"
-                              />
+                                className="w-full bg-[#F5F7FA] border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-xs outline-none text-[#111827] font-bold"
+                              >
+                                {FACTORY_COLORS.map(color => (
+                                  <option key={color} value={color}>{color}</option>
+                                ))}
+                              </select>
                             </div>
                           </div>
                         )}
@@ -4012,82 +3989,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                           </div>
                         </div>
 
-                        {/* ФУНКЦИЯ 9: Сравнительный конфигуратор моделей */}
-                        <div className="bg-[#F5F7FA] p-3.5 rounded-2xl border border-[#E5E7EB] space-y-3">
-                          <h6 className="text-[10px] font-bold text-amber-600 uppercase tracking-wide flex items-center space-x-1 font-mono">
-                            <Sliders className="w-4 h-4 text-amber-500" />
-                            <span>9. Сравнение характеристик автомобилей</span>
-                          </h6>
-                          <p className="text-[9px] text-[#64748B] leading-normal font-medium">
-                            Выберите два автомобиля из каталога для генерации красивой сравнительной карточки параметров.
-                          </p>
-
-                          <div className="space-y-2.5">
-                            <div className="grid grid-cols-2 gap-2">
-                              <div>
-                                <label className="block text-[8px] text-[#64748B] font-bold font-mono mb-1">Автомобиль А</label>
-                                <select
-                                  value={compareCarAId}
-                                  onChange={(e) => setCompareCarAId(e.target.value)}
-                                  className="w-full bg-white border border-[#E5E7EB] rounded-xl px-2 py-1 text-[10px] outline-none text-[#111827] font-bold"
-                                >
-                                  <option value="">-- Выберите --</option>
-                                  {cars.map(c => (
-                                    <option key={c.id} value={c.id}>{c.brand} {c.model}</option>
-                                  ))}
-                                </select>
-                              </div>
-                              <div>
-                                <label className="block text-[8px] text-[#64748B] font-bold font-mono mb-1">Автомобиль Б</label>
-                                <select
-                                  value={compareCarBId}
-                                  onChange={(e) => setCompareCarBId(e.target.value)}
-                                  className="w-full bg-white border border-[#E5E7EB] rounded-xl px-2 py-1 text-[10px] outline-none text-[#111827] font-bold"
-                                >
-                                  <option value="">-- Выберите --</option>
-                                  {cars.map(c => (
-                                    <option key={c.id} value={c.id}>{c.brand} {c.model}</option>
-                                  ))}
-                                </select>
-                              </div>
-                            </div>
-
-                            {compareCarAId && compareCarBId && (() => {
-                              const carA = cars.find(c => c.id === compareCarAId);
-                              const carB = cars.find(c => c.id === compareCarBId);
-                              if (!carA || !carB) return null;
-                              return (
-                                <div className="bg-white p-3 rounded-xl border border-[#E5E7EB] space-y-1 text-[9px] font-sans text-left">
-                                  <div className="grid grid-cols-3 font-bold border-b pb-1 text-[#111827]">
-                                    <span>Параметр</span>
-                                    <span>{carA.brand} {carA.model}</span>
-                                    <span>{carB.brand} {carB.model}</span>
-                                  </div>
-                                  <div className="grid grid-cols-3 border-b py-0.5 text-gray-500">
-                                    <span>Год выпуска</span>
-                                    <span className="text-[#111827] font-bold">{carA.year} г.</span>
-                                    <span className="text-[#111827] font-bold">{carB.year} г.</span>
-                                  </div>
-                                  <div className="grid grid-cols-3 border-b py-0.5 text-gray-500">
-                                    <span>Двигатель</span>
-                                    <span className="text-[#111827] font-medium">{carA.engineVolume} ({carA.power} л.с.)</span>
-                                    <span className="text-[#111827] font-medium">{carB.engineVolume} ({carB.power} л.с.)</span>
-                                  </div>
-                                  <div className="grid grid-cols-3 border-b py-0.5 text-gray-500">
-                                    <span>Привод / КПП</span>
-                                    <span className="text-[#111827] font-medium">{carA.driveType} / {carA.transmission.slice(0,3)}</span>
-                                    <span className="text-[#111827] font-medium">{carB.driveType} / {carB.transmission.slice(0,3)}</span>
-                                  </div>
-                                  <div className="grid grid-cols-3 pt-1 text-gray-500">
-                                    <span>Цена в РФ</span>
-                                    <span className="text-emerald-700 font-extrabold">{formatCurrency(calculateFullCarPrice(carA).finalPriceRUB)}</span>
-                                    <span className="text-emerald-700 font-extrabold">{formatCurrency(calculateFullCarPrice(carB).finalPriceRUB)}</span>
-                                  </div>
-                                </div>
-                              );
-                            })()}
-                          </div>
-                        </div>
+                        {/* ФУНКЦИЯ 9: Сравнительный конфигуратор моделей удален по запросу */}
 
                         {/* ФУНКЦИЯ 10: Trade-In Калькулятор оценки */}
                         <div className="bg-[#F5F7FA] p-3.5 rounded-2xl border border-[#E5E7EB] space-y-3">

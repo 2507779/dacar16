@@ -5,7 +5,9 @@
 
 import { create } from 'zustand';
 import { Car, Order, OrderStatus, TrackingStep, AppTexts, ManagerContact } from '../types';
-import { CARS_DATA, calculateFullCarPrice, getCarImages } from '../data/cars';
+import { calculateFullCarPrice, getCarImages } from '../data/cars';
+import CARS_DATA_JSON from '../../cars.json';
+const CARS_DATA = CARS_DATA_JSON as Car[];
 import { APP_CONFIG } from '../config';
 
 // Список всех статусов логистики по порядку
@@ -158,9 +160,9 @@ export const useStore = create<AppStore>((set, get) => {
       carId: 'zeekr-001-you-2024',
       carBrand: 'Zeekr',
       carModel: '001 YOU 100kWh',
-      carImage: 'https://images.unsplash.com/photo-1619767886558-efdc259cde1a?auto=format&fit=crop&w=800&q=80',
+      carImage: '/cars/zeekr_001.jpg',
       carYear: 2024,
-      finalPriceRUB: calculateFullCarPrice(loadedCars.find(c => c.id === 'zeekr-001-you-2024') || CARS_DATA[1], 'Москва').finalPriceRUB,
+      finalPriceRUB: calculateFullCarPrice(loadedCars.find(c => c.id === 'zeekr-001-you-2024') || (CARS_DATA as Car[])[1], 'Москва').finalPriceRUB,
       customerName: 'Константин',
       customerPhone: '+7 (927) 444-11-22',
       customerCity: 'Москва',
@@ -173,9 +175,9 @@ export const useStore = create<AppStore>((set, get) => {
       carId: 'hyundai-palisade-2022',
       carBrand: 'Hyundai',
       carModel: 'Palisade Calligraphy',
-      carImage: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=80',
+      carImage: '/cars/hyundai_palisade_1.jpg',
       carYear: 2022,
-      finalPriceRUB: calculateFullCarPrice(loadedCars.find(c => c.id === 'hyundai-palisade-2022') || CARS_DATA[2], 'Казань (Главный филиал)').finalPriceRUB,
+      finalPriceRUB: calculateFullCarPrice(loadedCars.find(c => c.id === 'hyundai-palisade-2022') || (CARS_DATA as Car[])[2], 'Казань (Главный филиал)').finalPriceRUB,
       customerName: 'Евгений',
       customerPhone: '+7 (917) 222-33-44',
       customerCity: 'Казань (Главный филиал)',

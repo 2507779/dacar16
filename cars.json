@@ -16,8 +16,8 @@
     "transmission": "Automatic",
     "color": "Белый жемчуг (White Pearl)",
     "images": [
-      "/cars/rav41.jpg",
-      "/cars/rav42.jpg"
+      "/cars/toyota_rav4_1.jpg",
+      "/cars/toyota_rav4_2.jpg"
     ],
     "priceUSD": 28500,
     "recyclingFeeRUB": 3400,
@@ -49,8 +49,8 @@
     "transmission": "Automatic",
     "color": "Темно-серый металлик",
     "images": [
-      "/cars/highlander1.jpg",
-      "/cars/highlander2.jpg"
+      "/cars/toyota_highlander_1.jpg",
+      "/cars/toyota_highlander_2.jpg"
     ],
     "priceUSD": 44000,
     "recyclingFeeRUB": 3400,
@@ -82,8 +82,8 @@
     "transmission": "Automatic",
     "color": "Серый матовый (Space Grey)",
     "images": [
-      "/cars/gacs71.jpg",
-      "/cars/gacs72.jpg"
+      "/cars/gac_s7_1.jpg",
+      "/cars/gac_s7_2.jpg"
     ],
     "priceUSD": 31000,
     "recyclingFeeRUB": 3400,
@@ -115,8 +115,8 @@
     "transmission": "Robotic",
     "color": "Серебристый металлик",
     "images": [
-      "/cars/tiguanlpro1.jpg",
-      "/cars/tiguanlpro2.jpg"
+      "/cars/vw_tiguan_l_pro_1.jpg",
+      "/cars/vw_tiguan_l_pro_2.jpg"
     ],
     "priceUSD": 33500,
     "recyclingFeeRUB": 3400,
@@ -148,8 +148,8 @@
     "transmission": "Robotic",
     "color": "Красный спорт (Tango Red)",
     "images": [
-      "/cars/audiq31.jpg",
-      "/cars/audiq32.jpg"
+      "/cars/audi_q3_1.jpg",
+      "/cars/audi_q3_2.jpg"
     ],
     "priceUSD": 29800,
     "recyclingFeeRUB": 3400,
@@ -181,8 +181,8 @@
     "transmission": "Robotic",
     "color": "Серый кварц (Daytona Grey)",
     "images": [
-      "/cars/audiq51.jpg",
-      "/cars/audiq52.jpg"
+      "/cars/audi_q5_1.jpg",
+      "/cars/audi_q5_2.jpg"
     ],
     "priceUSD": 38500,
     "recyclingFeeRUB": 3400,
@@ -191,7 +191,7 @@
     "features": [
       "Матричная оптика Matrix LED",
       "Увеличенная колесная база L",
-      "Премиум аудиосистема Bang & Olufsen",
+      "Premium аудиосистема Bang & Olufsen",
       "Трехзонный климат-контроль"
     ],
     "availability": "on_order",
@@ -214,8 +214,8 @@
     "transmission": "Automatic",
     "color": "Серый графит (Graphite Grey)",
     "images": [
-      "/cars/glccoupe1.jpg",
-      "/cars/glccoupe2.jpg"
+      "/cars/mercedes_glc_coupe_1.jpg",
+      "/cars/mercedes_glc_coupe_2.jpg"
     ],
     "priceUSD": 44500,
     "recyclingFeeRUB": 3400,
@@ -247,8 +247,8 @@
     "transmission": "Automatic",
     "color": "Черный карбон (Carbon Black)",
     "images": [
-      "/cars/bmwx51.jpg",
-      "/cars/bmwx52.jpg"
+      "/cars/bmw_x5_1.jpg",
+      "/cars/bmw_x5_2.jpg"
     ],
     "priceUSD": 59000,
     "recyclingFeeRUB": 3400,
@@ -280,8 +280,8 @@
     "transmission": "Automatic",
     "color": "Ярко-красный (Soul Red Crystal)",
     "images": [
-      "/cars/cx5comfort1.jpg",
-      "/cars/cx5comfort2.jpg"
+      "/cars/mazda_cx5_comfort_1.jpg",
+      "/cars/mazda_cx5_comfort_2.jpg"
     ],
     "priceUSD": 22000,
     "recyclingFeeRUB": 3400,
@@ -313,8 +313,8 @@
     "transmission": "Automatic",
     "color": "Темно-серый металлик (Machine Grey)",
     "images": [
-      "/cars/cx5premium1.jpg",
-      "/cars/cx5premium2.jpg"
+      "/cars/mazda_cx5_premium_1.jpg",
+      "/cars/mazda_cx5_premium_2.jpg"
     ],
     "priceUSD": 25500,
     "recyclingFeeRUB": 3400,
@@ -346,8 +346,8 @@
     "transmission": "Automatic",
     "color": "Ярко-оранжевый / Черный верх",
     "images": [
-      "/cars/kiakx11.jpg",
-      "/cars/kiakx12.jpg"
+      "/cars/kia_kx1_1.jpg",
+      "/cars/kia_kx1_2.jpg"
     ],
     "priceUSD": 14500,
     "recyclingFeeRUB": 3400,
@@ -379,8 +379,8 @@
     "transmission": "Robotic",
     "color": "Небесно-голубой (Sky Blue)",
     "images": [
-      "/cars/tharuxr1.jpg",
-      "/cars/tharuxr2.jpg"
+      "/cars/vw_tharu_xr_1.jpg",
+      "/cars/vw_tharu_xr_2.jpg"
     ],
     "priceUSD": 18500,
     "recyclingFeeRUB": 3400,
@@ -412,8 +412,8 @@
     "transmission": "Automatic",
     "color": "Бронзовый металлик",
     "images": [
-      "/cars/c5x1.jpg",
-      "/cars/c5x2.jpg"
+      "/cars/citroen_c5x_1.jpg",
+      "/cars/citroen_c5x_2.jpg"
     ],
     "priceUSD": 24800,
     "recyclingFeeRUB": 3400,
@@ -445,8 +445,8 @@
     "transmission": "Robotic",
     "color": "Серый металлик (Monsoon Grey)",
     "images": [
-      "/cars/audiq3used1.jpg",
-      "/cars/audiq3used2.jpg"
+      "/cars/audi_q3_used_1.jpg",
+      "/cars/audi_q3_used_2.jpg"
     ],
     "priceUSD": 22000,
     "recyclingFeeRUB": 5200,
@@ -478,8 +478,8 @@
     "transmission": "Automatic",
     "color": "Темно-синий металлик",
     "images": [
-      "/cars/audia31.jpg",
-      "/cars/audia32.jpg"
+      "/cars/audi_a3_used_1.jpg",
+      "/cars/audi_a3_used_2.jpg"
     ],
     "priceUSD": 18900,
     "recyclingFeeRUB": 5200,
@@ -511,8 +511,8 @@
     "transmission": "Automatic",
     "color": "Белый минерал (Mineral White)",
     "images": [
-      "/cars/bmwx11.jpg",
-      "/cars/bmwx12.jpg"
+      "/cars/bmw_x1_used_1.jpg",
+      "/cars/bmw_x1_used_2.jpg"
     ],
     "priceUSD": 21500,
     "recyclingFeeRUB": 5200,
@@ -520,7 +520,7 @@
     "description": "Динамичный полноприводный кроссовер BMW X1 с тяговитым 2.0-литровым дизельным мотором. Превосходная маневренность, комфортная подвеска и проверенное состояние у официального корейского дилера.",
     "features": [
       "Фирменный полный привод xDrive",
-      "Панорамная стеклянная крыша с люком",
+      "Паномарная стеклянная крыша с люком",
       "Спортивные сиденья с памятью",
       "Проекционный экран на лобовое стекло"
     ],
@@ -544,8 +544,8 @@
     "transmission": "Automatic",
     "color": "Синий фитоник (Phytonic Blue)",
     "images": [
-      "/cars/bmwx31.jpg",
-      "/cars/bmwx32.jpg"
+      "/cars/bmw_x3_used_1.jpg",
+      "/cars/bmw_x3_used_2.jpg"
     ],
     "priceUSD": 32000,
     "recyclingFeeRUB": 5200,
@@ -577,8 +577,8 @@
     "transmission": "Automatic",
     "color": "Черный обсидиан (Obsidian Black)",
     "images": [
-      "/cars/gle1.jpg",
-      "/cars/gle2.jpg"
+      "/cars/mercedes_gle_used_1.jpg",
+      "/cars/mercedes_gle_used_2.jpg"
     ],
     "priceUSD": 51000,
     "recyclingFeeRUB": 5200,
@@ -610,8 +610,8 @@
     "transmission": "Robotic",
     "color": "Полярный серебристый металлик",
     "images": [
-      "/cars/a1801.jpg",
-      "/cars/a1802.jpg"
+      "/cars/mercedes_a180_used_1.jpg",
+      "/cars/mercedes_a180_used_2.jpg"
     ],
     "priceUSD": 16500,
     "recyclingFeeRUB": 5200,
@@ -643,8 +643,8 @@
     "transmission": "Automatic",
     "color": "Черный обсидиан",
     "images": [
-      "/cars/eclass1.jpg",
-      "/cars/eclass2.jpg"
+      "/cars/mercedes_e260l_used_1.jpg",
+      "/cars/mercedes_e260l_used_2.jpg"
     ],
     "priceUSD": 28900,
     "recyclingFeeRUB": 5200,
@@ -676,8 +676,8 @@
     "transmission": "Robotic",
     "color": "Серый дельфин (Dolphin Grey)",
     "images": [
-      "/cars/golf81.jpg",
-      "/cars/golf82.jpg"
+      "/cars/vw_golf_used_1.jpg",
+      "/cars/vw_golf_used_2.jpg"
     ],
     "priceUSD": 15500,
     "recyclingFeeRUB": 5200,
@@ -709,8 +709,8 @@
     "transmission": "Robotic",
     "color": "Белый жемчуг (Onyx White)",
     "images": [
-      "/cars/tayron1.jpg",
-      "/cars/tayron2.jpg"
+      "/cars/vw_tayron_used_1.jpg",
+      "/cars/vw_tayron_used_2.jpg"
     ],
     "priceUSD": 19800,
     "recyclingFeeRUB": 5200,
@@ -742,8 +742,8 @@
     "transmission": "Automatic",
     "color": "Мятно-зеленый (Mint Green)",
     "images": [
-      "/cars/tcross1.jpg",
-      "/cars/tcross2.jpg"
+      "/cars/vw_tcross_used_1.jpg",
+      "/cars/vw_tcross_used_2.jpg"
     ],
     "priceUSD": 12800,
     "recyclingFeeRUB": 5200,
@@ -775,8 +775,8 @@
     "transmission": "Robotic",
     "color": "Желтый металлик с черной крышей",
     "images": [
-      "/cars/troc1.jpg",
-      "/cars/troc2.jpg"
+      "/cars/vw_troc_used_1.jpg",
+      "/cars/vw_troc_used_2.jpg"
     ],
     "priceUSD": 14500,
     "recyclingFeeRUB": 5200,
@@ -808,9 +808,8 @@
     "transmission": "Automatic",
     "color": "Черный изумруд",
     "images": [
-      "/cars/lil91.jpg",
-      "/cars/lil92.jpg",
-      "/cars/lil93.jpg"
+      "/cars/li_l9.jpg",
+      "/cars/li_l9_2.jpg"
     ],
     "priceUSD": 46500,
     "recyclingFeeRUB": 3400,
@@ -843,8 +842,8 @@
     "transmission": "Single-speed",
     "color": "Серый матовый (Phantom)",
     "images": [
-      "/cars/zeekr0011.jpg",
-      "/cars/zeekr0012.jpg"
+      "/cars/zeekr_001.jpg",
+      "/cars/zeekr_001_2.jpg"
     ],
     "priceUSD": 42000,
     "recyclingFeeRUB": 3400,
@@ -877,8 +876,8 @@
     "transmission": "Automatic",
     "color": "Белый жемчуг",
     "images": [
-      "/cars/palisade1.jpg",
-      "/cars/palisade2.jpg"
+      "/cars/hyundai_palisade_1.jpg",
+      "/cars/hyundai_palisade_2.jpg"
     ],
     "priceUSD": 31800,
     "recyclingFeeRUB": 5200,
@@ -911,8 +910,8 @@
     "transmission": "Automatic",
     "color": "Темно-синий металлик",
     "images": [
-      "/cars/carnival1.jpg",
-      "/cars/carnival2.jpg"
+      "/cars/kia_carnival_1.jpg",
+      "/cars/kia_carnival_2.jpg"
     ],
     "priceUSD": 28500,
     "recyclingFeeRUB": 5200,
@@ -944,8 +943,8 @@
     "transmission": "Automatic",
     "color": "Королевский Синий матовый",
     "images": [
-      "/cars/gv801.jpg",
-      "/cars/gv802.jpg"
+      "/cars/genesis_gv80_1.jpg",
+      "/cars/genesis_gv80_2.jpg"
     ],
     "priceUSD": 41500,
     "recyclingFeeRUB": 5200,
@@ -978,8 +977,8 @@
     "transmission": "Single-speed",
     "color": "Aqua Blue (Синий аквамарин)",
     "images": [
-      "/cars/su71.jpg",
-      "/cars/su72.jpg"
+      "/cars/xiaomi_su7_max_1.jpg",
+      "/cars/xiaomi_su7_max_2.jpg"
     ],
     "priceUSD": 39500,
     "recyclingFeeRUB": 3400,
@@ -1012,8 +1011,8 @@
     "transmission": "Automatic",
     "color": "Изумрудный металлик (Emerald)",
     "images": [
-      "/cars/monjaro1.jpg",
-      "/cars/monjaro2.jpg"
+      "/cars/geely_monjaro.jpg",
+      "/cars/geely_monjaro_2.jpg"
     ],
     "priceUSD": 22800,
     "recyclingFeeRUB": 5200,
@@ -1045,8 +1044,8 @@
     "transmission": "Automatic",
     "color": "Серебристый металлик",
     "images": [
-      "/cars/camry1.jpg",
-      "/cars/camry2.jpg"
+      "/cars/toyota_camry_1.jpg",
+      "/cars/toyota_camry_2.jpg"
     ],
     "priceUSD": 21500,
     "recyclingFeeRUB": 5200,

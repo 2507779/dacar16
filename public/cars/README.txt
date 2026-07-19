@@ -1,72 +1,14 @@
-Замените пустые файлы своими фотографиями, сохранив имена файлов.
-Формат: JPG (или измените расширения в JSON).
-Пути уже прописаны как /cars/<имя>.jpg
+ИНСТРУКЦИЯ ПО ДОБАВЛЕНИЮ ФОТОГРАФИЙ (DA!CAR)
+==============================================
 
-Всего файлов: 66
+Вы можете легко добавлять свои собственные фотографии автомобилей в этот каталог:
 
-rav41.jpg
-rav42.jpg
-highlander1.jpg
-highlander2.jpg
-gacs71.jpg
-gacs72.jpg
-tiguanlpro1.jpg
-tiguanlpro2.jpg
-audiq31.jpg
-audiq32.jpg
-audiq51.jpg
-audiq52.jpg
-glccoupe1.jpg
-glccoupe2.jpg
-bmwx51.jpg
-bmwx52.jpg
-cx5comfort1.jpg
-cx5comfort2.jpg
-cx5premium1.jpg
-cx5premium2.jpg
-kiakx11.jpg
-kiakx12.jpg
-tharuxr1.jpg
-tharuxr2.jpg
-c5x1.jpg
-c5x2.jpg
-audiq3used1.jpg
-audiq3used2.jpg
-audia31.jpg
-audia32.jpg
-bmwx11.jpg
-bmwx12.jpg
-bmwx31.jpg
-bmwx32.jpg
-gle1.jpg
-gle2.jpg
-a1801.jpg
-a1802.jpg
-eclass1.jpg
-eclass2.jpg
-golf81.jpg
-golf82.jpg
-tayron1.jpg
-tayron2.jpg
-tcross1.jpg
-tcross2.jpg
-troc1.jpg
-troc2.jpg
-lil91.jpg
-lil92.jpg
-lil93.jpg
-zeekr0011.jpg
-zeekr0012.jpg
-palisade1.jpg
-palisade2.jpg
-carnival1.jpg
-carnival2.jpg
-gv801.jpg
-gv802.jpg
-su71.jpg
-su72.jpg
-monjaro1.jpg
-monjaro2.jpg
-camry1.jpg
-camry2.jpg
-no-image.jpg
+1. Скопируйте файлы изображений (в формате .jpg, .png, .webp) в эту папку `/public/cars/` в вашем GitHub репозитории.
+2. При добавлении или редактировании автомобиля в админ-панели используйте простой относительный путь:
+   `/cars/имя_файла.jpg` (например, `/cars/my_bmw.jpg`).
+3. Также вы можете использовать встроенный в приложение умный загрузчик файлов: он автоматически конвертирует любое изображение с вашего телефона/компьютера в формат Base64 и сохранит его внутри базы данных (не нужно ничего никуда загружать вручную)!
+
+Примеры уже доступных предустановленных фотографий:
+- `/cars/zeekr_001.jpg` — Zeekr 001
+- `/cars/geely_monjaro.jpg` — Geely Monjaro
+- `/cars/li_l9.jpg` — Li Auto L9

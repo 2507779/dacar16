@@ -15,6 +15,36 @@ export default function VehicleDetails() {
   const { cars, activeCarId, setActiveCarId, favorites, toggleFavorite, addOrder, setCurrentTab, managerContacts, selectedCity, setSelectedCity } = useStore();
   const [isOrderSheetOpen, setIsOrderSheetOpen] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+
+  const minSwipeDistance = 50;
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    
+    const carImages = getCarImages(car);
+    if (isLeftSwipe && carImages.length > 1) {
+      triggerHaptic('light');
+      setActiveImageIndex((prev) => (prev + 1) % carImages.length);
+    } else if (isRightSwipe && carImages.length > 1) {
+      triggerHaptic('light');
+      setActiveImageIndex((prev) => (prev - 1 + carImages.length) % carImages.length);
+    }
+  };
 
   // Форма заказа
   const [userName, setUserName] = useState('');
@@ -214,16 +244,25 @@ export default function VehicleDetails() {
     <div className="flex flex-col text-[#1C1917] pb-16 select-none relative bg-[#F0EEEC]">
       
       {/* 1. Слайдер Изображений */}
-      <div className="relative h-64 bg-[#1C1917] overflow-hidden">
+      <div 
+        className="relative h-64 bg-[#1C1917] overflow-hidden cursor-zoom-in"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onClick={() => {
+          triggerHaptic('light');
+          setIsLightboxOpen(true);
+        }}
+      >
         <img
           src={getCarImages(car)[activeImageIndex] || getCarImages(car)[0]}
           alt={`${car.brand} ${car.model}`}
           referrerPolicy="no-referrer"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover select-none"
         />
 
         {/* Индикаторы слайдов */}
-        <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2">
+        <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-2 z-10" onClick={(e) => e.stopPropagation()}>
           {getCarImages(car).map((_, idx) => (
             <button
               key={idx}
@@ -238,14 +277,17 @@ export default function VehicleDetails() {
 
         {/* Избранное прямо на фото */}
         <button
-          onClick={handleToggleFav}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleToggleFav();
+          }}
           className="absolute top-4 right-4 p-3 rounded-full bg-white/80 border border-black/[0.03] backdrop-blur-md hover:bg-white text-[#1C1917] transition active:scale-90 z-10 shadow-md"
         >
           <Heart className={`w-5 h-5 transition-all ${isFav ? 'fill-red-500 text-red-500' : 'text-[#78716C]'}`} />
         </button>
 
         {/* Страна и состояние */}
-        <div className="absolute top-4 left-4 flex space-x-2 z-10">
+        <div className="absolute top-4 left-4 flex space-x-2 z-10" onClick={(e) => e.stopPropagation()}>
           <span className="bg-white/95 border border-[#EFEBE4] backdrop-blur-md text-[#1C1917] text-[10px] font-bold px-3 py-1 rounded-lg uppercase tracking-wider shadow-sm">
             {car.country === 'China' ? 'Китай 🇨🇳' : car.country === 'South Korea' ? 'Корея 🇰🇷' : 'Киргизия 🇰🇬'}
           </span>
@@ -548,6 +590,87 @@ export default function VehicleDetails() {
             <div className="mt-8 flex items-center space-x-2 text-[10px] text-[#C5A880] font-mono font-bold">
               <span className="w-2 h-2 bg-[#C5A880] rounded-full animate-ping"></span>
               <span>Переход на вкладку «Подбор»...</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* 9. Fullscreen Lightbox Zoom */}
+      <AnimatePresence>
+        {isLightboxOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/95 z-[999] flex flex-col justify-between p-4 select-none"
+            onClick={() => setIsLightboxOpen(false)}
+          >
+            {/* Header */}
+            <div className="flex justify-between items-center text-white z-10 w-full" onClick={(e) => e.stopPropagation()}>
+              <span className="text-xs font-mono font-bold bg-white/10 px-3 py-1.5 rounded-full backdrop-blur">
+                {activeImageIndex + 1} / {getCarImages(car).length}
+              </span>
+              <button
+                onClick={() => {
+                  triggerHaptic('light');
+                  setIsLightboxOpen(false);
+                }}
+                className="p-2.5 bg-white/10 hover:bg-white/20 rounded-full transition-all duration-300 active:scale-90"
+              >
+                <X className="w-5 h-5 text-white" />
+              </button>
+            </div>
+
+            {/* Main Image Viewport with swipe */}
+            <div 
+              className="flex-1 flex items-center justify-center relative w-full h-full"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
+              <motion.img
+                key={activeImageIndex}
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+                src={getCarImages(car)[activeImageIndex]}
+                alt={`${car.brand} ${car.model} Fullscreen`}
+                referrerPolicy="no-referrer"
+                className="max-w-full max-h-[80vh] object-contain rounded-2xl select-none shadow-2xl border border-white/5"
+                onClick={(e) => e.stopPropagation()}
+              />
+
+              {/* Navigation arrows (desktop) */}
+              {getCarImages(car).length > 1 && (
+                <>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      triggerHaptic('light');
+                      setActiveImageIndex((prev) => (prev - 1 + getCarImages(car).length) % getCarImages(car).length);
+                    }}
+                    className="absolute left-4 p-4 bg-white/10 hover:bg-white/20 rounded-full text-white transition active:scale-90 hidden md:block"
+                  >
+                    <ChevronRight className="w-6 h-6 rotate-180" />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      triggerHaptic('light');
+                      setActiveImageIndex((prev) => (prev + 1) % getCarImages(car).length);
+                    }}
+                    className="absolute right-4 p-4 bg-white/10 hover:bg-white/20 rounded-full text-white transition active:scale-90 hidden md:block"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+                </>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="text-center text-white/60 text-xs font-mono tracking-wider pb-6" onClick={(e) => e.stopPropagation()}>
+              {car.brand} {car.model} • {car.year}
             </div>
           </motion.div>
         )}
