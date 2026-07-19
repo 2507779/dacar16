@@ -501,26 +501,55 @@ export default function Profile() {
                       ]);
                       inp.value = '';
 
-                      // Отправка в Telegram!
+                      // SECURE TELEGRAM NOTIFICATION DISPATCH (VIA BACKEND)
                       try {
-                        const botToken = localStorage.getItem('tg_bot_token') || APP_CONFIG.DEFAULT_TG_BOT_TOKEN;
-                        const channelId = localStorage.getItem('tg_channel_id') || APP_CONFIG.DEFAULT_TG_CHANNEL_ID;
-                        if (botToken && channelId) {
-                          const tgMessage = `📞 **ЗАКАЗ ОБРАТНОГО ЗВОНКА**\n\n` +
-                            `👤 **Пользователь:** Premium Клиент\n` +
-                            `📞 **Телефон:** ${phone}\n\n` +
-                            `⚡ *Срочно перезвоните клиенту!*`;
+                        const tgMessage = `📞 **ЗАКАЗ ОБРАТНОГО ЗВОНКА**\n\n` +
+                          `👤 **Пользователь:** Premium Клиент\n` +
+                          `📞 **Телефон:** ${phone}\n\n` +
+                          `⚡ *Срочно перезвоните клиенту!*`;
 
-                          fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                              chat_id: channelId,
-                              text: tgMessage,
-                              parse_mode: 'Markdown'
-                            })
-                          });
-                        }
+                        const channelId = localStorage.getItem('tg_channel_id') || APP_CONFIG.DEFAULT_TG_CHANNEL_ID;
+
+                        fetch('/api/telegram/notify', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            text: tgMessage,
+                            chatId: channelId || undefined
+                          })
+                        })
+                        .then(async (res) => {
+                          if (!res.ok) {
+                            console.warn('Secure Telegram notification proxy returned error, attempting direct client fallback...');
+                            const botToken = localStorage.getItem('tg_bot_token') || APP_CONFIG.DEFAULT_TG_BOT_TOKEN;
+                            if (botToken && channelId) {
+                              fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                  chat_id: channelId,
+                                  text: tgMessage,
+                                  parse_mode: 'Markdown'
+                                })
+                              });
+                            }
+                          }
+                        })
+                        .catch(err => {
+                          console.error('Secure notification failed, attempting direct client fallback...', err);
+                          const botToken = localStorage.getItem('tg_bot_token') || APP_CONFIG.DEFAULT_TG_BOT_TOKEN;
+                          if (botToken && channelId) {
+                            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({
+                                chat_id: channelId,
+                                  text: tgMessage,
+                                  parse_mode: 'Markdown'
+                              })
+                            });
+                          }
+                        });
                       } catch (e) {
                         console.error('Callback TG error:', e);
                       }

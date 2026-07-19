@@ -280,38 +280,58 @@ export const useStore = create<AppStore>((set, get) => {
       localStorage.setItem('dacar_orders', JSON.stringify(updatedOrders));
       set({ orders: updatedOrders });
 
-      // REAL TELEGRAM NOTIFICATION DISPATCH
+      // SECURE TELEGRAM NOTIFICATION DISPATCH (VIA BACKEND)
       try {
-        const botToken = localStorage.getItem('tg_bot_token') || APP_CONFIG.DEFAULT_TG_BOT_TOKEN;
+        const leadMessage = `🔔 **НОВАЯ ЗАЯВКА НА АВТОМОБИЛЬ DA!CAR**\n\n` +
+          `👤 **Имя клиента:** ${customerName}\n` +
+          `📞 **Телефон:** ${customerPhone}\n` +
+          `🚘 **Выбранный автомобиль:** ${car.brand} ${car.model} (${car.year} г.)\n` +
+          `💰 **Стоимость под ключ:** ${finalPriceRUB.toLocaleString('ru-RU')} ₽\n` +
+          `📍 **Город доставки:** ${customerCity}\n\n` +
+          `⏳ *Менеджер уже получил уведомление и связывается с клиентом!*`;
+
         const channelId = localStorage.getItem('tg_channel_id') || APP_CONFIG.DEFAULT_TG_CHANNEL_ID;
 
-        if (botToken && channelId) {
-          const leadMessage = `🔔 **НОВАЯ ЗАЯВКА НА АВТОМОБИЛЬ DA!CAR**\n\n` +
-            `👤 **Имя клиента:** ${customerName}\n` +
-            `📞 **Телефон:** ${customerPhone}\n` +
-            `🚘 **Выбранный автомобиль:** ${car.brand} ${car.model} (${car.year} г.)\n` +
-            `💰 **Стоимость под ключ:** ${finalPriceRUB.toLocaleString('ru-RU')} ₽\n` +
-            `📍 **Город доставки:** ${customerCity}\n\n` +
-            `⏳ *Менеджер уже получил уведомление и связывается с клиентом!*`;
-
-          fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              chat_id: channelId,
-              text: leadMessage,
-              parse_mode: 'Markdown'
-            })
+        fetch('/api/telegram/notify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: leadMessage,
+            chatId: channelId || undefined
           })
-          .then(res => {
-            if (!res.ok) {
-              console.warn('Telegram sending failed', res.statusText);
+        })
+        .then(async (res) => {
+          if (!res.ok) {
+            console.warn('Secure Telegram notification proxy returned error, attempting direct client fallback...');
+            const botToken = localStorage.getItem('tg_bot_token') || APP_CONFIG.DEFAULT_TG_BOT_TOKEN;
+            if (botToken && channelId) {
+              fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  chat_id: channelId,
+                  text: leadMessage,
+                  parse_mode: 'Markdown'
+                })
+              });
             }
-          })
-          .catch(err => {
-            console.error('Error sending message to Telegram', err);
-          });
-        }
+          }
+        })
+        .catch(err => {
+          console.error('Secure notification failed, attempting direct client fallback...', err);
+          const botToken = localStorage.getItem('tg_bot_token') || APP_CONFIG.DEFAULT_TG_BOT_TOKEN;
+          if (botToken && channelId) {
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                chat_id: channelId,
+                text: leadMessage,
+                parse_mode: 'Markdown'
+              })
+            });
+          }
+        });
       } catch (err) {
         console.error('Telegram notification dispatch error:', err);
       }

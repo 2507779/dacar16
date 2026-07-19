@@ -21,6 +21,7 @@ interface TelegramConfig {
   githubBranch: string;
   allowedChatIds: string; // Запятые или пробелы
   webhookRegistered: boolean;
+  telegramChannelId?: string;
 }
 
 const DEFAULT_CONFIG: TelegramConfig = {
@@ -29,7 +30,8 @@ const DEFAULT_CONFIG: TelegramConfig = {
   githubRepo: '2507779/dacar16',
   githubBranch: 'main',
   allowedChatIds: '',
-  webhookRegistered: false
+  webhookRegistered: false,
+  telegramChannelId: ''
 };
 
 function cleanRepoString(repo: string): string {
@@ -131,6 +133,7 @@ function writeConfig(config: TelegramConfig) {
       githubBranch: config.githubBranch,
       allowedChatIds: config.allowedChatIds,
       webhookRegistered: config.webhookRegistered,
+      telegramChannelId: config.telegramChannelId || '',
       telegramBotToken: '', // заменяем на пустую строку в отслеживаемом файле
       githubToken: ''       // заменяем на пустую строку в отслеживаемом файле
     };
@@ -424,7 +427,8 @@ async function startServer() {
         githubRepo: newConfig.githubRepo || '2507779/dacar16',
         githubBranch: newConfig.githubBranch || 'main',
         allowedChatIds: newConfig.allowedChatIds || '',
-        webhookRegistered: currentConfig.webhookRegistered
+        webhookRegistered: currentConfig.webhookRegistered,
+        telegramChannelId: newConfig.telegramChannelId || currentConfig.telegramChannelId || ''
       };
 
       writeConfig(updatedConfig);
@@ -432,6 +436,63 @@ async function startServer() {
     } catch (err) {
       console.error('Error saving config:', err);
       res.status(500).json({ error: 'Failed to save config' });
+    }
+  });
+
+  // Secure proxy endpoint for sending Telegram notifications to the admin/channel
+  app.post('/api/telegram/notify', async (req, res) => {
+    try {
+      const { text, chatId } = req.body;
+      const config = readConfig();
+
+      if (!config.telegramBotToken) {
+        return res.status(400).json({ error: 'Telegram Bot Token не настроен на сервере!' });
+      }
+
+      let targetChatId = chatId || config.telegramChannelId;
+      if (!targetChatId && config.allowedChatIds) {
+        const ids = config.allowedChatIds.split(/[\s,]+/).map(id => id.trim()).filter(Boolean);
+        if (ids.length > 0) {
+          const firstId = ids[0];
+          if (!firstId.startsWith('-')) {
+            if (firstId.startsWith('100')) {
+              targetChatId = `-${firstId}`;
+            } else if (firstId.length >= 9) {
+              targetChatId = `-100${firstId}`;
+            } else {
+              targetChatId = firstId;
+            }
+          } else {
+            targetChatId = firstId;
+          }
+        }
+      }
+
+      if (!targetChatId) {
+        return res.status(400).json({ error: 'Целевой Chat ID или канал не настроен!' });
+      }
+
+      console.log(`[Telegram Notify] Sending message to ${targetChatId}`);
+      const response = await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: targetChatId,
+          text: text,
+          parse_mode: 'Markdown'
+        })
+      });
+
+      const data = await response.json() as any;
+      if (!response.ok || !data.ok) {
+        console.error('[Telegram Notify Error]:', data);
+        return res.status(400).json({ error: 'Ошибка отправки в Telegram API', details: data });
+      }
+
+      res.json({ success: true, message: 'Уведомление успешно отправлено!' });
+    } catch (err: any) {
+      console.error('[Telegram Notify Exception]:', err);
+      res.status(500).json({ error: err.message || 'Внутренняя ошибка сервера' });
     }
   });
 
