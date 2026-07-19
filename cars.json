@@ -17,7 +17,8 @@
     "color": "Серый металлик (Grey)",
     "images": [
       "/cars/vw_tharu_1.jpg",
-      "/cars/vw_tharu_2.jpg"
+      "/cars/vw_tharu_2.jpg",
+      "/cars/vw_tharu_3.jpg"
     ],
     "priceUSD": 21500,
     "recyclingFeeRUB": 3400,
@@ -50,7 +51,8 @@
     "color": "Белый жемчуг (White Pearl)",
     "images": [
       "/cars/toyota_rav4_1.jpg",
-      "/cars/toyota_rav4_2.jpg"
+      "/cars/toyota_rav4_2.jpg",
+      "/cars/toyota_rav4_3.jpg"
     ],
     "priceUSD": 28500,
     "recyclingFeeRUB": 3400,
