@@ -33,6 +33,7 @@ export default function App() {
       .then(data => {
         if (data && data.timestamp) {
           localStorage.setItem('dacar_cache_buster', data.timestamp);
+          useStore.getState().setCacheBuster(data.timestamp);
         }
       })
       .catch(e => console.warn('Failed to fetch cache buster:', e));
@@ -91,21 +92,6 @@ export default function App() {
   }, [activeCarId]);
 
   const renderActiveTab = () => {
-    // Если открыта конкретная карточка машины, рендерим её детали поверх любой вкладки
-    if (activeCarId) {
-      return (
-        <motion.div
-          key="car-details"
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -15 }}
-          transition={{ duration: 0.25, ease: 'easeOut' }}
-        >
-          <VehicleDetails />
-        </motion.div>
-      );
-    }
-
     switch (currentTab) {
       case 'home':
         return (
@@ -248,6 +234,21 @@ export default function App() {
         </AnimatePresence>
         <VehicleStories />
       </Layout>
+
+      <AnimatePresence>
+        {activeCarId && (
+          <motion.div
+            key="car-details-overlay"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+            className="fixed inset-0 bg-[#F0EEEC] z-40 overflow-y-auto"
+          >
+            <VehicleDetails />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

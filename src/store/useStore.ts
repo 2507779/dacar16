@@ -81,6 +81,7 @@ interface AppStore {
   homepageBannerTitle: string;
   homepageBannerSubtitle: string;
   selectedCity: string;
+  cacheBuster: string;
   
   // Editable App Texts & Contacts
   appTexts: AppTexts;
@@ -114,6 +115,7 @@ interface AppStore {
   setHomepageBannerUrl: (url: string) => void;
   setHomepageBannerTitle: (title: string) => void;
   setHomepageBannerSubtitle: (sub: string) => void;
+  setCacheBuster: (buster: string) => void;
   
   // Custom setters for texts and contacts
   setAppTexts: (texts: Partial<AppTexts>) => void;
@@ -228,6 +230,7 @@ export const useStore = create<AppStore>((set, get) => {
     homepageBannerTitle: savedBannerTitle,
     homepageBannerSubtitle: savedBannerSubtitle,
     selectedCity: savedCity,
+    cacheBuster: typeof window !== 'undefined' ? (localStorage.getItem('dacar_cache_buster') || Math.floor(Date.now() / (3600 * 1000)).toString()) : Math.floor(Date.now() / (3600 * 1000)).toString(),
     appTexts: {
       homeTitle: savedHomeTitle,
       homeSubtitle: savedHomeSubtitle,
@@ -516,6 +519,10 @@ export const useStore = create<AppStore>((set, get) => {
     setHomepageBannerSubtitle: (sub) => {
       localStorage.setItem('dacar_banner_subtitle', sub);
       set({ homepageBannerSubtitle: sub });
+    },
+
+    setCacheBuster: (buster) => {
+      set({ cacheBuster: buster });
     },
 
     setAppTexts: (newTexts) => set((state) => {

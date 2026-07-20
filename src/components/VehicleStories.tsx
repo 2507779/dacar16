@@ -122,10 +122,6 @@ export default function VehicleStories() {
     };
   }, [car, currentSlideIndex, isPaused, showOrderForm]);
 
-  if (!car) return null;
-
-  const calculated = calculateFullCarPrice(car, selectedCity);
-
   const handleClose = () => {
     triggerHaptic('medium');
     setActiveStoryCarId(null);
@@ -134,7 +130,7 @@ export default function VehicleStories() {
   const isFormValid = name.trim().length >= 2 && phone.trim().length >= 6 && !isSubmitting;
 
   const executeStoriesSubmission = () => {
-    if (!isFormValid || isSubmitting) return;
+    if (!isFormValid || isSubmitting || !car) return;
 
     triggerHaptic('success');
     setIsSubmitting(true);
@@ -171,6 +167,7 @@ export default function VehicleStories() {
 
   // Интеграция с Telegram MainButton для форм в сторис
   useEffect(() => {
+    if (!car) return;
     const tg = (window as any).Telegram?.WebApp;
     if (!tg || !tg.MainButton) return;
 
@@ -203,6 +200,10 @@ export default function VehicleStories() {
       tg.MainButton.hide();
     }
   }, [showOrderForm, name, phone, isFormValid, isSubmitting, orderSuccess, car, selectedCity]);
+
+  if (!car) return null;
+
+  const calculated = calculateFullCarPrice(car, selectedCity);
 
   // Кастомные фичи в левом столбце
   const defaultFeatures = [

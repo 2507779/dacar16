@@ -12,7 +12,7 @@ import { Heart, ChevronRight, MapPin, Truck, ShieldCheck, FileText, Send, X, Che
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function VehicleDetails() {
-  const { cars, activeCarId, setActiveCarId, favorites, toggleFavorite, addOrder, setCurrentTab, managerContacts, selectedCity, setSelectedCity } = useStore();
+  const { cars, activeCarId, setActiveCarId, favorites, toggleFavorite, addOrder, setCurrentTab, managerContacts, selectedCity, setSelectedCity, cacheBuster } = useStore();
   const [isOrderSheetOpen, setIsOrderSheetOpen] = useState(false);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);

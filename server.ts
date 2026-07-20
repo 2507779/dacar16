@@ -1398,13 +1398,40 @@ async function startServer() {
   });
 
   // Получить глобальный кэш-бастер на основе времени изменения cars.json или clear_cache.txt
-  app.get('/api/cache-buster', (req, res) => {
+  app.get('/api/cache-buster', async (req, res) => {
     try {
       const clearCachePath = path.join(process.cwd(), 'clear_cache.txt');
+      const config = readConfig();
       
-      // Если файл-триггер очистки кэша удален из репозитория, возвращаем уникальный таймштамп Date.now()
+      // Проверяем наличие clear_cache.txt в GitHub репозитории (raw CDN) для мгновенного сброса
+      let gitFileExists = true;
+      if (config.githubRepo) {
+        const branch = config.githubBranch || 'main';
+        const rawUrl = `https://raw.githubusercontent.com/${config.githubRepo}/${branch}/clear_cache.txt`;
+        try {
+          const checkRes = await fetch(rawUrl, { method: 'HEAD', headers: { 'User-Agent': 'Dacar16-Integration' } });
+          if (checkRes.status === 404) {
+            gitFileExists = false;
+            // Если локально файл все еще есть, удаляем его
+            if (fs.existsSync(clearCachePath)) {
+              fs.unlinkSync(clearCachePath);
+              console.log('[Cache Buster] clear_cache.txt was deleted from GitHub. Deleted local file as well.');
+            }
+          } else if (checkRes.ok) {
+            // Если файла локально нет, но в гите он появился, восстанавливаем его локально
+            if (!fs.existsSync(clearCachePath)) {
+              fs.writeFileSync(clearCachePath, 'Файл существует на GitHub. Очистка кэша не требуется.', 'utf-8');
+              console.log('[Cache Buster] clear_cache.txt recreated on GitHub. Re-created locally.');
+            }
+          }
+        } catch (err) {
+          console.warn('[Cache Buster] Failed to check clear_cache.txt on GitHub raw CDN, using local cache state:', err);
+        }
+      }
+
+      // Если файл-триггер очистки кэша отсутствует локально или на GitHub, возвращаем уникальный таймштамп Date.now()
       // Это заставляет все устройства мгновенно очистить кэш картинок и загрузить всё заново.
-      if (!fs.existsSync(clearCachePath)) {
+      if (!gitFileExists || !fs.existsSync(clearCachePath)) {
         console.log('[Cache Buster] clear_cache.txt is missing/deleted! Forcing full cache reset on all devices.');
         return res.json({ timestamp: Date.now().toString() });
       }

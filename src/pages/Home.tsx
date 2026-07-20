@@ -16,7 +16,8 @@ export default function Home() {
     appTexts,
     favorites,
     toggleFavorite,
-    selectedCity
+    selectedCity,
+    cacheBuster
   } = useStore();
 
   // Feature 9: Onboarding Stories

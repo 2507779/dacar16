@@ -59,7 +59,8 @@ export default function Catalog() {
     setActiveStoryCarId,
     favorites,
     toggleFavorite,
-    selectedCity
+    selectedCity,
+    cacheBuster
   } = useStore();
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
