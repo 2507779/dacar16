@@ -348,6 +348,41 @@ export function AdminPanel() {
       const res = await fetch('/api/telegram/config');
       if (res.ok) {
         const data = await res.json();
+        
+        // Самовосстановление токенов из localStorage при перезапуске контейнера
+        const savedBotToken = localStorage.getItem('tg_bot_token') || '';
+        const savedGithubToken = localStorage.getItem('github_token') || '';
+        
+        if (!data.hasRawTokens && (savedBotToken || savedGithubToken)) {
+          console.log('[Self-Healing] Восстановление секретов Telegram/GitHub из localStorage браузера...');
+          await fetch('/api/telegram/config', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              telegramBotToken: savedBotToken || undefined,
+              githubToken: savedGithubToken || undefined,
+              githubRepo: data.githubRepo || '2507779/dacar16',
+              githubBranch: data.githubBranch || 'main',
+              allowedChatIds: data.allowedChatIds || ''
+            })
+          });
+          
+          const retryRes = await fetch('/api/telegram/config');
+          if (retryRes.ok) {
+            const retryData = await retryRes.json();
+            setTgGitBotToken(retryData.telegramBotToken || '');
+            setTgGitGithubToken(retryData.githubToken || '');
+            setTgGitGithubRepo(retryData.githubRepo || '2507779/dacar16');
+            setTgGitGithubBranch(retryData.githubBranch || 'main');
+            setTgGitAllowedChatIds(retryData.allowedChatIds || '');
+            setTgGitWebhookRegistered(retryData.webhookRegistered || false);
+            if (retryData.lastGithubError) {
+              setLastGithubError(retryData.lastGithubError);
+            }
+            return;
+          }
+        }
+
         setTgGitBotToken(data.telegramBotToken || '');
         setTgGitGithubToken(data.githubToken || '');
         setTgGitGithubRepo(data.githubRepo || '2507779/dacar16');
@@ -369,6 +404,21 @@ export function AdminPanel() {
     try {
       setTgGitLoading(true);
       setTgGitStatus({ type: '', message: '' });
+      
+      // Сохраняем реальные не маскированные токены в localStorage браузера
+      if (tgGitBotToken && !tgGitBotToken.includes('...')) {
+        localStorage.setItem('tg_bot_token', tgGitBotToken);
+      }
+      if (tgGitGithubToken && !tgGitGithubToken.includes('...')) {
+        localStorage.setItem('github_token', tgGitGithubToken);
+      }
+      if (tgGitAllowedChatIds) {
+        const ids = tgGitAllowedChatIds.split(/[\s,]+/).map(id => id.trim()).filter(Boolean);
+        if (ids.length > 0) {
+          localStorage.setItem('tg_channel_id', ids[0]);
+        }
+      }
+
       const res = await fetch('/api/telegram/config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

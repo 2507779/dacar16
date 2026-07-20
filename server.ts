@@ -489,7 +489,7 @@ async function startServer() {
 
       for (const target of targetList) {
         try {
-          const response = await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendMessage`, {
+          let response = await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -499,7 +499,26 @@ async function startServer() {
             })
           });
 
-          const data = await response.json() as any;
+          let data = await response.json() as any;
+
+          // Автоматический откат к отправке без разметки (plain text) при ошибке парсинга Markdown
+          if (!response.ok || !data.ok) {
+            const desc = (data.description || '').toLowerCase();
+            if (desc.includes('parse') || desc.includes('entities') || desc.includes('markdown') || desc.includes('bad request')) {
+              console.log(`[Telegram Notify Fallback] Ошибка парсинга Markdown для ${target}. Пробуем отправить как чистый текст...`);
+              const plainText = text.replace(/\*\*/g, '').replace(/\*/g, '');
+              response = await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  chat_id: target,
+                  text: plainText
+                })
+              });
+              data = await response.json() as any;
+            }
+          }
+
           if (response.ok && data.ok) {
             successCount++;
             results.push({ target, success: true });
