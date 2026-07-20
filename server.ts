@@ -1314,14 +1314,87 @@ async function startServer() {
     }
   });
 
-  // Ручная синхронизация базы с GitHub
+  // Ручная синхронизация базы с GitHub и умная очистка локального кэша изображений
   app.post('/api/cars/pull', async (req, res) => {
     try {
+      // 1. Скачиваем актуальную версию cars.json из GitHub
       await pullCarsFromGithub();
-      return res.json({ success: true, message: 'Данные каталога успешно синхронизированы с GitHub!' });
+
+      // Если в процессе скачивания возникла ошибка, прерываем и возвращаем её пользователю
+      if (lastGithubError) {
+        return res.status(400).json({ 
+          success: false, 
+          error: lastGithubError 
+        });
+      }
+
+      // 2. Умная очистка кэша: удаляем локально ТОЛЬКО те файлы из public/cars, 
+      // которые реально существуют в репозитории GitHub (чтобы они обновились на свежие версии),
+      // а все остальные локально загруженные пользователем файлы оставляем нетронутыми!
+      const config = readConfig();
+      let clearedFilesCount = 0;
+      let isSmartCleared = false;
+
+      if (config.githubToken && config.githubRepo) {
+        try {
+          const gitPhotosResult = await listGithubPhotosWithOctokit(
+            config.githubToken,
+            config.githubRepo,
+            config.githubBranch || 'main'
+          );
+          
+          if (gitPhotosResult.success && gitPhotosResult.files) {
+            const gitFilenames = new Set(gitPhotosResult.files.map(f => f.name.toLowerCase()));
+            const publicCarsDir = path.join(process.cwd(), 'public', 'cars');
+            
+            if (fs.existsSync(publicCarsDir)) {
+              const files = fs.readdirSync(publicCarsDir);
+              for (const file of files) {
+                // Удаляем только если файл есть на GitHub (т.е. это файл репозитория, который может обновиться)
+                if (gitFilenames.has(file.toLowerCase())) {
+                  const filePath = path.join(publicCarsDir, file);
+                  if (fs.statSync(filePath).isFile()) {
+                    try {
+                      fs.unlinkSync(filePath);
+                      clearedFilesCount++;
+                    } catch (unlinkErr) {
+                      console.warn(`[Cache Clear] Failed to delete file ${file}:`, unlinkErr);
+                    }
+                  }
+                }
+              }
+              isSmartCleared = true;
+            }
+          }
+        } catch (listErr) {
+          console.error('[Cache Clear] Failed to list GitHub photos for smart cache clearing:', listErr);
+        }
+      }
+
+      console.log(`[Cache Clear] Smart cache clearing finished. Deleted ${clearedFilesCount} GitHub-synced files. Local-only files preserved.`);
+
+      return res.json({ 
+        success: true, 
+        message: isSmartCleared 
+          ? `Данные каталога успешно синхронизированы с GitHub! Локальный кэш обновлен (удалено устаревших файлов с GitHub: ${clearedFilesCount}). Ваши локальные файлы сохранены!`
+          : `Данные каталога успешно синхронизированы с GitHub! Локальные файлы сохранены.`
+      });
     } catch (err: any) {
       console.error('Error pulling cars database:', err);
       return res.status(500).json({ error: err.message || 'Failed to pull cars database' });
+    }
+  });
+
+  // Получить глобальный кэш-бастер на основе времени изменения cars.json
+  app.get('/api/cache-buster', (req, res) => {
+    try {
+      let mtime = Date.now();
+      if (fs.existsSync(CARS_FILE_PATH)) {
+        mtime = fs.statSync(CARS_FILE_PATH).mtimeMs;
+      }
+      return res.json({ timestamp: Math.floor(mtime).toString() });
+    } catch (err) {
+      return res.json({ timestamp: Date.now().toString() });
     }
   });
 

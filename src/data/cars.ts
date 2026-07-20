@@ -194,19 +194,28 @@ export function getCarImages(car: any): string[] {
     ];
   }
 
-  // Добавляем кэш-бастер при наличии в localStorage для предотвращения показа старых фото
-  const buster = typeof window !== 'undefined' ? localStorage.getItem('dacar_cache_buster') : null;
-  if (buster) {
-    return rawImages.map(img => {
-      const cleanImg = img.split('?')[0];
-      if (cleanImg.startsWith('/') && !cleanImg.includes('?')) {
-        return `${cleanImg}?cb=${buster}`;
-      }
-      return cleanImg;
-    });
+  // Добавляем кэш-бастер при наличии в localStorage для предотвращения показа старых фото.
+  // Если кэш-бастера еще нет (первый визит), используем часовой кэш-бастер в качестве надежного фолбека.
+  // Это гарантирует, что новые фото отобразятся максимум через час у всех клиентов абсолютно автоматически!
+  let buster = typeof window !== 'undefined' ? localStorage.getItem('dacar_cache_buster') : null;
+  if (!buster) {
+    buster = Math.floor(Date.now() / (3600 * 1000)).toString();
   }
 
-  return rawImages;
+  return rawImages.map(img => {
+    if (!img || img.startsWith('data:')) return img;
+    
+    const cleanImg = img.split('?')[0];
+    
+    if (cleanImg.includes('//')) {
+      // Внешние URL
+      return cleanImg.includes('?') ? `${cleanImg}&cb=${buster}` : `${cleanImg}?cb=${buster}`;
+    } else {
+      // Локальные пути
+      const normalized = cleanImg.startsWith('/') ? cleanImg : `/${cleanImg}`;
+      return `${normalized}?cb=${buster}`;
+    }
+  });
 }
 
 // Безопасное получение списка характеристик/опций

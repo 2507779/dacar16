@@ -26,7 +26,16 @@ export default function App() {
   useEffect(() => {
     // Загружаем актуальную базу автомобилей с сервера для мгновенного отображения всем посетителям
     loadCarsFromServer();
-    fetchCars();
+
+    // Запрашиваем актуальный глобальный кэш-бастер с сервера
+    fetch('/api/cache-buster')
+      .then(r => r.json())
+      .then(data => {
+        if (data && data.timestamp) {
+          localStorage.setItem('dacar_cache_buster', data.timestamp);
+        }
+      })
+      .catch(e => console.warn('Failed to fetch cache buster:', e));
 
     // Инициализация Telegram WebApp API
     const tg = (window as any).Telegram?.WebApp;

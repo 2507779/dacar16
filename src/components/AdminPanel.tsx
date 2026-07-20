@@ -3158,7 +3158,21 @@ export const CARS_DATA: Car[] = ${formattedCars};
                             Готовые премиум пресеты баннеров
                           </span>
 
-                          <div className="grid grid-cols-2 gap-2">
+                          <div className="grid grid-cols-3 gap-2">
+                            <button
+                              onClick={() => applyPresetBanner(
+                                'https://images.unsplash.com/photo-1590579491410-b996726244bc?auto=format&fit=crop&w=1200&q=80',
+                                'Автомобили под заказ',
+                                'без лишних хлопот'
+                              )}
+                              className="bg-[#F5F7FA] border border-[#E5E7EB]/60 p-2.5 rounded-xl hover:border-[#2563EB] text-left transition"
+                            >
+                              <div className="aspect-video w-full rounded-lg bg-slate-200 overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1590579491410-b996726244bc?auto=format&fit=crop&w=300&q=80" alt="" className="w-full h-full object-cover" />
+                              </div>
+                              <span className="text-[10px] font-bold text-[#111827] block mt-1.5 truncate">г. Казань (Главный)</span>
+                            </button>
+
                             <button
                               onClick={() => applyPresetBanner(
                                 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80',

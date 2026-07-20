@@ -310,7 +310,14 @@ export default function Profile() {
                       // Перезагрузим окно для полной перезагрузки картинок браузером
                       window.location.reload();
                     } else {
-                      alert('⚠️ Ошибка синхронизации с сервером, но локальный кэш браузера был сброшен.');
+                      let errMsg = 'Неизвестная ошибка на сервере';
+                      try {
+                        const errData = await res.json();
+                        if (errData && errData.error) {
+                          errMsg = errData.error;
+                        }
+                      } catch (_) {}
+                      alert(`⚠️ Ошибка синхронизации с сервером: ${errMsg}`);
                     }
                   } catch (err) {
                     console.error(err);

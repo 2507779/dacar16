@@ -149,8 +149,8 @@ export const useStore = create<AppStore>((set, get) => {
     localStorage.setItem('dacar_all_cars', JSON.stringify(CARS_DATA));
   }
 
-  // Загрузка кастомизации баннера
-  const savedBannerUrl = localStorage.getItem('dacar_banner_url') || '';
+  // Загрузка кастомизации баннера (по умолчанию красивая фотография г. Казань)
+  const savedBannerUrl = localStorage.getItem('dacar_banner_url') || 'https://images.unsplash.com/photo-1590579491410-b996726244bc?auto=format&fit=crop&w=1200&q=80';
   const savedBannerTitle = localStorage.getItem('dacar_banner_title') || 'Автомобили из Азии';
   const savedBannerSubtitle = localStorage.getItem('dacar_banner_subtitle') || 'под ключ в РФ';
 
@@ -371,6 +371,7 @@ export const useStore = create<AppStore>((set, get) => {
     addCar: (newCar) => {
       const updatedCars = [...get().cars, newCar];
       localStorage.setItem('dacar_all_cars', JSON.stringify(updatedCars));
+      localStorage.setItem('dacar_cache_buster', Date.now().toString());
       set({ cars: updatedCars });
       fetch('/api/cars', {
         method: 'POST',
@@ -387,6 +388,7 @@ export const useStore = create<AppStore>((set, get) => {
         return car;
       });
       localStorage.setItem('dacar_all_cars', JSON.stringify(updatedCars));
+      localStorage.setItem('dacar_cache_buster', Date.now().toString());
       set({ cars: updatedCars });
       fetch('/api/cars', {
         method: 'POST',
@@ -398,6 +400,7 @@ export const useStore = create<AppStore>((set, get) => {
     deleteCar: (carId) => {
       const updatedCars = get().cars.filter(c => c.id !== carId);
       localStorage.setItem('dacar_all_cars', JSON.stringify(updatedCars));
+      localStorage.setItem('dacar_cache_buster', Date.now().toString());
       set({ cars: updatedCars });
       fetch('/api/cars', {
         method: 'POST',
@@ -408,6 +411,7 @@ export const useStore = create<AppStore>((set, get) => {
 
     setCars: (newCars) => {
       localStorage.setItem('dacar_all_cars', JSON.stringify(newCars));
+      localStorage.setItem('dacar_cache_buster', Date.now().toString());
       set({ cars: newCars });
       fetch('/api/cars', {
         method: 'POST',
