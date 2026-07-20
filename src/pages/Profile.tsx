@@ -16,6 +16,7 @@ export default function Profile() {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const [activeConsultation, setActiveConsultation] = useState(false);
   const [avatarClicks, setAvatarClicks] = useState(0);
+  const [isCallbackSubmitting, setIsCallbackSubmitting] = useState(false);
 
   // Настройки комфорта интерфейса
   const [hapticsEnabled, setHapticsEnabled] = useState(() => localStorage.getItem('dacar_settings_haptics') !== 'false');
@@ -486,10 +487,12 @@ export default function Profile() {
                   <input
                     type="tel"
                     id="callback-phone-input"
+                    disabled={isCallbackSubmitting}
                     placeholder="+7 (999) 000-00-00"
-                    className="flex-1 bg-white border border-[#EFEBE4] text-xs rounded-xl px-3 py-2 outline-none focus:border-[#C5A880]/50"
+                    className="flex-1 bg-white border border-[#EFEBE4] text-xs rounded-xl px-3 py-2 outline-none focus:border-[#C5A880]/50 disabled:opacity-50"
                   />
                   <button
+                    disabled={isCallbackSubmitting}
                     onClick={() => {
                       const inp = document.getElementById('callback-phone-input') as HTMLInputElement;
                       if (!inp || !inp.value.trim()) {
@@ -499,6 +502,7 @@ export default function Profile() {
                       
                       const phone = inp.value.trim();
                       triggerHaptic('success');
+                      setIsCallbackSubmitting(true);
                       
                       // Добавим в чат сообщение пользователя и ответ менеджера
                       setConsultationChat(prev => [
@@ -526,6 +530,7 @@ export default function Profile() {
                           })
                         })
                         .then(async (res) => {
+                          setIsCallbackSubmitting(false);
                           if (!res.ok) {
                             console.warn('Secure Telegram notification proxy returned error, attempting direct client fallback...');
                             const botToken = localStorage.getItem('tg_bot_token') || APP_CONFIG.DEFAULT_TG_BOT_TOKEN;
@@ -543,6 +548,7 @@ export default function Profile() {
                           }
                         })
                         .catch(err => {
+                          setIsCallbackSubmitting(false);
                           console.error('Secure notification failed, attempting direct client fallback...', err);
                           const botToken = localStorage.getItem('tg_bot_token') || APP_CONFIG.DEFAULT_TG_BOT_TOKEN;
                           if (botToken && channelId) {
@@ -558,12 +564,13 @@ export default function Profile() {
                           }
                         });
                       } catch (e) {
+                        setIsCallbackSubmitting(false);
                         console.error('Callback TG error:', e);
                       }
                     }}
-                    className="bg-[#1C1917] hover:bg-[#2E2A27] text-white text-[10px] font-black uppercase px-3 rounded-xl transition active:scale-95 cursor-pointer"
+                    className="bg-[#1C1917] hover:bg-[#2E2A27] text-white text-[10px] font-black uppercase px-3 rounded-xl transition active:scale-95 cursor-pointer disabled:opacity-50"
                   >
-                    Перезвонить
+                    {isCallbackSubmitting ? 'Отправка...' : 'Перезвонить'}
                   </button>
                 </div>
               </div>

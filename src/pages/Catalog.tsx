@@ -68,6 +68,23 @@ export default function Catalog() {
   const [isLoading, setIsLoading] = useState(false);
   const [visibleCount, setVisibleCount] = useState(8);
 
+  // Локальный поисковый ввод для дебаунса
+  const [localSearch, setLocalSearch] = useState(searchQuery);
+
+  // Синхронизация при изменении searchQuery извне (например, при сбросе фильтров)
+  React.useEffect(() => {
+    setLocalSearch(searchQuery);
+  }, [searchQuery]);
+
+  // Дебаунс обновления глобального поискового запроса
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchQuery(localSearch);
+    }, 250); // Комфортные 250мс для моментального применения без лагов
+
+    return () => clearTimeout(timer);
+  }, [localSearch, setSearchQuery]);
+
   React.useEffect(() => {
     setIsLoading(true);
     const timer = setTimeout(() => {
@@ -266,15 +283,15 @@ export default function Catalog() {
             <input
               type="text"
               placeholder="Марка, модель авто..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={localSearch}
+              onChange={(e) => setLocalSearch(e.target.value)}
               className="bg-transparent text-sm text-[#1C1917] outline-none w-full placeholder-[#78716C]/60 font-sans"
             />
-            {searchQuery && (
+            {localSearch && (
               <button
                 onClick={() => {
                   triggerHaptic('light');
-                  setSearchQuery('');
+                  setLocalSearch('');
                 }}
               >
                 <X className="w-4 h-4 text-[#78716C]" />

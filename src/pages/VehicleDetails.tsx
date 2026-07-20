@@ -50,6 +50,7 @@ export default function VehicleDetails() {
   const [userName, setUserName] = useState('');
   const [userPhone, setUserPhone] = useState('');
   const [orderSuccess, setOrderSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Опции премиум-калькулятора (Feature 4)
   const [fastDelivery, setFastDelivery] = useState(false);
@@ -81,7 +82,7 @@ export default function VehicleDetails() {
   }, [activeCarId]);
 
   // Валидация телефона
-  const isFormValid = userName.trim().length >= 2 && userPhone.trim().length >= 6;
+  const isFormValid = userName.trim().length >= 2 && userPhone.trim().length >= 6 && !isSubmitting;
 
   // Определение типа звука по марке/модели
   const getEngineSoundType = (vehicle: any): 'v12' | 'v8' | 'inline6' | 'electric' => {
@@ -194,21 +195,28 @@ export default function VehicleDetails() {
   };
 
   const handleOpenOrderSheet = () => {
+    if (isSubmitting) return;
     triggerHaptic('medium');
     setIsOrderSheetOpen(true);
   };
 
   const handleCloseOrderSheet = () => {
+    if (isSubmitting) return;
     triggerHaptic('light');
     setIsOrderSheetOpen(false);
   };
 
-  const handleSubmitOrder = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isFormValid) return;
+  const executeOrderSubmission = () => {
+    if (!isFormValid || isSubmitting) return;
 
     triggerHaptic('success');
+    setIsSubmitting(true);
     
+    const tg = (window as any).Telegram?.WebApp;
+    if (tg && tg.MainButton) {
+      tg.MainButton.showProgress();
+    }
+
     // Передаем базовую стоимость под ключ
     const finalAdjustedPrice = calculated.finalPriceRUB;
     
@@ -220,25 +228,89 @@ export default function VehicleDetails() {
     const currentOrders = JSON.parse(localStorage.getItem('dacar_orders') || '[]');
     if (currentOrders.length > 0) {
       currentOrders[0].finalPriceRUB = finalAdjustedPrice;
-      // Допишем комменты лида
       currentOrders[0].notes = `Заявка на бесплатную консультацию и расчет.`;
       localStorage.setItem('dacar_orders', JSON.stringify(currentOrders));
     }
 
-    setOrderSuccess(true);
-    setIsOrderSheetOpen(false);
-
-    // Сброс формы
-    setUserName('');
-    setUserPhone('');
-
-    // Редирект на экран заказов через 6 секунд
+    // Симулируем приятную задержку отправки (800мс), чтобы показать спиннер на кнопке
     setTimeout(() => {
-      setOrderSuccess(false);
-      setActiveCarId(null); // Закрываем детальный вид
-      setCurrentTab('orders'); // Переключаем на заказы
-    }, 6000);
+      setIsSubmitting(false);
+      setOrderSuccess(true);
+      setIsOrderSheetOpen(false);
+
+      // Сброс формы
+      setUserName('');
+      setUserPhone('');
+
+      if (tg && tg.MainButton) {
+        tg.MainButton.hideProgress();
+        tg.MainButton.hide();
+      }
+
+      // Редирект на экран заказов через 6 секунд
+      setTimeout(() => {
+        setOrderSuccess(false);
+        setActiveCarId(null); // Закрываем детальный вид
+        setCurrentTab('orders'); // Переключаем на заказы
+      }, 6000);
+    }, 800);
   };
+
+  const handleSubmitOrder = (e: React.FormEvent) => {
+    e.preventDefault();
+    executeOrderSubmission();
+  };
+
+  // Синхронизация Telegram MainButton для идеального нативного опыта
+  useEffect(() => {
+    const tg = (window as any).Telegram?.WebApp;
+    if (!tg || !tg.MainButton) return;
+
+    if (activeCarId && !orderSuccess) {
+      tg.MainButton.show();
+
+      if (!isOrderSheetOpen) {
+        tg.MainButton.setText('ПОЛУЧИТЬ РАСЧЕТ И КОНСУЛЬТАЦИЮ');
+        tg.MainButton.enable();
+        tg.MainButton.hideProgress();
+
+        const handleMainClick = () => {
+          triggerHaptic('medium');
+          setIsOrderSheetOpen(true);
+        };
+        tg.MainButton.onClick(handleMainClick);
+        return () => {
+          tg.MainButton.offClick(handleMainClick);
+        };
+      } else {
+        if (isSubmitting) {
+          tg.MainButton.setText('ОТПРАВКА ЗАЯВКИ...');
+          tg.MainButton.disable();
+          tg.MainButton.showProgress();
+        } else if (isFormValid) {
+          tg.MainButton.setText('ОТПРАВИТЬ ЗАЯВКУ В DA!CAR');
+          tg.MainButton.enable();
+          tg.MainButton.hideProgress();
+        } else {
+          tg.MainButton.setText('ЗАПОЛНИТЕ ИМЯ И ТЕЛЕФОН');
+          tg.MainButton.disable();
+          tg.MainButton.hideProgress();
+        }
+
+        const handleMainClick = () => {
+          if (isFormValid && !isSubmitting) {
+            executeOrderSubmission();
+          }
+        };
+        tg.MainButton.onClick(handleMainClick);
+        return () => {
+          tg.MainButton.offClick(handleMainClick);
+        };
+      }
+    } else {
+      tg.MainButton.hide();
+    }
+  }, [activeCarId, isOrderSheetOpen, userName, userPhone, isFormValid, isSubmitting, orderSuccess]);
 
   return (
     <div className="flex flex-col text-[#1C1917] pb-16 select-none relative bg-[#F0EEEC]">
@@ -522,10 +594,11 @@ export default function VehicleDetails() {
                   <input
                      type="text"
                      required
+                     disabled={isSubmitting}
                      value={userName}
                      onChange={(e) => setUserName(e.target.value)}
                      placeholder="Константин Konstantinopolsky"
-                     className="w-full bg-[#F0EEEC] border border-[#EFEBE4] text-xs font-semibold text-[#1C1917] rounded-xl px-4 py-3.5 outline-none focus:border-[#C5A880]/50 transition duration-300"
+                     className="w-full bg-[#F0EEEC] border border-[#EFEBE4] text-xs font-semibold text-[#1C1917] rounded-xl px-4 py-3.5 outline-none focus:border-[#C5A880]/50 transition duration-300 disabled:opacity-50"
                   />
                 </div>
 
@@ -534,10 +607,11 @@ export default function VehicleDetails() {
                   <input
                      type="tel"
                      required
+                     disabled={isSubmitting}
                      value={userPhone}
                      onChange={(e) => setUserPhone(e.target.value)}
                      placeholder="+7 (999) 000-00-00"
-                     className="w-full bg-[#F0EEEC] border border-[#EFEBE4] text-xs font-semibold text-[#1C1917] rounded-xl px-4 py-3.5 outline-none focus:border-[#C5A880]/50 transition duration-300"
+                     className="w-full bg-[#F0EEEC] border border-[#EFEBE4] text-xs font-semibold text-[#1C1917] rounded-xl px-4 py-3.5 outline-none focus:border-[#C5A880]/50 transition duration-300 disabled:opacity-50"
                   />
                 </div>
 
@@ -553,14 +627,14 @@ export default function VehicleDetails() {
 
                 <button
                   type="submit"
-                  disabled={!isFormValid}
+                  disabled={!isFormValid || isSubmitting}
                   className={`w-full py-4 rounded-xl text-xs font-black uppercase tracking-wider transition-bezier mt-6 cursor-pointer shadow-md ${
-                    isFormValid
+                    isFormValid && !isSubmitting
                       ? 'bg-[#C5A880] text-white hover:bg-[#B0936B] active:scale-95'
                       : 'bg-[#EFEBE4]/40 text-[#78716C]/50 border border-[#EFEBE4]/50 cursor-not-allowed'
                   }`}
                 >
-                  Отправить заявку в DA!CAR
+                  {isSubmitting ? 'Отправка...' : 'Отправить заявку в DA!CAR'}
                 </button>
               </form>
             </motion.div>

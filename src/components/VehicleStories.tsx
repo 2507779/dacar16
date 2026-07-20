@@ -36,6 +36,7 @@ export default function VehicleStories() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [orderSuccess, setOrderSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Реф для отслеживания таймера
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -130,24 +131,78 @@ export default function VehicleStories() {
     setActiveStoryCarId(null);
   };
 
-  const handleOrderSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!name.trim() || !phone.trim()) {
-      triggerHaptic('error');
-      return;
+  const isFormValid = name.trim().length >= 2 && phone.trim().length >= 6 && !isSubmitting;
+
+  const executeStoriesSubmission = () => {
+    if (!isFormValid || isSubmitting) return;
+
+    triggerHaptic('success');
+    setIsSubmitting(true);
+
+    const tg = (window as any).Telegram?.WebApp;
+    if (tg && tg.MainButton) {
+      tg.MainButton.showProgress();
     }
 
     addOrder(car, name, phone, selectedCity);
-    triggerHaptic('success');
-    setOrderSuccess(true);
-    setName('');
-    setPhone('');
-    
+
     setTimeout(() => {
-      setShowOrderForm(false);
-      setOrderSuccess(false);
-    }, 2500);
+      setIsSubmitting(false);
+      setOrderSuccess(true);
+      setName('');
+      setPhone('');
+
+      if (tg && tg.MainButton) {
+        tg.MainButton.hideProgress();
+        tg.MainButton.hide();
+      }
+
+      setTimeout(() => {
+        setShowOrderForm(false);
+        setOrderSuccess(false);
+      }, 2500);
+    }, 800);
   };
+
+  const handleOrderSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    executeStoriesSubmission();
+  };
+
+  // Интеграция с Telegram MainButton для форм в сторис
+  useEffect(() => {
+    const tg = (window as any).Telegram?.WebApp;
+    if (!tg || !tg.MainButton) return;
+
+    if (showOrderForm && !orderSuccess) {
+      tg.MainButton.show();
+      if (isSubmitting) {
+        tg.MainButton.setText('ОТПРАВКА...');
+        tg.MainButton.disable();
+        tg.MainButton.showProgress();
+      } else if (isFormValid) {
+        tg.MainButton.setText('ОТПРАВИТЬ ЗАЯВКУ');
+        tg.MainButton.enable();
+        tg.MainButton.hideProgress();
+      } else {
+        tg.MainButton.setText('ЗАПОЛНИТЕ ИМЯ И ТЕЛЕФОН');
+        tg.MainButton.disable();
+        tg.MainButton.hideProgress();
+      }
+
+      const handleMainClick = () => {
+        if (isFormValid && !isSubmitting) {
+          executeStoriesSubmission();
+        }
+      };
+      tg.MainButton.onClick(handleMainClick);
+      return () => {
+        tg.MainButton.offClick(handleMainClick);
+      };
+    } else {
+      tg.MainButton.hide();
+    }
+  }, [showOrderForm, name, phone, isFormValid, isSubmitting, orderSuccess, car, selectedCity]);
 
   // Кастомные фичи в левом столбце
   const defaultFeatures = [
@@ -553,9 +608,10 @@ export default function VehicleStories() {
                     <input 
                       type="text" 
                       placeholder="Иван Иванов"
+                      disabled={isSubmitting}
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-[#F0EEEC] border border-[#EFEBE4] rounded-xl px-3.5 py-2.5 text-xs text-[#1C1917] outline-none focus:border-[#C5A880] font-sans font-semibold transition"
+                      className="w-full bg-[#F0EEEC] border border-[#EFEBE4] rounded-xl px-3.5 py-2.5 text-xs text-[#1C1917] outline-none focus:border-[#C5A880] font-sans font-semibold transition disabled:opacity-50"
                       required
                     />
                   </div>
@@ -566,9 +622,10 @@ export default function VehicleStories() {
                     <input 
                       type="tel" 
                       placeholder="+7 (999) 123-45-67"
+                      disabled={isSubmitting}
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full bg-[#F0EEEC] border border-[#EFEBE4] rounded-xl px-3.5 py-2.5 text-xs text-[#1C1917] outline-none focus:border-[#C5A880] font-sans font-semibold transition"
+                      className="w-full bg-[#F0EEEC] border border-[#EFEBE4] rounded-xl px-3.5 py-2.5 text-xs text-[#1C1917] outline-none focus:border-[#C5A880] font-sans font-semibold transition disabled:opacity-50"
                       required
                     />
                   </div>
@@ -576,9 +633,14 @@ export default function VehicleStories() {
                   {/* Кнопка отправки */}
                   <button 
                     type="submit"
-                    className="w-full bg-[#C5A880] hover:bg-[#B0936B] text-[#1C1917] font-display font-black text-xs uppercase py-3.5 px-4 rounded-xl shadow-lg transition active:scale-[0.98] flex items-center justify-center space-x-1.5 cursor-pointer mt-4"
+                    disabled={!isFormValid || isSubmitting}
+                    className={`w-full text-[#1C1917] font-display font-black text-xs uppercase py-3.5 px-4 rounded-xl shadow-lg transition active:scale-[0.98] flex items-center justify-center space-x-1.5 cursor-pointer mt-4 ${
+                      isFormValid && !isSubmitting
+                        ? 'bg-[#C5A880] hover:bg-[#B0936B]'
+                        : 'bg-[#EFEBE4]/40 text-[#78716C]/50 border border-[#EFEBE4]/50 cursor-not-allowed'
+                    }`}
                   >
-                    <span>Отправить заявку менеджеру</span>
+                    <span>{isSubmitting ? 'Отправка...' : 'Отправить заявку менеджеру'}</span>
                     <ChevronRightIcon className="w-4 h-4" />
                   </button>
                 </form>
