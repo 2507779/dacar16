@@ -3,6 +3,7 @@
   "githubBranch": "main",
   "allowedChatIds": "1004472641899,54538879",
   "webhookRegistered": true,
+  "telegramChannelId": "",
   "telegramBotToken": "",
   "githubToken": ""
 }

@@ -353,14 +353,20 @@ export function AdminPanel() {
         const savedBotToken = localStorage.getItem('tg_bot_token') || '';
         const savedGithubToken = localStorage.getItem('github_token') || '';
         
-        if (!data.hasRawTokens && (savedBotToken || savedGithubToken)) {
+        const hasServerBotToken = !!data.telegramBotToken;
+        const hasServerGithubToken = !!data.githubToken;
+        
+        const needsBotTokenRestore = !hasServerBotToken && savedBotToken;
+        const needsGithubTokenRestore = !hasServerGithubToken && savedGithubToken;
+        
+        if (needsBotTokenRestore || needsGithubTokenRestore) {
           console.log('[Self-Healing] Восстановление секретов Telegram/GitHub из localStorage браузера...');
           await fetch('/api/telegram/config', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              telegramBotToken: savedBotToken || undefined,
-              githubToken: savedGithubToken || undefined,
+              telegramBotToken: needsBotTokenRestore ? savedBotToken : undefined,
+              githubToken: needsGithubTokenRestore ? savedGithubToken : undefined,
               githubRepo: data.githubRepo || '2507779/dacar16',
               githubBranch: data.githubBranch || 'main',
               allowedChatIds: data.allowedChatIds || ''

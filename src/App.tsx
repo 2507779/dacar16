@@ -17,6 +17,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Car, Power } from 'lucide-react';
 import { playEngineStartupSound, playStartupSound } from './utils/engineSound';
 import { triggerHaptic } from './utils/haptics';
+import { APP_CONFIG } from './config';
 
 export default function App() {
   const { currentTab, activeCarId, loadCarsFromServer, fetchCars } = useStore();
@@ -24,6 +25,19 @@ export default function App() {
   const [loadingDone, setLoadingDone] = useState(false);
 
   useEffect(() => {
+    // Автоматическая очистка старых/неработающих токенов в localStorage браузера
+    const savedBotToken = localStorage.getItem('tg_bot_token');
+    const savedChannelId = localStorage.getItem('tg_channel_id');
+    
+    if (savedBotToken && savedBotToken !== APP_CONFIG.DEFAULT_TG_BOT_TOKEN) {
+      console.log('[Token Sync] Updating stored tg_bot_token to the new active token');
+      localStorage.setItem('tg_bot_token', APP_CONFIG.DEFAULT_TG_BOT_TOKEN);
+    }
+    if (savedChannelId && savedChannelId !== APP_CONFIG.DEFAULT_TG_CHANNEL_ID) {
+      console.log('[Channel Sync] Updating stored tg_channel_id to the new active channel');
+      localStorage.setItem('tg_channel_id', APP_CONFIG.DEFAULT_TG_CHANNEL_ID);
+    }
+
     // Загружаем актуальную базу автомобилей с сервера для мгновенного отображения всем посетителям
     loadCarsFromServer();
 
