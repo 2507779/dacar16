@@ -149,8 +149,14 @@ export const useStore = create<AppStore>((set, get) => {
     localStorage.setItem('dacar_all_cars', JSON.stringify(CARS_DATA));
   }
 
-  // Загрузка кастомизации баннера (по умолчанию красивая фотография г. Казань)
-  const savedBannerUrl = localStorage.getItem('dacar_banner_url') || 'https://images.unsplash.com/photo-1590579491410-b996726244bc?auto=format&fit=crop&w=1200&q=80';
+  // Загрузка кастомизации баннера (по умолчанию — локальный премиум баннер бренда DA!CAR)
+  let savedBannerUrl = localStorage.getItem('dacar_banner_url');
+  const DEFAULT_BANNER_URL = '/banner-header.jpg';
+  
+  if (!savedBannerUrl || savedBannerUrl.includes('unsplash.com')) {
+    savedBannerUrl = DEFAULT_BANNER_URL;
+    localStorage.setItem('dacar_banner_url', DEFAULT_BANNER_URL);
+  }
   const savedBannerTitle = localStorage.getItem('dacar_banner_title') || 'Автомобили из Азии';
   const savedBannerSubtitle = localStorage.getItem('dacar_banner_subtitle') || 'под ключ в РФ';
 

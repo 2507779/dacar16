@@ -3211,44 +3211,44 @@ export const CARS_DATA: Car[] = ${formattedCars};
                           <div className="grid grid-cols-3 gap-2">
                             <button
                               onClick={() => applyPresetBanner(
-                                'https://images.unsplash.com/photo-1590579491410-b996726244bc?auto=format&fit=crop&w=1200&q=80',
+                                '/banner-header.jpg',
                                 'Автомобили под заказ',
                                 'без лишних хлопот'
                               )}
                               className="bg-[#F5F7FA] border border-[#E5E7EB]/60 p-2.5 rounded-xl hover:border-[#2563EB] text-left transition"
                             >
                               <div className="aspect-video w-full rounded-lg bg-slate-200 overflow-hidden">
-                                <img src="https://images.unsplash.com/photo-1590579491410-b996726244bc?auto=format&fit=crop&w=300&q=80" alt="" className="w-full h-full object-cover" />
+                                <img src="/banner-header.jpg" alt="" className="w-full h-full object-cover" />
                               </div>
-                              <span className="text-[10px] font-bold text-[#111827] block mt-1.5 truncate">г. Казань (Главный)</span>
+                              <span className="text-[10px] font-bold text-[#111827] block mt-1.5 truncate">DA!CAR Главный</span>
                             </button>
 
                             <button
                               onClick={() => applyPresetBanner(
-                                'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80',
-                                'Импорт Спорткаров 911',
-                                'Легендарные спорткары из Германии с полной очисткой под ключ'
+                                '/cars/zeekr_001.jpg',
+                                'Импорт Электрокаров',
+                                'Самые современные Zeekr, LiXiang и Xiaomi из Китая под ключ'
                               )}
                               className="bg-[#F5F7FA] border border-[#E5E7EB]/60 p-2.5 rounded-xl hover:border-[#2563EB] text-left transition"
                             >
                               <div className="aspect-video w-full rounded-lg bg-slate-200 overflow-hidden">
-                                <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=300&q=80" alt="" className="w-full h-full object-cover" />
+                                <img src="/cars/zeekr_001.jpg" alt="" className="w-full h-full object-cover" />
                               </div>
-                              <span className="text-[10px] font-bold text-[#111827] block mt-1.5 truncate">Porsche 911 Sport</span>
+                              <span className="text-[10px] font-bold text-[#111827] block mt-1.5 truncate">Zeekr 001 Premium</span>
                             </button>
 
                             <button
                               onClick={() => applyPresetBanner(
-                                'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=1200&q=80',
+                                '/cars/li_l9.jpg',
                                 'Премиальные Кроссоверы',
-                                'Надежные и роскошные внедорожники из Южной Кореи в Казань'
+                                'Надежные и роскошные семейные гибриды с гарантией в РФ'
                               )}
                               className="bg-[#F5F7FA] border border-[#E5E7EB]/60 p-2.5 rounded-xl hover:border-[#2563EB] text-left transition"
                             >
                               <div className="aspect-video w-full rounded-lg bg-slate-200 overflow-hidden">
-                                <img src="https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=300&q=80" alt="" className="w-full h-full object-cover" />
+                                <img src="/cars/li_l9.jpg" alt="" className="w-full h-full object-cover" />
                               </div>
-                              <span className="text-[10px] font-bold text-[#111827] block mt-1.5 truncate">Luxury SUV Prestige</span>
+                              <span className="text-[10px] font-bold text-[#111827] block mt-1.5 truncate">Lixiang L9 Luxury</span>
                             </button>
                           </div>
                         </div>
