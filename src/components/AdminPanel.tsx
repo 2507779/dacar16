@@ -86,7 +86,7 @@ export function AdminPanel() {
   const [passcodeError, setPasscodeError] = useState(false);
 
   // Табы админки
-  const [adminTab, setAdminTab] = useState<'add' | 'edit' | 'design' | 'funnel' | 'installer' | 'vip' | 'telegram'>('installer');
+  const [adminTab, setAdminTab] = useState<'add' | 'edit' | 'design' | 'funnel' | 'vip' | 'telegram'>('telegram');
   const [editingCarId, setEditingCarId] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
 
@@ -483,6 +483,72 @@ export function AdminPanel() {
       fetchTgGitConfig();
     }
   }, [adminTab]);
+
+  // Синхронизация всех полей Bot Token и Channel ID в реальном времени во избежание путаницы
+  useEffect(() => {
+    if (tgBotToken) {
+      if (installerToken !== tgBotToken) setInstallerToken(tgBotToken);
+      if (tgGitBotToken !== tgBotToken) setTgGitBotToken(tgBotToken);
+    }
+  }, [tgBotToken]);
+
+  useEffect(() => {
+    if (installerToken) {
+      if (tgBotToken !== installerToken) setTgBotToken(installerToken);
+      if (tgGitBotToken !== installerToken) setTgGitBotToken(installerToken);
+    }
+  }, [installerToken]);
+
+  useEffect(() => {
+    if (tgGitBotToken) {
+      if (tgBotToken !== tgGitBotToken) setTgBotToken(tgGitBotToken);
+      if (installerToken !== tgGitBotToken) setInstallerToken(tgGitBotToken);
+    }
+  }, [tgGitBotToken]);
+
+  // Синхронизация полей Channel ID
+  useEffect(() => {
+    if (tgChannelId) {
+      let urlVersion = tgChannelId;
+      if (tgChannelId.startsWith('@')) {
+        urlVersion = `https://t.me/${tgChannelId.substring(1)}`;
+      } else if (tgChannelId.startsWith('-100')) {
+        urlVersion = tgChannelId;
+      }
+      if (urlVersion !== installerChannel) {
+        setInstallerChannel(urlVersion);
+      }
+      if (!tgGitAllowedChatIds.includes(tgChannelId)) {
+        const ids = tgGitAllowedChatIds.split(/[\s,]+/).map(id => id.trim()).filter(Boolean);
+        if (!ids.includes(tgChannelId)) {
+          setTgGitAllowedChatIds([tgChannelId, ...ids].join(', '));
+        }
+      }
+    }
+  }, [tgChannelId]);
+
+  useEffect(() => {
+    if (installerChannel) {
+      let clean = installerChannel.replace('https://t.me/', '@').replace('t.me/', '@');
+      if (!clean.startsWith('@') && !clean.startsWith('-100') && clean.length > 0) {
+        clean = '@' + clean;
+      }
+      if (clean !== tgChannelId) {
+        setTgChannelId(clean);
+        localStorage.setItem('tg_channel_id', clean);
+      }
+    }
+  }, [installerChannel]);
+
+  useEffect(() => {
+    if (tgGitAllowedChatIds) {
+      const ids = tgGitAllowedChatIds.split(/[\s,]+/).map(id => id.trim()).filter(Boolean);
+      if (ids.length > 0 && ids[0] !== tgChannelId) {
+        setTgChannelId(ids[0]);
+        localStorage.setItem('tg_channel_id', ids[0]);
+      }
+    }
+  }, [tgGitAllowedChatIds]);
 
   const loadPresetsFromBackend = () => {
     setIsLoadingPresets(true);
@@ -1818,15 +1884,6 @@ export const CARS_DATA: Car[] = ${formattedCars};
                   {/* Навигационные табы панели */}
                   <div className="flex bg-[#F5F7FA] p-1 rounded-xl border border-[#E5E7EB]/40 overflow-x-auto scrollbar-none space-x-1">
                     <button
-                      onClick={() => setAdminTab('installer')}
-                      className={`flex-1 py-1.5 px-2.5 text-center text-[10px] font-bold rounded-lg transition shrink-0 flex items-center justify-center space-x-1 ${
-                        adminTab === 'installer' ? 'bg-[#2563EB] text-white' : 'text-[#64748B] hover:text-[#111827]'
-                      }`}
-                    >
-                      <Bot className="w-3.5 h-3.5 shrink-0" />
-                      <span>🤖 Установка</span>
-                    </button>
-                    <button
                       onClick={() => setAdminTab('edit')}
                       className={`flex-1 py-1.5 px-2 text-center text-[10px] font-bold rounded-lg transition shrink-0 ${
                         adminTab === 'edit' ? 'bg-[#2563EB] text-white' : 'text-[#64748B] hover:text-[#111827]'
@@ -1869,11 +1926,11 @@ export const CARS_DATA: Car[] = ${formattedCars};
                     </button>
                     <button
                       onClick={() => setAdminTab('telegram')}
-                      className={`flex-1 py-1.5 px-2 text-center text-[10px] font-bold rounded-lg transition shrink-0 flex items-center justify-center space-x-0.5 ${
+                      className={`flex-1 py-1.5 px-2.5 text-center text-[10px] font-bold rounded-lg transition shrink-0 flex items-center justify-center space-x-1 ${
                         adminTab === 'telegram' ? 'bg-blue-600 text-white' : 'text-[#64748B] hover:text-[#111827]'
                       }`}
                     >
-                      <Share2 className="w-3.5 h-3.5" />
+                      <Share2 className="w-3.5 h-3.5 shrink-0" />
                       <span>🔌 Telegram & Git</span>
                     </button>
                   </div>
@@ -1881,8 +1938,8 @@ export const CARS_DATA: Car[] = ${formattedCars};
                   {/* СОДЕРЖИМОЕ ТАБОВ */}
                   <div className="space-y-4 pt-1">
                     
-                    {/* ТАБ: АВТО-УСТАНОВЩИК И 10 ФУНКЦИЙ */}
-                    {adminTab === 'installer' && (
+                    {/* ТАБ: 🔌 TELEGRAM & GITHUB АВТОМАТИЗАЦИЯ */}
+                    {adminTab === 'telegram' && (
                       <div className="space-y-4">
                         {/* Главная карточка автоматического установщика */}
                         <div className="bg-gradient-to-tr from-slate-900 to-slate-800 text-white p-4 rounded-3xl shadow-xl border border-slate-700/50 space-y-3.5">
@@ -1951,11 +2008,11 @@ export const CARS_DATA: Car[] = ${formattedCars};
                           )}
                         </div>
 
-                        {/* НАБОР ИЗ 10 ПОЛЕЗНЫХ ФУНКЦИЙ */}
+                        {/* НАБОР ИЗ 9 ПОЛЕЗНЫХ ФУНКЦИЙ */}
                         <div className="space-y-3 pt-1">
                           <h6 className="text-[10px] font-black uppercase tracking-widest text-[#78716C] font-mono flex items-center space-x-1.5 px-1">
                             <Sliders className="w-4 h-4 text-[#C5A880]" />
-                            <span>10 Полезных функций CMS-менеджера</span>
+                            <span>9 Полезных функций CMS-менеджера</span>
                           </h6>
 
                           {/* ФУНКЦИЯ 1: Синхронизатор фото в каталог */}
@@ -2147,7 +2204,6 @@ export const CARS_DATA: Car[] = ${formattedCars};
                             <textarea
                               value={captionTemplate}
                               onChange={(e) => {
-                                setThemePreset(prev => prev); // dummy trigger update
                                 setCaptionTemplate(e.target.value);
                                 localStorage.setItem('dacar_caption_template', e.target.value);
                               }}
@@ -2156,12 +2212,10 @@ export const CARS_DATA: Car[] = ${formattedCars};
                             />
                           </div>
 
-                          {/* ФУНКЦИЯ 8: Кастомизатор Темы TMA удален по запросу */}
-
-                          {/* ФУНКЦИЯ 9: Автоматическая конвертация валют */}
+                          {/* ФУНКЦИЯ 8: Автоматическая конвертация валют */}
                           <div className="bg-white border border-[#EFEBE4] rounded-2xl p-3.5 space-y-2.5 shadow-md">
                             <h6 className="text-[11px] font-black text-[#1C1917] flex items-center">
-                              <span className="w-4 h-4 bg-[#C5A880]/15 rounded flex items-center justify-center text-[9px] font-black text-[#C5A880] mr-1">9</span>
+                              <span className="w-4 h-4 bg-[#C5A880]/15 rounded flex items-center justify-center text-[9px] font-black text-[#C5A880] mr-1">8</span>
                               <span>Валютный авто-конвертер цен</span>
                             </h6>
                             <p className="text-[9px] text-[#78716C] leading-normal">
@@ -2184,10 +2238,10 @@ export const CARS_DATA: Car[] = ${formattedCars};
                             </div>
                           </div>
 
-                          {/* ФУНКЦИЯ 10: QR-код & Дип-линки */}
+                          {/* ФУНКЦИЯ 9: QR-код & Дип-линки */}
                           <div className="bg-white border border-[#EFEBE4] rounded-2xl p-3.5 space-y-2.5 shadow-md">
                             <h6 className="text-[11px] font-black text-[#1C1917] flex items-center">
-                              <span className="w-4 h-4 bg-[#C5A880]/15 rounded flex items-center justify-center text-[9px] font-black text-[#C5A880] mr-1">10</span>
+                              <span className="w-4 h-4 bg-[#C5A880]/15 rounded flex items-center justify-center text-[9px] font-black text-[#C5A880] mr-1">9</span>
                               <span>QR-визитка & Генератор дип-линков</span>
                             </h6>
                             <p className="text-[9px] text-[#78716C] leading-normal">
@@ -4278,13 +4332,11 @@ export const CARS_DATA: Car[] = ${formattedCars};
                           </div>
                         </div>
 
-                        {/* ФУНКЦИЯ 9: Сравнительный конфигуратор моделей удален по запросу */}
-
-                        {/* ФУНКЦИЯ 10: Trade-In Калькулятор оценки */}
+                        {/* ФУНКЦИЯ 9: Trade-In Калькулятор оценки */}
                         <div className="bg-[#F5F7FA] p-3.5 rounded-2xl border border-[#E5E7EB] space-y-3">
                           <h6 className="text-[10px] font-bold text-amber-600 uppercase tracking-wide flex items-center space-x-1 font-mono">
                             <Calculator className="w-4 h-4 text-amber-500" />
-                            <span>10. Калькулятор оценки Trade-In</span>
+                            <span>9. Калькулятор оценки Trade-In</span>
                           </h6>
                           <p className="text-[9px] text-[#64748B] leading-normal font-medium">
                             Рассчитайте выкупную стоимость подержанного автомобиля вашего клиента для зачета его стоимости в покупку нового импортного авто.
