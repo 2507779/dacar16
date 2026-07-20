@@ -451,29 +451,32 @@ async function startServer() {
 
       const targets = new Set<string>();
 
+      // Вспомогательная функция для форматирования Chat ID
+      const formatChatId = (id: string): string => {
+        let formatted = id.trim();
+        if (!formatted.startsWith('-')) {
+          if (formatted.startsWith('100') || formatted.startsWith('200') || formatted.startsWith('300')) {
+            formatted = `-${formatted}`;
+          }
+        }
+        return formatted;
+      };
+
       // 1. Если клиент явно прислал chatId, используем его
       if (chatId && typeof chatId === 'string' && chatId.trim() !== '' && chatId !== 'null' && chatId !== 'undefined') {
-        targets.add(chatId.trim());
+        targets.add(formatChatId(chatId));
       }
 
       // 2. Канал по умолчанию из конфигурации
       if (config.telegramChannelId && typeof config.telegramChannelId === 'string' && config.telegramChannelId.trim() !== '') {
-        targets.add(config.telegramChannelId.trim());
+        targets.add(formatChatId(config.telegramChannelId));
       }
 
       // 3. Список всех разрешенных ID менеджеров/каналов из allowedChatIds
       if (config.allowedChatIds) {
         const ids = config.allowedChatIds.split(/[\s,]+/).map(id => id.trim()).filter(Boolean);
         for (const rawId of ids) {
-          let formattedId = rawId;
-          if (!formattedId.startsWith('-')) {
-            if (formattedId.startsWith('100')) {
-              formattedId = `-${formattedId}`;
-            } else if (formattedId.startsWith('200') || formattedId.startsWith('300')) {
-              formattedId = `-${formattedId}`;
-            }
-          }
-          targets.add(formattedId);
+          targets.add(formatChatId(rawId));
         }
       }
 

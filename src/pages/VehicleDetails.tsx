@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '../store/useStore';
 import { calculateFullCarPrice, formatCurrency, DELIVERY_CITIES, COMPANY_COMMISSION, BROKER_FEE_RUB, BASE_DELIVERY_KAZAN_RUB, EXCHANGE_RATES, getCarImages, getCarFeatures } from '../data/cars';
 import { triggerHaptic } from '../utils/haptics';
@@ -206,6 +206,27 @@ export default function VehicleDetails() {
     setIsOrderSheetOpen(false);
   };
 
+  // Рефы для таймаутов
+  const submitDetailsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const redirectDetailsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Очистка таймаутов при размонтировании
+  useEffect(() => {
+    return () => {
+      if (submitDetailsTimeoutRef.current) clearTimeout(submitDetailsTimeoutRef.current);
+      if (redirectDetailsTimeoutRef.current) clearTimeout(redirectDetailsTimeoutRef.current);
+    };
+  }, []);
+
+  // Очистка и завершение симулятора тест-драйва при размонтировании
+  useEffect(() => {
+    return () => {
+      if (simulator) {
+        simulator.stop();
+      }
+    };
+  }, [simulator]);
+
   const executeOrderSubmission = () => {
     if (!isFormValid || isSubmitting) return;
 
@@ -233,7 +254,7 @@ export default function VehicleDetails() {
     }
 
     // Симулируем приятную задержку отправки (800мс), чтобы показать спиннер на кнопке
-    setTimeout(() => {
+    submitDetailsTimeoutRef.current = setTimeout(() => {
       setIsSubmitting(false);
       setOrderSuccess(true);
       setIsOrderSheetOpen(false);
@@ -248,7 +269,7 @@ export default function VehicleDetails() {
       }
 
       // Редирект на экран заказов через 6 секунд
-      setTimeout(() => {
+      redirectDetailsTimeoutRef.current = setTimeout(() => {
         setOrderSuccess(false);
         setActiveCarId(null); // Закрываем детальный вид
         setCurrentTab('orders'); // Переключаем на заказы
@@ -261,56 +282,97 @@ export default function VehicleDetails() {
     executeOrderSubmission();
   };
 
-  // Синхронизация Telegram MainButton для идеального нативного опыта
+  // Синхронизация кнопки «Назад» в Telegram Mini App для бесшовного UX
+  useEffect(() => {
+    const tg = (window as any).Telegram?.WebApp;
+    if (!tg || !tg.BackButton) return;
+
+    if (activeCarId && car) {
+      tg.BackButton.show();
+      
+      const handleBackClick = () => {
+        triggerHaptic('light');
+        if (isLightboxOpen) {
+          setIsLightboxOpen(false);
+        } else if (isTestDriveOpen) {
+          stopTestDrive();
+        } else if (isOrderSheetOpen) {
+          setIsOrderSheetOpen(false);
+        } else {
+          setActiveCarId(null);
+        }
+      };
+
+      tg.BackButton.onClick(handleBackClick);
+      return () => {
+        tg.BackButton.offClick(handleBackClick);
+        tg.BackButton.hide();
+      };
+    } else {
+      tg.BackButton.hide();
+    }
+  }, [activeCarId, car, isLightboxOpen, isTestDriveOpen, isOrderSheetOpen, simulator]);
+
+  // Управление видимостью Telegram MainButton в деталях авто
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp;
     if (!tg || !tg.MainButton) return;
 
-    if (activeCarId && !orderSuccess) {
+    if (activeCarId && car && !orderSuccess) {
       tg.MainButton.show();
-
-      if (!isOrderSheetOpen) {
-        tg.MainButton.setText('ПОЛУЧИТЬ РАСЧЕТ И КОНСУЛЬТАЦИЮ');
-        tg.MainButton.enable();
-        tg.MainButton.hideProgress();
-
-        const handleMainClick = () => {
-          triggerHaptic('medium');
-          setIsOrderSheetOpen(true);
-        };
-        tg.MainButton.onClick(handleMainClick);
-        return () => {
-          tg.MainButton.offClick(handleMainClick);
-        };
-      } else {
-        if (isSubmitting) {
-          tg.MainButton.setText('ОТПРАВКА ЗАЯВКИ...');
-          tg.MainButton.disable();
-          tg.MainButton.showProgress();
-        } else if (isFormValid) {
-          tg.MainButton.setText('ОТПРАВИТЬ ЗАЯВКУ В DA!CAR');
-          tg.MainButton.enable();
-          tg.MainButton.hideProgress();
-        } else {
-          tg.MainButton.setText('ЗАПОЛНИТЕ ИМЯ И ТЕЛЕФОН');
-          tg.MainButton.disable();
-          tg.MainButton.hideProgress();
-        }
-
-        const handleMainClick = () => {
-          if (isFormValid && !isSubmitting) {
-            executeOrderSubmission();
-          }
-        };
-        tg.MainButton.onClick(handleMainClick);
-        return () => {
-          tg.MainButton.offClick(handleMainClick);
-        };
-      }
     } else {
       tg.MainButton.hide();
     }
-  }, [activeCarId, isOrderSheetOpen, userName, userPhone, isFormValid, isSubmitting, orderSuccess]);
+
+    return () => {
+      tg.MainButton.hide();
+    };
+  }, [activeCarId, car, orderSuccess]);
+
+  // Настройка контента и обработчиков клика Telegram MainButton в деталях авто
+  useEffect(() => {
+    const tg = (window as any).Telegram?.WebApp;
+    if (!tg || !tg.MainButton || !activeCarId || !car || orderSuccess) return;
+
+    if (!isOrderSheetOpen) {
+      tg.MainButton.setText('ПОЛУЧИТЬ РАСЧЕТ И КОНСУЛЬТАЦИЮ');
+      tg.MainButton.enable();
+      tg.MainButton.hideProgress();
+
+      const handleMainClick = () => {
+        triggerHaptic('medium');
+        setIsOrderSheetOpen(true);
+      };
+      tg.MainButton.onClick(handleMainClick);
+      return () => {
+        tg.MainButton.offClick(handleMainClick);
+      };
+    } else {
+      if (isSubmitting) {
+        tg.MainButton.setText('ОТПРАВКА ЗАЯВКИ...');
+        tg.MainButton.disable();
+        tg.MainButton.showProgress();
+      } else if (isFormValid) {
+        tg.MainButton.setText('ОТПРАВИТЬ ЗАЯВКУ В DA!CAR');
+        tg.MainButton.enable();
+        tg.MainButton.hideProgress();
+      } else {
+        tg.MainButton.setText('ЗАПОЛНИТЕ ИМЯ И ТЕЛЕФОН');
+        tg.MainButton.disable();
+        tg.MainButton.hideProgress();
+      }
+
+      const handleMainClick = () => {
+        if (isFormValid && !isSubmitting) {
+          executeOrderSubmission();
+        }
+      };
+      tg.MainButton.onClick(handleMainClick);
+      return () => {
+        tg.MainButton.offClick(handleMainClick);
+      };
+    }
+  }, [activeCarId, car, isOrderSheetOpen, userName, userPhone, isFormValid, isSubmitting, orderSuccess]);
 
   return (
     <div className="flex flex-col text-[#1C1917] pb-16 select-none relative bg-[#F0EEEC]">

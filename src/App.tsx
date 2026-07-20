@@ -70,27 +70,6 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Синхронизация нативной кнопки «Назад» в Telegram Mini App для бесшовного UX
-  useEffect(() => {
-    const tg = (window as any).Telegram?.WebApp;
-    if (tg && tg.BackButton) {
-      if (activeCarId) {
-        tg.BackButton.show();
-        const handleBackClick = () => {
-          triggerHaptic('light');
-          useStore.getState().setActiveCarId(null);
-        };
-        tg.BackButton.onClick(handleBackClick);
-        return () => {
-          tg.BackButton.offClick(handleBackClick);
-          tg.BackButton.hide();
-        };
-      } else {
-        tg.BackButton.hide();
-      }
-    }
-  }, [activeCarId]);
-
   const renderActiveTab = () => {
     switch (currentTab) {
       case 'home':

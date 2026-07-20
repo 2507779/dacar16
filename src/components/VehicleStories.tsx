@@ -122,6 +122,17 @@ export default function VehicleStories() {
     };
   }, [car, currentSlideIndex, isPaused, showOrderForm]);
 
+  // Рефы для очистки таймаутов
+  const submitStoriesTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const closeStoriesFormTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (submitStoriesTimeoutRef.current) clearTimeout(submitStoriesTimeoutRef.current);
+      if (closeStoriesFormTimeoutRef.current) clearTimeout(closeStoriesFormTimeoutRef.current);
+    };
+  }, []);
+
   const handleClose = () => {
     triggerHaptic('medium');
     setActiveStoryCarId(null);
@@ -142,7 +153,7 @@ export default function VehicleStories() {
 
     addOrder(car, name, phone, selectedCity);
 
-    setTimeout(() => {
+    submitStoriesTimeoutRef.current = setTimeout(() => {
       setIsSubmitting(false);
       setOrderSuccess(true);
       setName('');
@@ -153,7 +164,7 @@ export default function VehicleStories() {
         tg.MainButton.hide();
       }
 
-      setTimeout(() => {
+      closeStoriesFormTimeoutRef.current = setTimeout(() => {
         setShowOrderForm(false);
         setOrderSuccess(false);
       }, 2500);
@@ -165,41 +176,81 @@ export default function VehicleStories() {
     executeStoriesSubmission();
   };
 
-  // Интеграция с Telegram MainButton для форм в сторис
+  // Синхронизация кнопки «Назад» в Telegram Mini App для сторис
   useEffect(() => {
-    if (!car) return;
+    const tg = (window as any).Telegram?.WebApp;
+    if (!tg || !tg.BackButton) return;
+
+    if (activeStoryCarId && car) {
+      tg.BackButton.show();
+      
+      const handleBackClick = () => {
+        triggerHaptic('light');
+        if (showOrderForm) {
+          setShowOrderForm(false);
+        } else {
+          setActiveStoryCarId(null);
+        }
+      };
+
+      tg.BackButton.onClick(handleBackClick);
+      return () => {
+        tg.BackButton.offClick(handleBackClick);
+        tg.BackButton.hide();
+      };
+    } else {
+      // Прячем только если не открыты основные детали
+      if (!useStore.getState().activeCarId) {
+        tg.BackButton.hide();
+      }
+    }
+  }, [activeStoryCarId, car, showOrderForm]);
+
+  // Управление видимостью Telegram MainButton в сторис
+  useEffect(() => {
     const tg = (window as any).Telegram?.WebApp;
     if (!tg || !tg.MainButton) return;
 
-    if (showOrderForm && !orderSuccess) {
+    if (car && showOrderForm && !orderSuccess) {
       tg.MainButton.show();
-      if (isSubmitting) {
-        tg.MainButton.setText('ОТПРАВКА...');
-        tg.MainButton.disable();
-        tg.MainButton.showProgress();
-      } else if (isFormValid) {
-        tg.MainButton.setText('ОТПРАВИТЬ ЗАЯВКУ');
-        tg.MainButton.enable();
-        tg.MainButton.hideProgress();
-      } else {
-        tg.MainButton.setText('ЗАПОЛНИТЕ ИМЯ И ТЕЛЕФОН');
-        tg.MainButton.disable();
-        tg.MainButton.hideProgress();
-      }
-
-      const handleMainClick = () => {
-        if (isFormValid && !isSubmitting) {
-          executeStoriesSubmission();
-        }
-      };
-      tg.MainButton.onClick(handleMainClick);
-      return () => {
-        tg.MainButton.offClick(handleMainClick);
-      };
     } else {
       tg.MainButton.hide();
     }
-  }, [showOrderForm, name, phone, isFormValid, isSubmitting, orderSuccess, car, selectedCity]);
+
+    return () => {
+      tg.MainButton.hide();
+    };
+  }, [car, showOrderForm, orderSuccess]);
+
+  // Настройка контента и обработчиков клика Telegram MainButton в сторис
+  useEffect(() => {
+    const tg = (window as any).Telegram?.WebApp;
+    if (!tg || !tg.MainButton || !car || !showOrderForm || orderSuccess) return;
+
+    if (isSubmitting) {
+      tg.MainButton.setText('ОТПРАВКА...');
+      tg.MainButton.disable();
+      tg.MainButton.showProgress();
+    } else if (isFormValid) {
+      tg.MainButton.setText('ОТПРАВИТЬ ЗАЯВКУ');
+      tg.MainButton.enable();
+      tg.MainButton.hideProgress();
+    } else {
+      tg.MainButton.setText('ЗАПОЛНИТЕ ИМЯ И ТЕЛЕФОН');
+      tg.MainButton.disable();
+      tg.MainButton.hideProgress();
+    }
+
+    const handleMainClick = () => {
+      if (isFormValid && !isSubmitting) {
+        executeStoriesSubmission();
+      }
+    };
+    tg.MainButton.onClick(handleMainClick);
+    return () => {
+      tg.MainButton.offClick(handleMainClick);
+    };
+  }, [car, showOrderForm, name, phone, isFormValid, isSubmitting, orderSuccess]);
 
   if (!car) return null;
 
