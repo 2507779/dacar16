@@ -126,11 +126,10 @@ export function formatCurrency(value: number): string {
   }).format(value);
 }
 
-// Безопасное получение списка изображений автомобиля (строго локальные пути по умолчанию)
-export function getCarImages(car: any): string[] {
+// Получение чистых сырых изображений автомобиля из полей без кэш-бастера
+export function getRawCarImages(car: any): string[] {
   if (!car) return [];
   
-  // 1. Получаем список явно заданных картинок из car.images или fallback
   let rawImages: string[] = [];
   if (Array.isArray(car.images)) {
     rawImages = car.images.filter(img => typeof img === 'string' && img.trim().length > 0);
@@ -142,6 +141,17 @@ export function getCarImages(car: any): string[] {
       rawImages = [fallback];
     }
   }
+
+  // Полностью очищаем любые параметры кэш-бастера (?cb=...) при возвращении raw-картинок
+  return rawImages.map(img => img.split('?')[0]);
+}
+
+// Безопасное получение списка изображений автомобиля (строго локальные пути по умолчанию)
+export function getCarImages(car: any): string[] {
+  if (!car) return [];
+  
+  // 1. Получаем список явно заданных картинок из car.images или fallback
+  let rawImages = getRawCarImages(car);
 
   // Если список пуст, пытаемся использовать последовательные картинки по порядковому номеру машины в каталоге
   if (rawImages.length === 0) {
@@ -188,10 +198,11 @@ export function getCarImages(car: any): string[] {
   const buster = typeof window !== 'undefined' ? localStorage.getItem('dacar_cache_buster') : null;
   if (buster) {
     return rawImages.map(img => {
-      if (img.startsWith('/') && !img.includes('?')) {
-        return `${img}?cb=${buster}`;
+      const cleanImg = img.split('?')[0];
+      if (cleanImg.startsWith('/') && !cleanImg.includes('?')) {
+        return `${cleanImg}?cb=${buster}`;
       }
-      return img;
+      return cleanImg;
     });
   }
 

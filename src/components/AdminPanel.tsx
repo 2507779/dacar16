@@ -16,7 +16,7 @@ import {
   UserCheck, Save, Users, Calendar, Calculator
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { calculateFullCarPrice, formatCurrency, getCarImages, getCarFeatures } from '../data/cars';
+import { calculateFullCarPrice, formatCurrency, getCarImages, getRawCarImages, getCarFeatures } from '../data/cars';
 import CARS_DATA_JSON from '../../cars.json';
 const CARS_DATA = CARS_DATA_JSON as any[];
 
@@ -149,11 +149,12 @@ export function AdminPanel() {
       return;
     }
     // Проверим, нет ли уже этой картинки в галерее автомобиля
-    if (getCarImages(targetCar).includes(imagePath)) {
+    const raw = getRawCarImages(targetCar);
+    if (raw.includes(imagePath)) {
       alert('⚠️ Данное фото уже присутствует в галерее этого автомобиля.');
       return;
     }
-    const updatedImages = [...getCarImages(targetCar), imagePath];
+    const updatedImages = [...raw, imagePath];
     editCar(carId, { ...targetCar, images: updatedImages });
     triggerHaptic('success');
     alert(`✅ Фотография ${imagePath} успешно добавлена в галерею ${targetCar.brand} ${targetCar.model}!`);
@@ -640,7 +641,7 @@ export function AdminPanel() {
     setNewCustomsEUR(car.customsEUR || car.customsDutyEUR || 3500);
     setNewRecyclingRUB(car.recyclingRUB || car.recyclingFeeRUB || 3400);
     setNewCustomFinalPrice(car.customFinalPriceRUB || car.customFinalPrice || '');
-    setNewImgUrl(getCarImages(car).join('\n') || '');
+    setNewImgUrl(getRawCarImages(car).join('\n') || '');
     setNewDesc(car.description || '');
     setNewFeatures(getCarFeatures(car).join(', ') || '');
     setAdminTab('add');
@@ -838,7 +839,8 @@ export const CARS_DATA: Car[] = ${formattedCars};
     const targetCar = cars.find(c => c.id === carId);
     if (targetCar) {
       triggerHaptic('medium');
-      const updatedGallery = [...getCarImages(targetCar), correctedUrl];
+      const raw = getRawCarImages(targetCar);
+      const updatedGallery = [...raw, correctedUrl];
       editCar(carId, { ...targetCar, images: updatedGallery });
       setNewPhotoUrl('');
     }
@@ -847,13 +849,17 @@ export const CARS_DATA: Car[] = ${formattedCars};
   const handleRemovePhotoFromCar = (carId: string, imgIndex: number) => {
     const targetCar = cars.find(c => c.id === carId);
     if (targetCar) {
-      const images = getCarImages(targetCar);
-      if (images.length <= 1) {
+      const raw = getRawCarImages(targetCar);
+      if (raw.length === 0) {
+        alert('Нельзя удалить стандартное фото по умолчанию. Пожалуйста, загрузите свое собственное фото!');
+        return;
+      }
+      if (raw.length <= 1) {
         alert('У автомобиля должна оставаться хотя бы одна фотография!');
         return;
       }
       triggerHaptic('medium');
-      const updatedGallery = images.filter((_, idx) => idx !== imgIndex);
+      const updatedGallery = raw.filter((_, idx) => idx !== imgIndex);
       editCar(carId, { ...targetCar, images: updatedGallery });
     }
   };
@@ -882,8 +888,13 @@ export const CARS_DATA: Car[] = ${formattedCars};
             const targetCar = cars.find(c => c.id === carId);
             if (targetCar && data.url) {
               triggerHaptic('success');
-              const updatedImages = [...getCarImages(targetCar)];
-              updatedImages[index] = data.url;
+              const raw = getRawCarImages(targetCar);
+              let updatedImages = [...raw];
+              if (raw.length === 0) {
+                updatedImages = [data.url];
+              } else {
+                updatedImages[index] = data.url;
+              }
               editCar(carId, { ...targetCar, images: updatedImages });
             }
           } else {
@@ -925,7 +936,8 @@ export const CARS_DATA: Car[] = ${formattedCars};
             const targetCar = cars.find(c => c.id === carId);
             if (targetCar && data.url) {
               triggerHaptic('success');
-              const updatedGallery = [...getCarImages(targetCar), data.url];
+              const raw = getRawCarImages(targetCar);
+              const updatedGallery = [...raw, data.url];
               editCar(carId, { ...targetCar, images: updatedGallery });
             }
           } else {
@@ -947,7 +959,8 @@ export const CARS_DATA: Car[] = ${formattedCars};
     const targetCar = cars.find(c => c.id === carId);
     if (targetCar) {
       triggerHaptic('medium');
-      const updatedGallery = [...getCarImages(targetCar), presetPath];
+      const raw = getRawCarImages(targetCar);
+      const updatedGallery = [...raw, presetPath];
       editCar(carId, { ...targetCar, images: updatedGallery });
     }
   };
@@ -1230,7 +1243,8 @@ export const CARS_DATA: Car[] = ${formattedCars};
     const targetCar = cars.find(c => c.id === selectedCarForSync);
     if (!targetCar) return;
     
-    const updatedImages = [...getCarImages(targetCar), photoUrl];
+    const raw = getRawCarImages(targetCar);
+    const updatedImages = [...raw, photoUrl];
     editCar(selectedCarForSync, { ...targetCar, images: updatedImages });
     triggerHaptic('success');
     alert(`✅ Фото успешно добавлено в галерею ${targetCar.brand} ${targetCar.model}!`);
