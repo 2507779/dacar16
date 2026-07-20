@@ -1397,13 +1397,29 @@ async function startServer() {
     }
   });
 
-  // Получить глобальный кэш-бастер на основе времени изменения cars.json
+  // Получить глобальный кэш-бастер на основе времени изменения cars.json или clear_cache.txt
   app.get('/api/cache-buster', (req, res) => {
     try {
-      let mtime = Date.now();
-      if (fs.existsSync(CARS_FILE_PATH)) {
-        mtime = fs.statSync(CARS_FILE_PATH).mtimeMs;
+      const clearCachePath = path.join(process.cwd(), 'clear_cache.txt');
+      
+      // Если файл-триггер очистки кэша удален из репозитория, возвращаем уникальный таймштамп Date.now()
+      // Это заставляет все устройства мгновенно очистить кэш картинок и загрузить всё заново.
+      if (!fs.existsSync(clearCachePath)) {
+        console.log('[Cache Buster] clear_cache.txt is missing/deleted! Forcing full cache reset on all devices.');
+        return res.json({ timestamp: Date.now().toString() });
       }
+
+      // Если файл существует, возвращаем максимальное время модификации из cars.json и clear_cache.txt
+      let mtime = 0;
+      if (fs.existsSync(CARS_FILE_PATH)) {
+        mtime = Math.max(mtime, fs.statSync(CARS_FILE_PATH).mtimeMs);
+      }
+      mtime = Math.max(mtime, fs.statSync(clearCachePath).mtimeMs);
+      
+      if (mtime === 0) {
+        mtime = Date.now();
+      }
+
       return res.json({ timestamp: Math.floor(mtime).toString() });
     } catch (err) {
       return res.json({ timestamp: Date.now().toString() });

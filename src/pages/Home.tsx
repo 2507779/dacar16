@@ -91,8 +91,8 @@ export default function Home() {
     setActiveCarId(id);
   };
 
-  // Рекомендованные авто (первые 3)
-  const hotCars = cars.slice(0, 3);
+  // Рекомендованные авто (первые 6)
+  const hotCars = cars.slice(0, 6);
 
   return (
     <div className="flex flex-col text-[#1C1917] pb-12 select-none bg-[#F0EEEC]">
@@ -258,6 +258,32 @@ export default function Home() {
             })}
           </div>
         </div>
+      </div>
+
+      {/* Второй баннер "Автомобили под заказ без лишних хлопот" (header2.jpg) */}
+      <div className="px-4 mt-6">
+        <motion.div 
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          id="second-custom-banner"
+          className="w-full relative overflow-hidden rounded-3xl border border-[#EFEBE4] bg-white shadow-sm cursor-pointer"
+          onClick={() => {
+            triggerHaptic('medium');
+            setCurrentTab('catalog');
+          }}
+        >
+          <img 
+            src="/header2.jpg" 
+            alt="Автомобили под заказ без лишних хлопот" 
+            className="w-full h-auto object-cover select-none"
+            onError={() => {
+              const bannerEl = document.getElementById('second-custom-banner');
+              if (bannerEl) bannerEl.style.display = 'none';
+            }}
+          />
+        </motion.div>
       </div>
 
       {/* Горячие предложения */}
