@@ -449,47 +449,82 @@ async function startServer() {
         return res.status(400).json({ error: 'Telegram Bot Token не настроен на сервере!' });
       }
 
-      let targetChatId = chatId || config.telegramChannelId;
-      if (!targetChatId && config.allowedChatIds) {
+      const targets = new Set<string>();
+
+      // 1. Если клиент явно прислал chatId, используем его
+      if (chatId && typeof chatId === 'string' && chatId.trim() !== '' && chatId !== 'null' && chatId !== 'undefined') {
+        targets.add(chatId.trim());
+      }
+
+      // 2. Канал по умолчанию из конфигурации
+      if (config.telegramChannelId && typeof config.telegramChannelId === 'string' && config.telegramChannelId.trim() !== '') {
+        targets.add(config.telegramChannelId.trim());
+      }
+
+      // 3. Список всех разрешенных ID менеджеров/каналов из allowedChatIds
+      if (config.allowedChatIds) {
         const ids = config.allowedChatIds.split(/[\s,]+/).map(id => id.trim()).filter(Boolean);
-        if (ids.length > 0) {
-          const firstId = ids[0];
-          if (!firstId.startsWith('-')) {
-            if (firstId.startsWith('100')) {
-              targetChatId = `-${firstId}`;
-            } else if (firstId.length >= 9) {
-              targetChatId = `-100${firstId}`;
-            } else {
-              targetChatId = firstId;
+        for (const rawId of ids) {
+          let formattedId = rawId;
+          if (!formattedId.startsWith('-')) {
+            if (formattedId.startsWith('100')) {
+              formattedId = `-${formattedId}`;
+            } else if (formattedId.startsWith('200') || formattedId.startsWith('300')) {
+              formattedId = `-${formattedId}`;
             }
-          } else {
-            targetChatId = firstId;
           }
+          targets.add(formattedId);
         }
       }
 
-      if (!targetChatId) {
+      const targetList = Array.from(targets);
+      if (targetList.length === 0) {
         return res.status(400).json({ error: 'Целевой Chat ID или канал не настроен!' });
       }
 
-      console.log(`[Telegram Notify] Sending message to ${targetChatId}`);
-      const response = await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: targetChatId,
-          text: text,
-          parse_mode: 'Markdown'
-        })
-      });
+      console.log(`[Telegram Notify] Sending message to targets: ${targetList.join(', ')}`);
+      
+      const results = [];
+      let successCount = 0;
 
-      const data = await response.json() as any;
-      if (!response.ok || !data.ok) {
-        console.error('[Telegram Notify Error]:', data);
-        return res.status(400).json({ error: 'Ошибка отправки в Telegram API', details: data });
+      for (const target of targetList) {
+        try {
+          const response = await fetch(`https://api.telegram.org/bot${config.telegramBotToken}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chat_id: target,
+              text: text,
+              parse_mode: 'Markdown'
+            })
+          });
+
+          const data = await response.json() as any;
+          if (response.ok && data.ok) {
+            successCount++;
+            results.push({ target, success: true });
+          } else {
+            console.error(`[Telegram Notify Error] Failed for target ${target}:`, data);
+            results.push({ target, success: false, error: data.description || 'API error' });
+          }
+        } catch (err: any) {
+          console.error(`[Telegram Notify Exception] Failed for target ${target}:`, err);
+          results.push({ target, success: false, error: err.message || 'Connection error' });
+        }
       }
 
-      res.json({ success: true, message: 'Уведомление успешно отправлено!' });
+      if (successCount === 0) {
+        return res.status(400).json({ 
+          error: 'Ошибка отправки уведомления во все указанные адреса Telegram API', 
+          details: results 
+        });
+      }
+
+      res.json({ 
+        success: true, 
+        message: `Уведомление успешно отправлено! Доставлено: ${successCount}/${targetList.length}`, 
+        details: results 
+      });
     } catch (err: any) {
       console.error('[Telegram Notify Exception]:', err);
       res.status(500).json({ error: err.message || 'Внутренняя ошибка сервера' });
@@ -1328,56 +1363,14 @@ async function startServer() {
         });
       }
 
-      // 2. Умная очистка кэша: удаляем локально ТОЛЬКО те файлы из public/cars, 
-      // которые реально существуют в репозитории GitHub (чтобы они обновились на свежие версии),
-      // а все остальные локально загруженные пользователем файлы оставляем нетронутыми!
-      const config = readConfig();
-      let clearedFilesCount = 0;
-      let isSmartCleared = false;
-
-      if (config.githubToken && config.githubRepo) {
-        try {
-          const gitPhotosResult = await listGithubPhotosWithOctokit(
-            config.githubToken,
-            config.githubRepo,
-            config.githubBranch || 'main'
-          );
-          
-          if (gitPhotosResult.success && gitPhotosResult.files) {
-            const gitFilenames = new Set(gitPhotosResult.files.map(f => f.name.toLowerCase()));
-            const publicCarsDir = path.join(process.cwd(), 'public', 'cars');
-            
-            if (fs.existsSync(publicCarsDir)) {
-              const files = fs.readdirSync(publicCarsDir);
-              for (const file of files) {
-                // Удаляем только если файл есть на GitHub (т.е. это файл репозитория, который может обновиться)
-                if (gitFilenames.has(file.toLowerCase())) {
-                  const filePath = path.join(publicCarsDir, file);
-                  if (fs.statSync(filePath).isFile()) {
-                    try {
-                      fs.unlinkSync(filePath);
-                      clearedFilesCount++;
-                    } catch (unlinkErr) {
-                      console.warn(`[Cache Clear] Failed to delete file ${file}:`, unlinkErr);
-                    }
-                  }
-                }
-              }
-              isSmartCleared = true;
-            }
-          }
-        } catch (listErr) {
-          console.error('[Cache Clear] Failed to list GitHub photos for smart cache clearing:', listErr);
-        }
-      }
-
-      console.log(`[Cache Clear] Smart cache clearing finished. Deleted ${clearedFilesCount} GitHub-synced files. Local-only files preserved.`);
+      // 2. По просьбе пользователя ("ты их не удаляй после обновления") МЫ НЕ УДАЛЯЕМ локальные фотографии!
+      // Все локальные фотографии (включая загруженные через GitHub или админку) сохраняются на 100%.
+      // Любые новые изображения будут подгружены прокси-сервером на лету при обращении к ним.
+      console.log('[Cache Clear] Photo deletion skipped. All local photo cache is 100% preserved.');
 
       return res.json({ 
         success: true, 
-        message: isSmartCleared 
-          ? `Данные каталога успешно синхронизированы с GitHub! Локальный кэш обновлен (удалено устаревших файлов с GitHub: ${clearedFilesCount}). Ваши локальные файлы сохранены!`
-          : `Данные каталога успешно синхронизированы с GitHub! Локальные файлы сохранены.`
+        message: 'Данные каталога успешно синхронизированы с GitHub! Все локальные фотографии и кэш-файлы сохранены в полной безопасности.'
       });
     } catch (err: any) {
       console.error('Error pulling cars database:', err);
