@@ -206,7 +206,7 @@ export default function Favorites() {
                     ))}
                   </tr>
                   <tr className="bg-[#F0EEEC]">
-                    <td className="py-3 font-bold text-[#1C1917]">Цена под ключ</td>
+                    <td className="py-3 font-bold text-[#1C1917]">Цена под ключ от</td>
                     {favoriteCars.map(car => {
                       const calculated = calculateFullCarPrice(car, selectedCity);
                       const isBest = calculated.finalPriceRUB === lowestPrice && favoriteCars.length > 1;
@@ -215,7 +215,7 @@ export default function Favorites() {
                           <span className={`font-display font-black text-xs block ${
                             isBest ? 'text-emerald-600 font-extrabold text-[12.5px]' : 'text-[#C5A880]'
                           }`}>
-                            {formatCurrency(calculated.finalPriceRUB)} {isBest && '🔥'}
+                            {formatCurrency(calculated.finalPriceRUB, true)} {isBest && '🔥'}
                           </span>
                         </td>
                       );
@@ -285,9 +285,10 @@ export default function Favorites() {
                         <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
                         <span>~{car.deliveryDays} дней</span>
                       </span>
-                      <div className="text-right">
-                        <span className="font-display font-black text-[#C5A880] text-xs">
-                          {formatCurrency(calculated.finalPriceRUB)}
+                      <div className="text-right flex flex-col items-end">
+                        <span className="text-[7px] text-[#78716C] uppercase tracking-widest font-mono block">Цена под ключ</span>
+                        <span className="font-display font-black text-[#C5A880] text-xs block">
+                          {formatCurrency(calculated.finalPriceRUB, true)}
                         </span>
                       </div>
                     </div>
@@ -355,7 +356,7 @@ export default function Favorites() {
                             {idx + 1}. {car.brand} {car.model} ({car.year})
                           </span>
                           <span className="text-[#C5A880] font-bold font-mono">
-                            {formatCurrency(calc.finalPriceRUB)}
+                            {formatCurrency(calc.finalPriceRUB, true)}
                           </span>
                         </div>
                       );

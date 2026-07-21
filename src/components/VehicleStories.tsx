@@ -601,7 +601,7 @@ export default function VehicleStories() {
                     <div>
                       <h4 className="text-xs font-bold text-[#1C1917]">{car.brand} {car.model}</h4>
                       <p className="text-[9px] text-[#C5A880] font-black mt-0.5">
-                        {formatCurrency(calculated.finalPriceRUB)} • дост. до {selectedCity.split(' ')[0]}
+                        {formatCurrency(calculated.finalPriceRUB, true)} • дост. до {selectedCity.split(' ')[0]}
                       </p>
                     </div>
                   </div>

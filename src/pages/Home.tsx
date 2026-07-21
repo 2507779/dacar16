@@ -442,9 +442,9 @@ export default function Home() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <span className="text-[8px] text-[#78716C] block uppercase tracking-widest font-mono">Итого под ключ</span>
+                      <span className="text-[8px] text-[#78716C] block uppercase tracking-widest font-mono">Цена под ключ от</span>
                       <span className="font-display font-black text-[#C5A880] text-xs mt-0.5 block">
-                        {formatCurrency(calculated.finalPriceRUB)}
+                        {formatCurrency(calculated.finalPriceRUB, true)}
                       </span>
                     </div>
                   </div>

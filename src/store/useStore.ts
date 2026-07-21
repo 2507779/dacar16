@@ -143,6 +143,50 @@ export const useStore = create<AppStore>((set, get) => {
   if (localAllCars) {
     try {
       loadedCars = JSON.parse(localAllCars);
+      let isChanged = false;
+      
+      // Синхронизируем свойства дефолтных авто, если они изменились в cars.json
+      loadedCars = loadedCars.map(lc => {
+        const fresh = CARS_DATA.find(c => c.id === lc.id);
+        if (fresh) {
+          if (lc.model !== fresh.model || 
+              lc.country !== fresh.country || 
+              lc.priceUSD !== fresh.priceUSD || 
+              lc.customFinalPriceRUB !== fresh.customFinalPriceRUB ||
+              lc.power !== fresh.power ||
+              lc.transmission !== fresh.transmission ||
+              lc.engineVolume !== fresh.engineVolume ||
+              lc.engineType !== fresh.engineType) {
+            isChanged = true;
+            return { ...lc, ...fresh };
+          }
+        }
+        return lc;
+      });
+
+      // Если добавлены новые дефолтные авто в cars.json, которых нет в кэше, объединяем
+      const hasNewCars = CARS_DATA.some(c => !loadedCars.some(lc => lc.id === c.id));
+      if (hasNewCars) {
+        const newOnly = CARS_DATA.filter(c => !loadedCars.some(lc => lc.id === c.id));
+        loadedCars = [...loadedCars, ...newOnly];
+        isChanged = true;
+      }
+
+      // Удаляем из loadedCars те дефолтные машины, которых больше нет в CARS_DATA (например, старые дубликаты)
+      const validCarIds = new Set(CARS_DATA.map(c => c.id));
+      const filteredCars = loadedCars.filter(lc => {
+        const isDefaultPrefix = lc.id.includes('-kg') || lc.id.includes('-cn') || lc.id.includes('-used') || lc.id.endsWith('-new');
+        if (isDefaultPrefix && !validCarIds.has(lc.id)) {
+          isChanged = true;
+          return false;
+        }
+        return true;
+      });
+      loadedCars = filteredCars;
+
+      if (isChanged) {
+        localStorage.setItem('dacar_all_cars', JSON.stringify(loadedCars));
+      }
     } catch (e) {
       loadedCars = CARS_DATA;
     }

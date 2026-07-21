@@ -493,7 +493,7 @@ export default function VehicleDetails() {
               {/* Итоговая жирная строка */}
               <div className="border-t border-dashed border-[#EFEBE4] mt-4 pt-4 flex justify-between items-end text-left">
                 <div>
-                  <span className="text-[10px] uppercase text-[#78716C] font-bold block font-mono">Полная цена под ключ</span>
+                  <span className="text-[10px] uppercase text-[#78716C] font-bold block font-mono">Цена под ключ от</span>
                   <span className="text-[9px] text-[#C5A880] font-bold flex items-center space-x-0.5 mt-0.5">
                     <ShieldCheck className="w-3.5 h-3.5" />
                     <span>Фиксация цены в договоре</span>
@@ -501,7 +501,7 @@ export default function VehicleDetails() {
                 </div>
                 <div className="text-right">
                   <span className="font-display font-black text-[#C5A880] text-lg block leading-none">
-                    По запросу
+                    Цена по запросу
                   </span>
                 </div>
               </div>
@@ -545,7 +545,7 @@ export default function VehicleDetails() {
               {/* Итоговая жирная строка */}
               <div className="border-t border-dashed border-[#EFEBE4] pt-4 flex justify-between items-end">
                 <div>
-                  <span className="text-[10px] uppercase text-[#78716C] font-bold block font-mono">Полная цена под ключ</span>
+                  <span className="text-[10px] uppercase text-[#78716C] font-bold block font-mono">Цена под ключ от</span>
                   <span className="text-[9px] text-[#C5A880] font-bold flex items-center space-x-0.5 mt-0.5">
                     <ShieldCheck className="w-3.5 h-3.5" />
                     <span>Фиксация цены в договоре</span>
@@ -553,7 +553,7 @@ export default function VehicleDetails() {
                 </div>
                 <div className="text-right">
                   <span className="font-display font-black text-[#C5A880] text-lg block leading-none">
-                    {formatCurrency(calculated.finalPriceRUB)}
+                    {formatCurrency(calculated.finalPriceRUB, true)}
                   </span>
                 </div>
               </div>
@@ -621,7 +621,7 @@ export default function VehicleDetails() {
                 />
                 <div>
                   <h4 className="font-display font-bold text-xs text-[#1C1917]">{car.brand} {car.model}</h4>
-                  <p className="text-[10px] text-[#C5A880] font-black mt-0.5">{formatCurrency(calculated.finalPriceRUB)}</p>
+                  <p className="text-[10px] text-[#C5A880] font-black mt-0.5">{formatCurrency(calculated.finalPriceRUB, true)}</p>
                 </div>
               </div>
 

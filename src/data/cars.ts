@@ -54,8 +54,14 @@ export function calculateFullCarPrice(
   companyCommissionRUB: number;
   finalPriceRUB: number;
 } {
-  // Если цена в USD или кастомная цена под ключ равна 0, считаем стоимость "По запросу" (возвращаем все составляющие по 0)
-  if (car.priceUSD === 0 || (car.customFinalPriceRUB === 0 || (car as any).customFinalPrice === 0)) {
+  const customFinalPriceRUB = car.customFinalPriceRUB || (car as any).customFinalPrice || 0;
+
+  // Если и цена в USD равна 0 (и при этом нет кастомной цены), или кастомная цена явно равна 0, считаем стоимость "По запросу"
+  const isRequestOnly = (car.priceUSD === 0 && customFinalPriceRUB === 0) || 
+                        (car.customFinalPriceRUB !== undefined && car.customFinalPriceRUB === 0) ||
+                        ((car as any).customFinalPrice !== undefined && (car as any).customFinalPrice === 0);
+
+  if (isRequestOnly) {
     return {
       carBasePriceRUB: 0,
       customsDutyRUB: 0,
@@ -73,7 +79,6 @@ export function calculateFullCarPrice(
   // Поддержка альтернативных имен свойств утильсбора и пошлины из панели администратора
   const recyclingFeeRUB = car.recyclingFeeRUB || (car as any).recyclingRUB || 5200;
   const customsDutyEUR = car.customsDutyEUR || (car as any).customsEUR || 0;
-  const customFinalPriceRUB = car.customFinalPriceRUB || (car as any).customFinalPrice || 0;
 
   // 4. Оформление документов
   const brokerFeeRUB = BROKER_FEE_RUB;
@@ -130,16 +135,17 @@ export function calculateFullCarPrice(
   };
 }
 
-// Форматирование чисел в денежный формат (например, 7 850 000 ₽)
-export function formatCurrency(value: number): string {
+// Форматирование чисел в денежный формат (например, от 7 850 000 ₽)
+export function formatCurrency(value: number, showOt: boolean = false): string {
   if (value === 0) {
-    return 'По запросу';
+    return 'Цена по запросу';
   }
-  return new Intl.NumberFormat('ru-RU', {
+  const formatted = new Intl.NumberFormat('ru-RU', {
     style: 'currency',
     currency: 'RUB',
     maximumFractionDigits: 0,
   }).format(value);
+  return showOt ? `от ${formatted}` : formatted;
 }
 
 // Получение чистых сырых изображений автомобиля из полей без кэш-бастера

@@ -21,7 +21,7 @@
       "/cars/vw_tharu_3.jpg",
       "/cars/vw_tharu_4.jpg"
     ],
-    "priceUSD": 21500,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
     "customsDutyEUR": 3400,
     "description": "Новый динамичный городской кроссовер Volkswagen Tharu китайской сборки. Экономичный и современный двигатель 1.5 TSI Evo II, богатое оснащение и качественные материалы отделки. Доставка под ключ через Киргизию.",
@@ -37,18 +37,18 @@
   {
     "id": "toyota-rav4-new-cn",
     "brand": "Toyota",
-    "model": "RAV4 Luxury",
+    "model": "RAV4 Luxury CVT",
     "generation": "V (XA50)",
     "year": 2026,
     "mileage": 0,
     "condition": "new",
-    "country": "Китай",
+    "country": "Киргизия",
     "bodyType": "SUV",
     "engineType": "gasoline",
     "engineVolume": "2.0L",
     "power": 171,
     "driveType": "AWD",
-    "transmission": "Automatic",
+    "transmission": "CVT",
     "color": "Белый жемчуг (White Pearl)",
     "images": [
       "/cars/toyota_rav4_1.jpg",
@@ -56,10 +56,11 @@
       "/cars/toyota_rav4_3.jpg",
       "/cars/toyota_rav4_4.jpg"
     ],
-    "priceUSD": 28500,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
-    "customsDutyEUR": 4800,
-    "description": "Новый надежный кроссовер Toyota RAV4 китайского производства, импортируемый по ускоренному каналу через Киргизию под ключ. Полная таможенная очистка, действующий ЭПТС. Отличная адаптация для суровых зим.",
+    "customsDutyEUR": 0,
+    "customFinalPriceRUB": 3990000,
+    "description": "Новый надежный кроссовер Toyota RAV4 Luxury CVT напрямую из Киргизии. Полная таможенная очистка, действующий ЭПТС. Отличная адаптация для суровых зим.",
     "features": [
       "Светодиодная оптика LED",
       "Зимний пакет (подогрев лобового и руля)",
@@ -67,21 +68,21 @@
       "Камера заднего вида с динамической разметкой"
     ],
     "availability": "on_order",
-    "deliveryDays": 14
+    "deliveryDays": 12
   },
   {
     "id": "toyota-highlander-7s",
     "brand": "Toyota",
-    "model": "Highlander (7-seater)",
+    "model": "Highlander Premium (7-seater)",
     "generation": "IV (XU70)",
     "year": 2026,
     "mileage": 0,
     "condition": "new",
-    "country": "Китай",
+    "country": "Киргизия",
     "bodyType": "SUV",
-    "engineType": "hybrid",
-    "engineVolume": "2.5L Hybrid",
-    "power": 249,
+    "engineType": "gasoline",
+    "engineVolume": "2.0T",
+    "power": 248,
     "driveType": "AWD",
     "transmission": "Automatic",
     "color": "Черный обсидиан (Black)",
@@ -91,10 +92,11 @@
       "/cars/toyota_highlander_3.jpg",
       "/cars/toyota_highlander_4.jpg"
     ],
-    "priceUSD": 44000,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
-    "customsDutyEUR": 6800,
-    "description": "Роскошный полноразмерный кроссовер Toyota Highlander на 7 посадочных мест. Экономичная гибридная установка, великолепная плавность хода и вместительный багажник. Поставка напрямую из Китая транзитом через Киргизию.",
+    "customsDutyEUR": 0,
+    "customFinalPriceRUB": 4920000,
+    "description": "Полноразмерный 7-местный кроссовер Toyota Highlander в премиальной комплектации из Киргизии. Мощный турбированный двигатель 2.0L на 248 л.с., максимальный комфорт и передовые системы безопасности.",
     "features": [
       "7 мест (салон трансформер)",
       "Панорамный люк",
@@ -102,12 +104,12 @@
       "Трехзонный климат-контроль"
     ],
     "availability": "on_order",
-    "deliveryDays": 15
+    "deliveryDays": 12
   },
   {
     "id": "gac-s7-new-kg",
     "brand": "GAC",
-    "model": "S7 Intelligent",
+    "model": "S7 Premium 4WD",
     "generation": "I",
     "year": 2026,
     "mileage": 0,
@@ -115,10 +117,10 @@
     "country": "Киргизия",
     "bodyType": "SUV",
     "engineType": "hybrid",
-    "engineVolume": "2.0T PHEV",
-    "power": 252,
+    "engineVolume": "1.5T Hybrid",
+    "power": 304,
     "driveType": "AWD",
-    "transmission": "Automatic",
+    "transmission": "Reduction Gear",
     "color": "Серый матовый (Space Grey)",
     "images": [
       "/cars/gac_s7_1.jpg",
@@ -126,10 +128,11 @@
       "/cars/gac_s7_3.jpg",
       "/cars/gac_s7_4.jpg"
     ],
-    "priceUSD": 31000,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
-    "customsDutyEUR": 5100,
-    "description": "Интеллектуальный технологичный кроссовер GAC S7 с мощной последовательной гибридной силовой установкой. Сверхсовременный интерьер с парящим экраном мультимедиа, автопилот уровня L2+ и премиальная отделка салона.",
+    "customsDutyEUR": 0,
+    "customFinalPriceRUB": 4390000,
+    "description": "Высокотехнологичный премиальный гибридный кроссовер GAC S7 с системой полного привода 4WD. Обладает мощностью 304 л.с. и ультрасовременной силовой установкой через редуктор.",
     "features": [
       "Интеллектуальный автопилот L2+",
       "Премиальная эко-кожа Nappa",
@@ -161,7 +164,7 @@
       "/cars/vw_lamando_3.jpg",
       "/cars/vw_lamando_4.jpg"
     ],
-    "priceUSD": 23000,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
     "customsDutyEUR": 3200,
     "description": "Стильный спортивный лифтбек купеобразного силуэта с безрамочными дверями. Volkswagen Lamando L создан для ярких эмоций на дороге. Немецкие ходовые качества и ультрасовременный дизайн цифрового кокпита.",
@@ -177,18 +180,18 @@
   {
     "id": "audi-q3-new-cn",
     "brand": "Audi",
-    "model": "Q3 40 TFSI S-line",
+    "model": "Q3",
     "generation": "II Facelift",
     "year": 2026,
     "mileage": 0,
     "condition": "new",
-    "country": "Китай",
+    "country": "Киргизия",
     "bodyType": "SUV",
     "engineType": "gasoline",
-    "engineVolume": "2.0T",
-    "power": 186,
+    "engineVolume": "1.4L",
+    "power": 150,
     "driveType": "FWD",
-    "transmission": "Robotic",
+    "transmission": "Automatic",
     "color": "Темно-синий металлик (Navarra Blue)",
     "images": [
       "/cars/audi_q3_1.jpg",
@@ -196,10 +199,11 @@
       "/cars/audi_q3_3.jpg",
       "/cars/audi_q3_4.jpg"
     ],
-    "priceUSD": 32500,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
-    "customsDutyEUR": 4800,
-    "description": "Новый премиальный городской кроссовер Audi Q3 в спортивном пакете S-line. Великолепная управляемость, премиальные отделочные материалы и передовая архитектура Audi Virtual Cockpit. Экспресс-доставка из Китая.",
+    "customsDutyEUR": 0,
+    "customFinalPriceRUB": 2590000,
+    "description": "Новый компактный премиум-кроссовер Audi Q3 напрямую из Киргизии. Оснащен экономичным 1.4-литровым турбомотором на 150 л.с. в паре с надежным 6-ступенчатым автоматом.",
     "features": [
       "Пакет внешней отделки S-line",
       "Audi Virtual Cockpit 10.25\"",
@@ -207,7 +211,7 @@
       "Контурное освещение салона (30 цветов)"
     ],
     "availability": "on_order",
-    "deliveryDays": 14
+    "deliveryDays": 12
   },
   {
     "id": "audi-q2-new",
@@ -231,7 +235,7 @@
       "/cars/audi_q2_3.jpg",
       "/cars/audi_q2_4.jpg"
     ],
-    "priceUSD": 25500,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
     "customsDutyEUR": 3400,
     "description": "Новый компактный премиальный кроссовер Audi Q2 в удлиненной версии L для дополнительного комфорта задних пассажиров. Маневренный, яркий и технологичный кросс-хэтчбек с немецким характером.",
@@ -247,12 +251,12 @@
   {
     "id": "audi-q5-new",
     "brand": "Audi",
-    "model": "Q5 L 45 TFSI Quattro",
+    "model": "Q5",
     "generation": "II Facelift",
     "year": 2026,
     "mileage": 0,
     "condition": "new",
-    "country": "Китай",
+    "country": "Киргизия",
     "bodyType": "SUV",
     "engineType": "gasoline",
     "engineVolume": "2.0T",
@@ -266,10 +270,11 @@
       "/cars/audi_q5_3.jpg",
       "/cars/audi_q5_4.jpg"
     ],
-    "priceUSD": 41500,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
-    "customsDutyEUR": 6200,
-    "description": "Легендарный среднеразмерный кроссовер Audi Q5 L с системой постоянного полного привода Quattro и удлиненной колесной базой. Максимальный комфорт в дальних поездках и безупречные динамические характеристики.",
+    "customsDutyEUR": 0,
+    "customFinalPriceRUB": 0,
+    "description": "Легендарный среднеразмерный кроссовер Audi Q5 с полным приводом Quattro из Киргизии. Расчет стоимости по запросу.",
     "features": [
       "Полный привод Quattro ultra",
       "Пневматическая подвеска с адаптивной настройкой",
@@ -277,7 +282,7 @@
       "Матричные фары Matrix LED"
     ],
     "availability": "on_order",
-    "deliveryDays": 14
+    "deliveryDays": 12
   },
   {
     "id": "mercedes-glc-coupe-new",
@@ -287,7 +292,7 @@
     "year": 2026,
     "mileage": 0,
     "condition": "new",
-    "country": "Китай",
+    "country": "Киргизия",
     "bodyType": "SUV",
     "engineType": "gasoline",
     "engineVolume": "2.0T",
@@ -301,10 +306,11 @@
       "/cars/mercedes_glc_coupe_3.jpg",
       "/cars/mercedes_glc_coupe_4.jpg"
     ],
-    "priceUSD": 51000,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
-    "customsDutyEUR": 7800,
-    "description": "Абсолютно новый купе-кроссовер Mercedes-Benz GLC Coupe. Совершенство спортивных линий, ультрасовременный интерьер в стиле S-Class с вертикальным экраном MBUX и фирменный мягкий гибрид EQ Boost.",
+    "customsDutyEUR": 0,
+    "customFinalPriceRUB": 0,
+    "description": "Премиальный купе-кроссовер Mercedes-Benz GLC 260 Coupe из Киргизии. Элегантный силуэт и технологичный салон нового поколения. Расчет по запросу.",
     "features": [
       "Спортивный пакет AMG Line",
       "Интеллектуальная система мультимедиа MBUX II",
@@ -312,17 +318,17 @@
       "Акустика объемного звучания Burmester"
     ],
     "availability": "on_order",
-    "deliveryDays": 16
+    "deliveryDays": 12
   },
   {
     "id": "bmw-x5-20-new",
     "brand": "BMW",
-    "model": "X5 xDrive25Li (2.0T)",
+    "model": "X5 xDrive25Li M Sport (2.0T)",
     "generation": "G18 Facelift",
     "year": 2026,
     "mileage": 0,
     "condition": "new",
-    "country": "Китай",
+    "country": "Киргизия",
     "bodyType": "SUV",
     "engineType": "gasoline",
     "engineVolume": "2.0T",
@@ -336,10 +342,11 @@
       "/cars/bmw_x5_3.jpg",
       "/cars/bmw_x5_4.jpg"
     ],
-    "priceUSD": 63000,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
-    "customsDutyEUR": 9500,
-    "description": "Удлиненная люксовая версия BMW X5 Li с мощным и экономичным двигателем 2.0 TwinPower Turbo. Королевский простор на заднем ряду сидений, эксклюзивная отделка кожей Sensafin и пневмоподвеска.",
+    "customsDutyEUR": 0,
+    "customFinalPriceRUB": 8990000,
+    "description": "Удлиненный премиальный кроссовер BMW X5 Li в фирменном М-пакете из Киргизии. Мощный двигатель 2.0T (258 л.с.), великолепная плавность хода и непревзойденный простор сзади.",
     "features": [
       "Увеличенная колесная база Li",
       "Лазерные фары BMW Laserlight",
@@ -347,7 +354,7 @@
       "Спортивный М-пакет"
     ],
     "availability": "on_order",
-    "deliveryDays": 15
+    "deliveryDays": 12
   },
   {
     "id": "mazda-cx5-cn",
@@ -361,7 +368,7 @@
     "bodyType": "SUV",
     "engineType": "gasoline",
     "engineVolume": "2.0L",
-    "power": 156,
+    "power": 150,
     "driveType": "FWD",
     "transmission": "Automatic",
     "color": "Красный фирменный (Soul Red Crystal)",
@@ -371,10 +378,11 @@
       "/cars/mazda_cx5_3.jpg",
       "/cars/mazda_cx5_4.jpg"
     ],
-    "priceUSD": 23800,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
-    "customsDutyEUR": 3800,
-    "description": "Классический японский кроссовер Mazda CX-5 китайской сборки (совместное предприятие Changan-Mazda). Надежный атмосферный двигатель SkyActiv-G и классическая 6-ступенчатая гидротрансформаторная АКПП.",
+    "customsDutyEUR": 0,
+    "customFinalPriceRUB": 2690000,
+    "description": "Классический японский кроссовер Mazda CX-5 китайской сборки (совместное предприятие Changan-Mazda). Надежный атмосферный двигатель SkyActiv-G и классическая 6-ступенчатая гидротрансформаторная АКПП. Версия Comfort.",
     "features": [
       "Проекционный дисплей на лобовое стекло",
       "Система контроля вектора тяги G-Vectoring Control Plus",
@@ -387,7 +395,7 @@
   {
     "id": "mazda-cx5-max-cn",
     "brand": "Mazda",
-    "model": "CX-5 High Active (Max)",
+    "model": "CX-5 High Active",
     "generation": "II Facelift",
     "year": 2026,
     "mileage": 0,
@@ -395,8 +403,8 @@
     "country": "Китай",
     "bodyType": "SUV",
     "engineType": "gasoline",
-    "engineVolume": "2.5L",
-    "power": 196,
+    "engineVolume": "2.0L",
+    "power": 150,
     "driveType": "AWD",
     "transmission": "Automatic",
     "color": "Серый металлик (Machine Grey)",
@@ -406,10 +414,11 @@
       "/cars/mazda_cx5_max_3.jpg",
       "/cars/mazda_cx5_max_4.jpg"
     ],
-    "priceUSD": 26900,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
-    "customsDutyEUR": 4400,
-    "description": "Максимальная комплектация Mazda CX-5 с мощным атмосферным мотором 2.5L и системой полного привода i-Activ AWD. Салон из натуральной кожи, вентиляция сидений, люк и полный зимний пакет.",
+    "customsDutyEUR": 0,
+    "customFinalPriceRUB": 3290000,
+    "description": "Новый кроссовер Mazda CX-5 китайской сборки. Надежный атмосферный двигатель SkyActiv-G 2.0L с классической 6-ступенчатой автоматической коробкой передач в комплектации High Active.",
     "features": [
       "Полный привод i-Activ AWD",
       "Аудиосистема Bose с 10 динамиками",
@@ -441,7 +450,7 @@
       "/cars/kia_k5_3.jpg",
       "/cars/kia_k5_4.jpg"
     ],
-    "priceUSD": 27500,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
     "customsDutyEUR": 4500,
     "description": "Обновленный седан бизнес-класса Kia K5 в максимальной китайской конфигурации с турбомотором 2.0 T-GDI. Потрясающий футуристичный дизайн фар 'биение сердца', панорамная крыша и расширенный комплекс безопасности Drive Wise.",
@@ -457,12 +466,12 @@
   {
     "id": "vw-tiguan-lpro-new",
     "brand": "Volkswagen",
-    "model": "Tiguan L Pro",
+    "model": "Tiguan L Pro Luxe",
     "generation": "III",
     "year": 2026,
     "mileage": 0,
     "condition": "new",
-    "country": "Китай",
+    "country": "Киргизия",
     "bodyType": "SUV",
     "engineType": "gasoline",
     "engineVolume": "2.0T",
@@ -476,10 +485,11 @@
       "/cars/vw_tiguan_l_pro_3.jpg",
       "/cars/vw_tiguan_l_pro_4.jpg"
     ],
-    "priceUSD": 34500,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
-    "customsDutyEUR": 5800,
-    "description": "Ультратехнологичный кроссовер Volkswagen Tiguan L Pro третьего поколения. Модель оснащена тремя экранами на передней панели (включая дисплей пассажира), матричными фарами HD Matrix и мощной силовой установкой 2.0 TSI Quattro.",
+    "customsDutyEUR": 0,
+    "customFinalPriceRUB": 4690000,
+    "description": "Новейший Volkswagen Tiguan L Pro в роскошной комплектации Luxe из Киргизии. Полный привод 4WD, современная цифровая панель с дополнительными экранами и отличная управляемость.",
     "features": [
       "Три экрана на передней панели (включая пассажирский)",
       "Матричные фары высокого разрешения IQ.Light HD Matrix",
@@ -487,7 +497,7 @@
       "Проекция на лобовое стекло AR-HUD"
     ],
     "availability": "on_order",
-    "deliveryDays": 14
+    "deliveryDays": 12
   },
   {
     "id": "citroen-c5x-new",
@@ -500,8 +510,8 @@
     "country": "Китай",
     "bodyType": "Hatchback",
     "engineType": "gasoline",
-    "engineVolume": "1.6T",
-    "power": 175,
+    "engineVolume": "1.6L",
+    "power": 150,
     "driveType": "FWD",
     "transmission": "Automatic",
     "color": "Фирменный Амазонит (Amazonite Grey)",
@@ -511,10 +521,11 @@
       "/cars/citroen_c5x_3.jpg",
       "/cars/citroen_c5x_4.jpg"
     ],
-    "priceUSD": 25000,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
-    "customsDutyEUR": 3800,
-    "description": "Экстравагантный и невероятно комфортный флагман Citroen C5 X, сочетающий в себе черты элегантного седана, практичного универсала и внедорожного кроссовера. Легендарная подвеска Progressive Hydraulic Cushions.",
+    "customsDutyEUR": 0,
+    "customFinalPriceRUB": 3290000,
+    "description": "Экстравагантный и невероятно комфортный флагман Citroen C5 X, сочетающий в себе черты элегантного седана, практичного универсала и внедорожного кроссовера. Оснащен 1.6-литровым двигателем мощностью 150 л.с. и 8-ступенчатым автоматом.",
     "features": [
       "Комфортная подвеска Citroen Advanced Comfort Active Suspension",
       "Сиденья повышенной мягкости с памятью формы",
@@ -535,10 +546,10 @@
     "country": "Китай",
     "bodyType": "SUV",
     "engineType": "gasoline",
-    "engineVolume": "1.5T",
+    "engineVolume": "1.5L",
     "power": 150,
     "driveType": "FWD",
-    "transmission": "Robotic",
+    "transmission": "Automatic",
     "color": "Белый (Pure White)",
     "images": [
       "/cars/vw_tiguan_xr_1.jpg",
@@ -546,10 +557,11 @@
       "/cars/vw_tiguan_xr_3.jpg",
       "/cars/vw_tiguan_xr_4.jpg"
     ],
-    "priceUSD": 23500,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
-    "customsDutyEUR": 3100,
-    "description": "Стильная молодежная модификация Tiguan XR китайско-корейского направления. Экономичный и резвый кроссовер с современными мультимедийными технологиями и отличной эргономикой.",
+    "customsDutyEUR": 0,
+    "customFinalPriceRUB": 2190000,
+    "description": "Стильная молодежная модификация Tiguan XR китайско-корейского направления. Экономичный и резвый кроссовер с автоматической коробкой передач, современными мультимедийными технологиями и отличной эргономикой.",
     "features": [
       "Цифровой щиток приборов IQ.Drive",
       "Контурная LED-подсветка салона",
@@ -581,7 +593,7 @@
       "/cars/audi_q3_used_3.jpg",
       "/cars/audi_q3_used_4.jpg"
     ],
-    "priceUSD": 24500,
+    "priceUSD": 0,
     "recyclingFeeRUB": 5200,
     "customsDutyEUR": 5400,
     "description": "Превосходный экономичный дизельный кроссовер Audi Q3 напрямую со страхового аукциона Южной Кореи. Честный проверенный пробег, один владелец, безаварийное состояние. Идеальный выбор для дальних поездок.",
@@ -616,7 +628,7 @@
       "/cars/audi_a3_used_3.jpg",
       "/cars/audi_a3_used_4.jpg"
     ],
-    "priceUSD": 20500,
+    "priceUSD": 0,
     "recyclingFeeRUB": 5200,
     "customsDutyEUR": 3800,
     "description": "Элегантный и маневренный седан премиум-класса Audi A3 из Южной Кореи. Состояние нового автомобиля, подтвержденная сервисная история, богатое оснащение. Идеальный автомобиль на каждый день.",
@@ -651,7 +663,7 @@
       "/cars/bmw_x1_used_3.jpg",
       "/cars/bmw_x1_used_4.jpg"
     ],
-    "priceUSD": 23500,
+    "priceUSD": 0,
     "recyclingFeeRUB": 5200,
     "customsDutyEUR": 5400,
     "description": "Надежный и динамичный дизельный кроссовер BMW X1 с системой полного привода xDrive. Автомобиль закуплен у официального дилера BMW Premium Selection в Корее. Полностью в заводском окрасе.",
@@ -686,7 +698,7 @@
       "/cars/bmw_x3_used_3.jpg",
       "/cars/bmw_x3_used_4.jpg"
     ],
-    "priceUSD": 33500,
+    "priceUSD": 0,
     "recyclingFeeRUB": 5200,
     "customsDutyEUR": 5400,
     "description": "Один из лучших среднеразмерных кроссоверов в своем классе. BMW X3 в фирменном спортивном пакете M Sport. Отличный дизель с огромным ресурсом, полный привод xDrive и идеальное техническое состояние. Поставка из Кореи.",
@@ -721,7 +733,7 @@
       "/cars/bmw_320_used_3.jpg",
       "/cars/bmw_320_used_4.jpg"
     ],
-    "priceUSD": 27000,
+    "priceUSD": 0,
     "recyclingFeeRUB": 5200,
     "customsDutyEUR": 4200,
     "description": "Легендарный седан третьей серии BMW 320i в элегантном исполнении Luxury. Идеальная развесовка 50:50, задний привод, спортивный характер и премиальный уровень комфорта. Доставка из Южной Кореи в РФ.",
@@ -756,7 +768,7 @@
       "/cars/mercedes_gle_350_used_3.jpg",
       "/cars/mercedes_gle_350_used_4.jpg"
     ],
-    "priceUSD": 49000,
+    "priceUSD": 0,
     "recyclingFeeRUB": 5200,
     "customsDutyEUR": 9000,
     "description": "Роскошный рамный кроссовер Mercedes-Benz GLE 350d с мощным и надежным рядным 6-цилиндровым дизельным мотором. Полноприводная система 4MATIC, оригинальный пробег, состояние кузова близко к новому. Экспорт из Кореи.",
@@ -791,7 +803,7 @@
       "/cars/mercedes_s180_used_3.jpg",
       "/cars/mercedes_s180_used_4.jpg"
     ],
-    "priceUSD": 46000,
+    "priceUSD": 0,
     "recyclingFeeRUB": 5200,
     "customsDutyEUR": 6800,
     "description": "Представительский седан Mercedes-Benz S-Class (W222) в удлиненной версии Long. Непревзойденный комфорт, безупречный стиль и высочайший уровень безопасности. Проверенная корейская эксплуатация.",
@@ -826,7 +838,7 @@
       "/cars/mercedes_eclass_used_3.jpg",
       "/cars/mercedes_eclass_used_4.jpg"
     ],
-    "priceUSD": 32800,
+    "priceUSD": 0,
     "recyclingFeeRUB": 5200,
     "customsDutyEUR": 5100,
     "description": "Обновленный седан Mercedes-Benz E-Class с экономичным и тяговитым дизельным двигателем и полным приводом 4MATIC. Покупался и обслуживался у официального дилера в Корее. В идеальном состоянии.",
@@ -861,7 +873,7 @@
       "/cars/kia_k5_used_3.jpg",
       "/cars/kia_k5_used_4.jpg"
     ],
-    "priceUSD": 18500,
+    "priceUSD": 0,
     "recyclingFeeRUB": 5200,
     "customsDutyEUR": 3400,
     "description": "Популярный молодежный седан бизнес-класса Kia K5 в богатой корейской комплектации Noblesse. Комфортный салон, отличная динамика и великолепная надежность. Полная история обслуживания.",
@@ -896,7 +908,7 @@
       "/cars/kia_k3_used_3.jpg",
       "/cars/kia_k3_used_4.jpg"
     ],
-    "priceUSD": 14500,
+    "priceUSD": 0,
     "recyclingFeeRUB": 5200,
     "customsDutyEUR": 2800,
     "description": "Экономичный компактный седан Kia K3 (Cerato) в максимальной комплектации Signature напрямую из Южной Кореи. Оснащен экономичным мотором Smartstream и вариатором IVT.",
@@ -931,7 +943,7 @@
       "/cars/kia_ray_3.jpg",
       "/cars/kia_ray_4.jpg"
     ],
-    "priceUSD": 16000,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
     "customsDutyEUR": 1500,
     "description": "Суперкомпактный, но невероятно вместительный микровэн Kia Ray. Сдвижная боковая дверь без центральной стойки обеспечивает королевскую посадку. Доступен в бензиновой и электрической версиях.",
@@ -966,9 +978,10 @@
       "/cars/kia_kx1_3.jpg",
       "/cars/kia_kx1_4.jpg"
     ],
-    "priceUSD": 16900,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
-    "customsDutyEUR": 1900,
+    "customsDutyEUR": 0,
+    "customFinalPriceRUB": 1690000,
     "description": "Субкомпактный экономичный кроссовер Kia KX1 (родственник Kia Stonic). Отличная подвеска, классический атмосферный двигатель 1.4 и надежный 6-ступенчатый автомат. Идеален для городского трафика.",
     "features": [
       "Надежная связка: атмосферный мотор + классическая АКПП",
@@ -1001,7 +1014,7 @@
       "/cars/hyundai_sonata_avante_3.jpg",
       "/cars/hyundai_sonata_avante_4.jpg"
     ],
-    "priceUSD": 23500,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
     "customsDutyEUR": 3400,
     "description": "Стильные технологичные седаны Hyundai Sonata и Hyundai Avante (Elantra) новой генерации из Китая и Кореи. Агрессивный дизайн, просторный современный интерьер и передовые системы безопасности SmartSense.",
@@ -1036,7 +1049,7 @@
       "/cars/hyundai_santafe_3.jpg",
       "/cars/hyundai_santafe_4.jpg"
     ],
-    "priceUSD": 45000,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
     "customsDutyEUR": 6500,
     "description": "Пятое поколение легендарного кроссовера Hyundai Santa Fe в брутальном угловатом кузове. Максимальная люксовая комплектация Calligraphy. Премиальные материалы, роскошный капитанский салон и потрясающая практичность.",
@@ -1071,7 +1084,7 @@
       "/cars/vw_golf_3.jpg",
       "/cars/vw_golf_4.jpg"
     ],
-    "priceUSD": 21800,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
     "customsDutyEUR": 3100,
     "description": "Легендарный хэтчбек Golf восьмого поколения. Идеальная немецкая управляемость, компактные размеры и продуманный до мелочей салон. Доступен как в новом состоянии, так и с небольшим подтвержденным пробегом.",
@@ -1106,7 +1119,7 @@
       "/cars/vw_troc_3.jpg",
       "/cars/vw_troc_4.jpg"
     ],
-    "priceUSD": 22000,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
     "customsDutyEUR": 3200,
     "description": "Яркий молодежный паркетник Volkswagen T-Roc в спортивном пакете R-Line. Новый эффективный мотор 1.5 TSI, контрастная окраска кузова с черной крышей и панорамное остекление.",
@@ -1141,7 +1154,7 @@
       "/cars/vw_tcross_3.jpg",
       "/cars/vw_tcross_4.jpg"
     ],
-    "priceUSD": 18900,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
     "customsDutyEUR": 1900,
     "description": "Экономичный компактный кроссовер Volkswagen T-Cross. Удивительный внутренний объем при скромных внешних габаритах, сдвижной задний ряд сидений и надежная классическая гидротрансформаторная трансмиссия.",
@@ -1176,7 +1189,7 @@
       "/cars/vw_teramont_3.jpg",
       "/cars/vw_teramont_4.jpg"
     ],
-    "priceUSD": 48500,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
     "customsDutyEUR": 6800,
     "description": "Огромный семиместный внедорожник Volkswagen Teramont китайской сборки. Полноприводный семейный лайнер с потрясающим уровнем комфорта, панорамной крышей и премиальной акустикой. Поставляется по прямому каналу под ключ.",
@@ -1211,7 +1224,7 @@
       "/cars/vw_lavida_3.jpg",
       "/cars/vw_lavida_4.jpg"
     ],
-    "priceUSD": 19500,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
     "customsDutyEUR": 2500,
     "description": "Бестселлер китайского рынка седанов — Volkswagen Lavida в специальном спортивном исполнении Starry Edition. Экономичность, невероятно практичный салон и доступная цена обслуживания.",
@@ -1246,7 +1259,7 @@
       "/cars/jetta_vs7_3.jpg",
       "/cars/jetta_vs7_4.jpg"
     ],
-    "priceUSD": 21800,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
     "customsDutyEUR": 2900,
     "description": "Полноразмерный семейный кроссовер Jetta VS7 от совместного предприятия FAW-Volkswagen. Немецкая платформа MQB, надежный турбомотор 1.4 TSI (EA211) в связке с классическим японским автоматом Aisin 6-АКПП.",
@@ -1281,7 +1294,7 @@
       "/cars/jetta_vs5_3.jpg",
       "/cars/jetta_vs5_4.jpg"
     ],
-    "priceUSD": 19500,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
     "customsDutyEUR": 2400,
     "description": "Практичный среднеразмерный кроссовер Jetta VS5. Аналог Skoda Karoq и VW Seat Ateca. Отличный дорожный просвет, проверенная немецкая эргономика и высочайшая надежность основных агрегатов.",
@@ -1316,7 +1329,7 @@
       "/cars/jetta_vs8_3.jpg",
       "/cars/jetta_vs8_4.jpg"
     ],
-    "priceUSD": 23200,
+    "priceUSD": 0,
     "recyclingFeeRUB": 3400,
     "customsDutyEUR": 3100,
     "description": "Перспективный флагман модельной линейки Jetta VS8. Обладает увеличенной колесной базой, расширенным перечнем ассистентов вождения и премиальным качеством отделки интерьера.",
@@ -1325,6 +1338,78 @@
       "Вентиляция сиденья водителя",
       "Цифровая панель приборов 12.3\"",
       "Электропривод двери багажника"
+    ],
+    "availability": "on_order",
+    "deliveryDays": 14
+  },
+  {
+    "id": "changan-cs55-new",
+    "brand": "Changan",
+    "model": "CS55 Plus",
+    "generation": "II",
+    "year": 2026,
+    "mileage": 0,
+    "condition": "new",
+    "country": "Китай",
+    "bodyType": "SUV",
+    "engineType": "gasoline",
+    "engineVolume": "1.5L",
+    "power": 140,
+    "driveType": "FWD",
+    "transmission": "Automatic",
+    "color": "Серый металлик",
+    "images": [
+      "/cars/changan_cs55_1.jpg",
+      "/cars/changan_cs55_2.jpg",
+      "/cars/changan_cs55_3.jpg",
+      "/cars/changan_cs55_4.jpg"
+    ],
+    "priceUSD": 0,
+    "recyclingFeeRUB": 3400,
+    "customsDutyEUR": 0,
+    "customFinalPriceRUB": 2190000,
+    "description": "Современный и технологичный кроссовер Changan CS55 Plus. Экономичный двигатель 1.5L в связке с классической 6-ступенчатой автоматической трансмиссией обеспечивает отличную динамику и комфорт в городских условиях.",
+    "features": [
+      "Светодиодная оптика",
+      "Панорамная крыша с люком",
+      "Камера 360 градусов",
+      "Адаптивный круиз-контроль"
+    ],
+    "availability": "on_order",
+    "deliveryDays": 14
+  },
+  {
+    "id": "bmw-x1-new",
+    "brand": "BMW",
+    "model": "X1",
+    "generation": "III (U11)",
+    "year": 2026,
+    "mileage": 0,
+    "condition": "new",
+    "country": "Китай",
+    "bodyType": "SUV",
+    "engineType": "gasoline",
+    "engineVolume": "1.5L",
+    "power": 140,
+    "driveType": "FWD",
+    "transmission": "Automatic",
+    "color": "Белый перламутр",
+    "images": [
+      "/cars/bmw_x1_1.jpg",
+      "/cars/bmw_x1_2.jpg",
+      "/cars/bmw_x1_3.jpg",
+      "/cars/bmw_x1_4.jpg"
+    ],
+    "priceUSD": 0,
+    "recyclingFeeRUB": 3400,
+    "customsDutyEUR": 0,
+    "customFinalPriceRUB": 2690000,
+    "description": "Стильный и маневренный баварский кроссовер BMW X1 нового поколения. Великолепное сочетание динамики, управляемости и передовых цифровых технологий с экономичным 1.5-литровым двигателем и 7-ступенчатым автоматом.",
+    "features": [
+      "BMW Live Cockpit Plus",
+      "Светодиодные фары",
+      "Ассистент парковки Active Park Assist",
+      "Двухзонный климат-контроль"
     ],
     "availability": "on_order",
     "deliveryDays": 14

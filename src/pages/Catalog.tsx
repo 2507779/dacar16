@@ -470,9 +470,9 @@ export default function Catalog() {
                         </p>
                       </div>
                       <div className="mt-3.5 pt-2 border-t border-[#EFEBE4]/40 flex flex-col">
-                        <span className="text-[8px] text-[#78716C] uppercase tracking-widest block font-mono">Итого под ключ</span>
+                        <span className="text-[8px] text-[#78716C] uppercase tracking-widest block font-mono">Цена под ключ от</span>
                         <span className="font-display font-bold text-[#C5A880] text-xs mt-0.5">
-                          {formatCurrency(calculated.finalPriceRUB)}
+                          {formatCurrency(calculated.finalPriceRUB, true)}
                         </span>
                       </div>
                     </div>
@@ -551,9 +551,10 @@ export default function Catalog() {
                           <CheckCircle className="w-3.5 h-3.5 shrink-0 animate-pulse" />
                           <span>~{car.deliveryDays} дней</span>
                         </span>
-                        <div className="text-right">
-                          <span className="font-display font-black text-[#C5A880] text-xs">
-                            {formatCurrency(calculated.finalPriceRUB)}
+                        <div className="text-right flex flex-col items-end">
+                          <span className="text-[7px] text-[#78716C] uppercase tracking-widest font-mono block">Цена под ключ</span>
+                          <span className="font-display font-black text-[#C5A880] text-xs block">
+                            {formatCurrency(calculated.finalPriceRUB, true)}
                           </span>
                         </div>
                       </div>
