@@ -38,8 +38,9 @@ export default function App() {
       localStorage.setItem('tg_channel_id', APP_CONFIG.DEFAULT_TG_CHANNEL_ID);
     }
 
-    // Загружаем актуальную базу автомобилей с сервера для мгновенного отображения всем посетителям
+    // Загружаем актуальную базу автомобилей с сервера и из статического JSON для работы на всех хостингах (включая Cloudflare/Vercel)
     loadCarsFromServer();
+    fetchCars();
 
     // Запрашиваем актуальный глобальный кэш-бастер с сервера
     fetch('/api/cache-buster')

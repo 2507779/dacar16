@@ -446,10 +446,10 @@ export const useStore = create<AppStore>((set, get) => {
 
     fetchCars: async () => {
       try {
-        const res = await fetch(`/public/cars.json?timestamp=${Date.now()}`);
+        const res = await fetch(`/cars.json?timestamp=${Date.now()}`);
         if (!res.ok) {
-          // Fallback to /cars.json in case public directory content is mapped on root (Vite behavior)
-          const fallbackRes = await fetch(`/cars.json?timestamp=${Date.now()}`);
+          // Fallback to public/cars.json
+          const fallbackRes = await fetch(`/public/cars.json?timestamp=${Date.now()}`);
           if (fallbackRes.ok) {
             const fetchedCars = await fallbackRes.json();
             if (Array.isArray(fetchedCars) && fetchedCars.length > 0) {
@@ -466,7 +466,7 @@ export const useStore = create<AppStore>((set, get) => {
           set({ cars: fetchedCars });
         }
       } catch (err) {
-        console.warn('Failed to fetch cars from public/cars.json:', err);
+        console.warn('Failed to fetch cars from cars.json:', err);
       }
     },
 
