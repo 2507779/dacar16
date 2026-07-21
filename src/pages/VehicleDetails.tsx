@@ -203,7 +203,29 @@ export default function VehicleDetails() {
   const handleCloseOrderSheet = () => {
     if (isSubmitting) return;
     triggerHaptic('light');
-    setIsOrderSheetOpen(false);
+    if (window.history.state?.view === 'ordersheet') {
+      window.history.back();
+    } else {
+      setIsOrderSheetOpen(false);
+    }
+  };
+
+  const closeLightbox = () => {
+    triggerHaptic('light');
+    if (window.history.state?.view === 'lightbox') {
+      window.history.back();
+    } else {
+      setIsLightboxOpen(false);
+    }
+  };
+
+  const closeDetails = () => {
+    triggerHaptic('light');
+    if (window.history.state?.view === 'details' || window.history.state?.view === 'lightbox' || window.history.state?.view === 'testdrive' || window.history.state?.view === 'ordersheet') {
+      window.history.back();
+    } else {
+      setActiveCarId(null);
+    }
   };
 
   // Рефы для таймаутов
@@ -279,7 +301,54 @@ export default function VehicleDetails() {
     executeOrderSubmission();
   };
 
-  // Синхронизация кнопки «Назад» в Telegram Mini App для бесшовного UX
+  // 1. Инициализация состояния истории при монтировании деталки
+  useEffect(() => {
+    if (window.history.state?.view !== 'details') {
+      window.history.pushState({ view: 'details' }, '');
+    }
+
+    const handlePopState = (e: PopStateEvent) => {
+      const state = e.state;
+      if (!state) {
+        // Мы вернулись на главную (state === null)
+        setIsLightboxOpen(false);
+        setIsTestDriveOpen(false);
+        setIsOrderSheetOpen(false);
+        setActiveCarId(null);
+      } else if (state.view === 'details') {
+        // Мы вернулись на страницу деталки из лайтбокса/тест-драйва/заказа
+        setIsLightboxOpen(false);
+        setIsTestDriveOpen(false);
+        setIsOrderSheetOpen(false);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, []);
+
+  // 2. Синхронизация состояний лайтбокса, тест-драйва и заказа с историей браузера
+  useEffect(() => {
+    if (isLightboxOpen && window.history.state?.view !== 'lightbox') {
+      window.history.pushState({ view: 'lightbox' }, '');
+    }
+  }, [isLightboxOpen]);
+
+  useEffect(() => {
+    if (isTestDriveOpen && window.history.state?.view !== 'testdrive') {
+      window.history.pushState({ view: 'testdrive' }, '');
+    }
+  }, [isTestDriveOpen]);
+
+  useEffect(() => {
+    if (isOrderSheetOpen && window.history.state?.view !== 'ordersheet') {
+      window.history.pushState({ view: 'ordersheet' }, '');
+    }
+  }, [isOrderSheetOpen]);
+
+  // 3. Синхронизация кнопки «Назад» в Telegram Mini App для бесшовного UX
   useEffect(() => {
     const tg = (window as any).Telegram?.WebApp;
     if (!tg || !tg.BackButton) return;
@@ -289,15 +358,7 @@ export default function VehicleDetails() {
       
       const handleBackClick = () => {
         triggerHaptic('light');
-        if (isLightboxOpen) {
-          setIsLightboxOpen(false);
-        } else if (isTestDriveOpen) {
-          stopTestDrive();
-        } else if (isOrderSheetOpen) {
-          setIsOrderSheetOpen(false);
-        } else {
-          setActiveCarId(null);
-        }
+        window.history.back();
       };
 
       tg.BackButton.onClick(handleBackClick);
@@ -308,7 +369,7 @@ export default function VehicleDetails() {
     } else {
       tg.BackButton.hide();
     }
-  }, [activeCarId, car, isLightboxOpen, isTestDriveOpen, isOrderSheetOpen, simulator]);
+  }, [activeCarId, car]);
 
   return (
     <div className="flex flex-col text-[#1C1917] pb-36 select-none relative bg-[#F0EEEC]">
@@ -349,8 +410,7 @@ export default function VehicleDetails() {
         <button
           onClick={(e) => {
             e.stopPropagation();
-            triggerHaptic('light');
-            setActiveCarId(null);
+            closeDetails();
           }}
           className="absolute top-4 left-4 p-2.5 rounded-full bg-white/80 border border-black/[0.03] backdrop-blur-md hover:bg-white text-[#1C1917] transition active:scale-90 z-10 shadow-md flex items-center justify-center cursor-pointer"
           title="Назад"
@@ -721,7 +781,7 @@ export default function VehicleDetails() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/95 z-[999] flex flex-col justify-between p-4 select-none"
-            onClick={() => setIsLightboxOpen(false)}
+            onClick={closeLightbox}
           >
             {/* Header */}
             <div className="flex justify-between items-center text-white z-10 w-full" onClick={(e) => e.stopPropagation()}>
@@ -729,10 +789,7 @@ export default function VehicleDetails() {
                 {activeImageIndex + 1} / {getCarImages(car).length}
               </span>
               <button
-                onClick={() => {
-                  triggerHaptic('light');
-                  setIsLightboxOpen(false);
-                }}
+                onClick={closeLightbox}
                 className="p-2.5 bg-white/10 hover:bg-white/20 rounded-full transition-all duration-300 active:scale-90"
               >
                 <X className="w-5 h-5 text-white" />
