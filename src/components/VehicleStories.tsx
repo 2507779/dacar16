@@ -462,11 +462,19 @@ export default function VehicleStories() {
 
             {/* Крупный ценник */}
             <div className="flex items-baseline space-x-1.5 mt-2.5">
-              <span className="text-[10px] font-bold text-[#1C1917]/75 uppercase">ОТ</span>
-              <span className="font-display font-black text-2xl text-[#1C1917] leading-none">
-                {formatCurrency(calculated.finalPriceRUB).replace('₽', '')}
-              </span>
-              <span className="text-xs font-black text-[#1C1917]">РУБ.</span>
+              {calculated.finalPriceRUB === 0 ? (
+                <span className="font-display font-black text-lg text-[#1C1917] leading-none uppercase">
+                  Цена по запросу
+                </span>
+              ) : (
+                <>
+                  <span className="text-[10px] font-bold text-[#1C1917]/75 uppercase">ОТ</span>
+                  <span className="font-display font-black text-2xl text-[#1C1917] leading-none">
+                    {formatCurrency(calculated.finalPriceRUB).replace('₽', '')}
+                  </span>
+                  <span className="text-xs font-black text-[#1C1917]">РУБ.</span>
+                </>
+              )}
             </div>
 
             {/* Описание "включено всё" */}

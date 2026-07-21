@@ -483,57 +483,82 @@ export default function VehicleDetails() {
           </div>
 
           {/* Табличная Детализация пошлин */}
-          <div className="space-y-2.5 text-xs pt-2">
-            <div className="flex justify-between text-[#78716C] font-medium">
-              <span>Стоимость авто ({car.country})</span>
-              <span className="font-mono font-bold text-[#1C1917]">
-                {formatCurrency(calculated.carBasePriceRUB)}
-              </span>
-            </div>
-            
-            <div className="flex justify-between text-[#78716C] font-medium">
-              <span>Таможенная пошлина РФ</span>
-              <span className="font-mono font-bold text-[#1C1917]">
-                {formatCurrency(calculated.customsDutyRUB)}
-              </span>
-            </div>
-
-            <div className="flex justify-between text-[#78716C] font-medium">
-              <span>Льготный утильсбор</span>
-              <span className="font-mono font-bold text-[#1C1917]">{formatCurrency(calculated.recyclingFeeRUB)}</span>
-            </div>
-
-            <div className="flex justify-between text-[#78716C] font-medium">
-              <span>СБКТС, ЭПТС & Услуги брокера</span>
-              <span className="font-mono font-bold text-[#1C1917]">{formatCurrency(BROKER_FEE_RUB)}</span>
-            </div>
-
-            <div className="flex justify-between text-[#78716C] font-medium">
-              <span>Доставка и страхование</span>
-              <span className="font-mono font-bold text-[#1C1917]">{formatCurrency(calculated.deliveryFeeRUB)}</span>
-            </div>
-
-            <div className="flex justify-between text-[#78716C] font-medium">
-              <span>Комиссия компании DA!CAR</span>
-              <span className="font-mono font-bold text-[#1C1917]">{formatCurrency(COMPANY_COMMISSION)}</span>
-            </div>
-
-            {/* Итоговая жирная строка */}
-            <div className="border-t border-dashed border-[#EFEBE4] pt-4 flex justify-between items-end">
-              <div>
-                <span className="text-[10px] uppercase text-[#78716C] font-bold block font-mono">Полная цена под ключ</span>
-                <span className="text-[9px] text-[#C5A880] font-bold flex items-center space-x-0.5 mt-0.5">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Фиксация цены в договоре</span>
-                </span>
-              </div>
-              <div className="text-right">
-                <span className="font-display font-black text-[#C5A880] text-lg block leading-none">
-                  {formatCurrency(calculated.finalPriceRUB)}
-                </span>
+          {calculated.finalPriceRUB === 0 ? (
+            <div className="pt-2 text-center pb-2">
+              <p className="text-[10px] font-bold text-[#C5A880] uppercase tracking-wider mb-1 font-mono">Расчет по запросу</p>
+              <p className="text-[10px] text-[#78716C] leading-relaxed font-semibold">
+                Стоимость этого автомобиля рассчитывается индивидуально с учетом текущих курсов валют, условий логистики и ваших индивидуальных требований.
+              </p>
+              
+              {/* Итоговая жирная строка */}
+              <div className="border-t border-dashed border-[#EFEBE4] mt-4 pt-4 flex justify-between items-end text-left">
+                <div>
+                  <span className="text-[10px] uppercase text-[#78716C] font-bold block font-mono">Полная цена под ключ</span>
+                  <span className="text-[9px] text-[#C5A880] font-bold flex items-center space-x-0.5 mt-0.5">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>Фиксация цены в договоре</span>
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="font-display font-black text-[#C5A880] text-lg block leading-none">
+                    По запросу
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="space-y-2.5 text-xs pt-2">
+              <div className="flex justify-between text-[#78716C] font-medium">
+                <span>Стоимость авто ({car.country})</span>
+                <span className="font-mono font-bold text-[#1C1917]">
+                  {formatCurrency(calculated.carBasePriceRUB)}
+                </span>
+              </div>
+              
+              <div className="flex justify-between text-[#78716C] font-medium">
+                <span>Таможенная пошлина РФ</span>
+                <span className="font-mono font-bold text-[#1C1917]">
+                  {formatCurrency(calculated.customsDutyRUB)}
+                </span>
+              </div>
+
+              <div className="flex justify-between text-[#78716C] font-medium">
+                <span>Льготный утильсбор</span>
+                <span className="font-mono font-bold text-[#1C1917]">{formatCurrency(calculated.recyclingFeeRUB)}</span>
+              </div>
+
+              <div className="flex justify-between text-[#78716C] font-medium">
+                <span>СБКТС, ЭПТС & Услуги брокера</span>
+                <span className="font-mono font-bold text-[#1C1917]">{formatCurrency(BROKER_FEE_RUB)}</span>
+              </div>
+
+              <div className="flex justify-between text-[#78716C] font-medium">
+                <span>Доставка и страхование</span>
+                <span className="font-mono font-bold text-[#1C1917]">{formatCurrency(calculated.deliveryFeeRUB)}</span>
+              </div>
+
+              <div className="flex justify-between text-[#78716C] font-medium">
+                <span>Комиссия компании DA!CAR</span>
+                <span className="font-mono font-bold text-[#1C1917]">{formatCurrency(COMPANY_COMMISSION)}</span>
+              </div>
+
+              {/* Итоговая жирная строка */}
+              <div className="border-t border-dashed border-[#EFEBE4] pt-4 flex justify-between items-end">
+                <div>
+                  <span className="text-[10px] uppercase text-[#78716C] font-bold block font-mono">Полная цена под ключ</span>
+                  <span className="text-[9px] text-[#C5A880] font-bold flex items-center space-x-0.5 mt-0.5">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>Фиксация цены в договоре</span>
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="font-display font-black text-[#C5A880] text-lg block leading-none">
+                    {formatCurrency(calculated.finalPriceRUB)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

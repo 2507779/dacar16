@@ -939,6 +939,9 @@ export function calculateFullCarPrice(car: Car, city: string = 'Казань (Г
 }
 
 export function formatCurrency(value: number): string {
+  if (value === 0) {
+    return 'По запросу';
+  }
   return new Intl.NumberFormat('ru-RU', {
     style: 'currency',
     currency: 'RUB',

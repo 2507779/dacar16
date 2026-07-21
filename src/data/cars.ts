@@ -54,6 +54,19 @@ export function calculateFullCarPrice(
   companyCommissionRUB: number;
   finalPriceRUB: number;
 } {
+  // Если цена в USD или кастомная цена под ключ равна 0, считаем стоимость "По запросу" (возвращаем все составляющие по 0)
+  if (car.priceUSD === 0 || (car.customFinalPriceRUB === 0 || (car as any).customFinalPrice === 0)) {
+    return {
+      carBasePriceRUB: 0,
+      customsDutyRUB: 0,
+      recyclingFeeRUB: 0,
+      brokerFeeRUB: 0,
+      deliveryFeeRUB: 0,
+      companyCommissionRUB: 0,
+      finalPriceRUB: 0,
+    };
+  }
+
   const usdRate = EXCHANGE_RATES.USD_to_RUB;
   const eurRate = EXCHANGE_RATES.EUR_to_RUB;
 
@@ -119,6 +132,9 @@ export function calculateFullCarPrice(
 
 // Форматирование чисел в денежный формат (например, 7 850 000 ₽)
 export function formatCurrency(value: number): string {
+  if (value === 0) {
+    return 'По запросу';
+  }
   return new Intl.NumberFormat('ru-RU', {
     style: 'currency',
     currency: 'RUB',
