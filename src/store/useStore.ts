@@ -425,6 +425,7 @@ export const useStore = create<AppStore>((set, get) => {
       const updatedCars = [...get().cars, newCar];
       localStorage.setItem('dacar_all_cars', JSON.stringify(updatedCars));
       localStorage.setItem('dacar_cache_buster', Date.now().toString());
+      localStorage.setItem('dacar_cars_last_fetched', Date.now().toString());
       set({ cars: updatedCars });
       fetch('/api/cars', {
         method: 'POST',
@@ -442,6 +443,7 @@ export const useStore = create<AppStore>((set, get) => {
       });
       localStorage.setItem('dacar_all_cars', JSON.stringify(updatedCars));
       localStorage.setItem('dacar_cache_buster', Date.now().toString());
+      localStorage.setItem('dacar_cars_last_fetched', Date.now().toString());
       set({ cars: updatedCars });
       fetch('/api/cars', {
         method: 'POST',
@@ -454,6 +456,7 @@ export const useStore = create<AppStore>((set, get) => {
       const updatedCars = get().cars.filter(c => c.id !== carId);
       localStorage.setItem('dacar_all_cars', JSON.stringify(updatedCars));
       localStorage.setItem('dacar_cache_buster', Date.now().toString());
+      localStorage.setItem('dacar_cars_last_fetched', Date.now().toString());
       set({ cars: updatedCars });
       fetch('/api/cars', {
         method: 'POST',
@@ -465,6 +468,7 @@ export const useStore = create<AppStore>((set, get) => {
     setCars: (newCars) => {
       localStorage.setItem('dacar_all_cars', JSON.stringify(newCars));
       localStorage.setItem('dacar_cache_buster', Date.now().toString());
+      localStorage.setItem('dacar_cars_last_fetched', Date.now().toString());
       set({ cars: newCars });
       fetch('/api/cars', {
         method: 'POST',
@@ -474,12 +478,28 @@ export const useStore = create<AppStore>((set, get) => {
     },
 
     loadCarsFromServer: async () => {
+      const lastFetched = localStorage.getItem('dacar_cars_last_fetched');
+      const cachedCars = localStorage.getItem('dacar_all_cars');
+      if (lastFetched && cachedCars && Date.now() - Number(lastFetched) < 300000) {
+        console.log('[Cache] Loading cars from localStorage (TTL active)');
+        try {
+          const parsed = JSON.parse(cachedCars);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            set({ cars: parsed });
+            return;
+          }
+        } catch (e) {
+          // continue to fetch if JSON.parse fails
+        }
+      }
+
       try {
         const res = await fetch('/api/cars');
         if (res.ok) {
           const fetchedCars = await res.json();
           if (Array.isArray(fetchedCars) && fetchedCars.length > 0) {
             localStorage.setItem('dacar_all_cars', JSON.stringify(fetchedCars));
+            localStorage.setItem('dacar_cars_last_fetched', Date.now().toString());
             set({ cars: fetchedCars });
           }
         }
@@ -489,6 +509,13 @@ export const useStore = create<AppStore>((set, get) => {
     },
 
     fetchCars: async () => {
+      const lastFetched = localStorage.getItem('dacar_cars_last_fetched');
+      const cachedCars = localStorage.getItem('dacar_all_cars');
+      if (lastFetched && cachedCars && Date.now() - Number(lastFetched) < 300000) {
+        console.log('[Cache] Skipping static fetch (TTL active)');
+        return;
+      }
+
       try {
         const res = await fetch(`/cars.json?timestamp=${Date.now()}`);
         if (!res.ok) {
@@ -498,6 +525,7 @@ export const useStore = create<AppStore>((set, get) => {
             const fetchedCars = await fallbackRes.json();
             if (Array.isArray(fetchedCars) && fetchedCars.length > 0) {
               localStorage.setItem('dacar_all_cars', JSON.stringify(fetchedCars));
+              localStorage.setItem('dacar_cars_last_fetched', Date.now().toString());
               set({ cars: fetchedCars });
             }
             return;
@@ -507,6 +535,7 @@ export const useStore = create<AppStore>((set, get) => {
         const fetchedCars = await res.json();
         if (Array.isArray(fetchedCars) && fetchedCars.length > 0) {
           localStorage.setItem('dacar_all_cars', JSON.stringify(fetchedCars));
+          localStorage.setItem('dacar_cars_last_fetched', Date.now().toString());
           set({ cars: fetchedCars });
         }
       } catch (err) {
