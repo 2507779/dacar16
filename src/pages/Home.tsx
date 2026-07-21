@@ -44,9 +44,9 @@ export default function Home() {
       desc: 'Транспортировка осуществляется в закрытых брендированных автовозах премиум-класса. Полная защита от дорожного мусора и камней.'
     },
     {
-      title: 'Наш офис',
+      title: 'Офис',
       image: '/cars/st4.jpg', // Путь к вашему изображению в папке public/cars/
-      tag: '🏢 Наш офис',
+      tag: '🏢 Офис',
       desc: `Приглашаем вас в наш главный офис по адресу: ${appTexts.showroomAddress}. Проведем полную предпродажную подготовку и выдадим авто!`
     }
   ];
@@ -155,15 +155,20 @@ export default function Home() {
         </h3>
         <div className="flex space-x-3.5 overflow-x-auto pb-1.5 scrollbar-none select-none">
           {onboardingStories.map((s, idx) => (
-            <button
+            <motion.button
               key={idx}
+              initial={{ opacity: 0, scale: 0.8, x: -10 }}
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              transition={{ duration: 0.3, delay: idx * 0.08, ease: 'easeOut' }}
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => {
                 triggerHaptic('medium');
                 setActiveStoryIndex(idx);
               }}
               className="flex flex-col items-center shrink-0 focus:outline-none cursor-pointer group"
             >
-              <div className="w-14 h-14 rounded-full p-[2.5px] bg-gradient-to-tr from-[#C5A880] to-[#EFEBE4] shadow-md transition group-hover:scale-105 active:scale-95 duration-200">
+              <div className="w-14 h-14 rounded-full p-[2.5px] bg-gradient-to-tr from-[#C5A880] to-[#EFEBE4] shadow-md transition duration-200">
                 <div className="w-full h-full rounded-full border-2 border-white overflow-hidden">
                   <img src={s.image} className="w-full h-full object-cover" alt={s.tag} />
                 </div>
@@ -171,7 +176,7 @@ export default function Home() {
               <span className="text-[8.5px] font-black text-[#1C1917] mt-1.5 leading-tight text-center truncate w-14">
                 {s.tag.split(' ')[1]}
               </span>
-            </button>
+            </motion.button>
           ))}
         </div>
       </div>
@@ -187,15 +192,20 @@ export default function Home() {
             { id: 'China', label: 'Китай 🇨🇳', desc: 'Электро / Гибриды' },
             { id: 'South Korea', label: 'Корея 🇰🇷', desc: 'Дизель / Benz' },
             { id: 'Kyrgyzstan', label: 'Киргизия 🇰🇬', desc: 'Мгновенный транзит' }
-          ].map((c) => (
-            <button
+          ].map((c, idx) => (
+            <motion.button
               key={c.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: idx * 0.1, ease: 'easeOut' }}
+              whileHover={{ y: -3, scale: 1.03, borderColor: '#C5A880/50' }}
+              whileTap={{ scale: 0.97 }}
               onClick={() => handleCountrySelect(c.id as any)}
-              className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/40 hover:bg-[#F0EEEC]/50 active:scale-95 transition-bezier p-3 rounded-2xl flex flex-col items-center justify-center text-center shadow-sm cursor-pointer group"
+              className="bg-white border border-[#EFEBE4] active:scale-95 transition-bezier p-3 rounded-2xl flex flex-col items-center justify-center text-center shadow-sm cursor-pointer group"
             >
               <span className="font-black text-xs text-[#1C1917] group-hover:text-[#C5A880] transition-colors">{c.label}</span>
               <span className="text-[7.5px] font-bold text-[#78716C] mt-0.5 leading-none">{c.desc}</span>
-            </button>
+            </motion.button>
           ))}
         </div>
       </div>
@@ -225,8 +235,13 @@ export default function Home() {
               const StepIcon = step.icon;
               const isActive = activeServiceStep === idx;
               return (
-                <button
+                <motion.button
                   key={idx}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35, delay: idx * 0.05, ease: 'easeOut' }}
+                  whileHover={{ scale: isActive ? 1.02 : 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => {
                     triggerHaptic('light');
                     setActiveServiceStep(idx);
@@ -252,7 +267,7 @@ export default function Home() {
                   }`}>
                     {step.name}
                   </h4>
-                </button>
+                </motion.button>
               );
             })}
           </div>
