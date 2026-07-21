@@ -26,25 +26,25 @@ export default function Home() {
   const onboardingStories = [
     {
       title: 'Договор и 100% Гарантии',
-      image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&q=80&w=400',
+      image: '/cars/toyota_highlander_1.jpg', // Путь к вашему изображению в папке public/cars/
       tag: '💼 Гарантии',
       desc: `Все поставки застрахованы на 100% стоимости. Заключаем официальный юридический договор с ${appTexts.legalInfo.split('.')[0]}.`
     },
     {
       title: 'Детальный Тест-Осмотр',
-      image: 'https://images.unsplash.com/photo-1617788138017-80ad40651399?auto=format&fit=crop&q=80&w=400',
+      image: '/cars/geely_monjaro.jpg', // Путь к вашему изображению в папке public/cars/
       tag: '🔍 Осмотр',
       desc: 'Наш инспектор в Китае или Корее выезжает на осмотр по 150+ параметрам. Предоставляем полный замер ЛКП, фото и видеоотчет 4K.'
     },
     {
       title: 'Премиум Логистика',
-      image: 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&q=80&w=400',
+      image: '/cars/li_l9.jpg', // Путь к вашему изображению в папке public/cars/
       tag: '🚛 Доставка',
       desc: 'Транспортировка осуществляется в закрытых брендированных автовозах премиум-класса. Полная защита от дорожного мусора и камней.'
     },
     {
       title: 'Премиум Шоурум',
-      image: 'https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&q=80&w=400',
+      image: '/cars/zeekr_001.jpg', // Путь к вашему изображению в папке public/cars/
       tag: '🏢 Шоурум',
       desc: `Приглашаем вас в наш главный детейлинг-центр по адресу: ${appTexts.showroomAddress}. Проведем полную предпродажную подготовку и выдадим авто!`
     }
