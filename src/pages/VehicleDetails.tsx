@@ -8,7 +8,7 @@ import { useStore } from '../store/useStore';
 import { calculateFullCarPrice, formatCurrency, DELIVERY_CITIES, COMPANY_COMMISSION, BROKER_FEE_RUB, BASE_DELIVERY_KAZAN_RUB, EXCHANGE_RATES, getCarImages, getCarFeatures } from '../data/cars';
 import { triggerHaptic } from '../utils/haptics';
 import { playEngineStartupSound, EngineSimulator } from '../utils/engineSound';
-import { Heart, ChevronRight, MapPin, Truck, ShieldCheck, FileText, Send, X, Check, CheckCircle2, Award, Settings, Gauge, Power, Music, CircleDot } from 'lucide-react';
+import { Heart, ChevronRight, MapPin, Truck, ShieldCheck, FileText, Send, X, Check, CheckCircle2, Award, Settings, Gauge, Power, Music, CircleDot, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function VehicleDetails() {
@@ -232,11 +232,6 @@ export default function VehicleDetails() {
 
     triggerHaptic('success');
     setIsSubmitting(true);
-    
-    const tg = (window as any).Telegram?.WebApp;
-    if (tg && tg.MainButton) {
-      tg.MainButton.showProgress();
-    }
 
     // Передаем базовую стоимость под ключ
     const finalAdjustedPrice = calculated.finalPriceRUB;
@@ -263,18 +258,20 @@ export default function VehicleDetails() {
       setUserName('');
       setUserPhone('');
 
-      if (tg && tg.MainButton) {
-        tg.MainButton.hideProgress();
-        tg.MainButton.hide();
-      }
-
-      // Редирект на экран заказов через 6 секунд
+      // Редирект на экран заказов через 2.5 секунды
       redirectDetailsTimeoutRef.current = setTimeout(() => {
         setOrderSuccess(false);
         setActiveCarId(null); // Закрываем детальный вид
         setCurrentTab('orders'); // Переключаем на заказы
-      }, 6000);
+      }, 2500);
     }, 800);
+  };
+
+  const handleProceedToOrders = () => {
+    if (redirectDetailsTimeoutRef.current) clearTimeout(redirectDetailsTimeoutRef.current);
+    setOrderSuccess(false);
+    setActiveCarId(null);
+    setCurrentTab('orders');
   };
 
   const handleSubmitOrder = (e: React.FormEvent) => {
@@ -313,69 +310,8 @@ export default function VehicleDetails() {
     }
   }, [activeCarId, car, isLightboxOpen, isTestDriveOpen, isOrderSheetOpen, simulator]);
 
-  // Управление видимостью Telegram MainButton в деталях авто
-  useEffect(() => {
-    const tg = (window as any).Telegram?.WebApp;
-    if (!tg || !tg.MainButton) return;
-
-    if (activeCarId && car && !orderSuccess) {
-      tg.MainButton.show();
-    } else {
-      tg.MainButton.hide();
-    }
-
-    return () => {
-      tg.MainButton.hide();
-    };
-  }, [activeCarId, car, orderSuccess]);
-
-  // Настройка контента и обработчиков клика Telegram MainButton в деталях авто
-  useEffect(() => {
-    const tg = (window as any).Telegram?.WebApp;
-    if (!tg || !tg.MainButton || !activeCarId || !car || orderSuccess) return;
-
-    if (!isOrderSheetOpen) {
-      tg.MainButton.setText('ПОЛУЧИТЬ РАСЧЕТ И КОНСУЛЬТАЦИЮ');
-      tg.MainButton.enable();
-      tg.MainButton.hideProgress();
-
-      const handleMainClick = () => {
-        triggerHaptic('medium');
-        setIsOrderSheetOpen(true);
-      };
-      tg.MainButton.onClick(handleMainClick);
-      return () => {
-        tg.MainButton.offClick(handleMainClick);
-      };
-    } else {
-      if (isSubmitting) {
-        tg.MainButton.setText('ОТПРАВКА ЗАЯВКИ...');
-        tg.MainButton.disable();
-        tg.MainButton.showProgress();
-      } else if (isFormValid) {
-        tg.MainButton.setText('ОТПРАВИТЬ ЗАЯВКУ В DA!CAR');
-        tg.MainButton.enable();
-        tg.MainButton.hideProgress();
-      } else {
-        tg.MainButton.setText('ЗАПОЛНИТЕ ИМЯ И ТЕЛЕФОН');
-        tg.MainButton.disable();
-        tg.MainButton.hideProgress();
-      }
-
-      const handleMainClick = () => {
-        if (isFormValid && !isSubmitting) {
-          executeOrderSubmission();
-        }
-      };
-      tg.MainButton.onClick(handleMainClick);
-      return () => {
-        tg.MainButton.offClick(handleMainClick);
-      };
-    }
-  }, [activeCarId, car, isOrderSheetOpen, userName, userPhone, isFormValid, isSubmitting, orderSuccess]);
-
   return (
-    <div className="flex flex-col text-[#1C1917] pb-16 select-none relative bg-[#F0EEEC]">
+    <div className="flex flex-col text-[#1C1917] pb-36 select-none relative bg-[#F0EEEC]">
       
       {/* 1. Слайдер Изображений */}
       <div 
@@ -409,23 +345,36 @@ export default function VehicleDetails() {
           ))}
         </div>
 
+        {/* Назад (Закрыть детальный вид) */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            triggerHaptic('light');
+            setActiveCarId(null);
+          }}
+          className="absolute top-4 left-4 p-2.5 rounded-full bg-white/80 border border-black/[0.03] backdrop-blur-md hover:bg-white text-[#1C1917] transition active:scale-90 z-10 shadow-md flex items-center justify-center cursor-pointer"
+          title="Назад"
+        >
+          <ArrowLeft className="w-5 h-5 text-[#1C1917]" />
+        </button>
+
         {/* Избранное прямо на фото */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             handleToggleFav();
           }}
-          className="absolute top-4 right-4 p-3 rounded-full bg-white/80 border border-black/[0.03] backdrop-blur-md hover:bg-white text-[#1C1917] transition active:scale-90 z-10 shadow-md"
+          className="absolute top-4 right-4 p-2.5 rounded-full bg-white/80 border border-black/[0.03] backdrop-blur-md hover:bg-white text-[#1C1917] transition active:scale-90 z-10 shadow-md cursor-pointer"
         >
           <Heart className={`w-5 h-5 transition-all ${isFav ? 'fill-red-500 text-red-500' : 'text-[#78716C]'}`} />
         </button>
 
         {/* Страна и состояние */}
-        <div className="absolute top-4 left-4 flex space-x-2 z-10" onClick={(e) => e.stopPropagation()}>
-          <span className="bg-white/95 border border-[#EFEBE4] backdrop-blur-md text-[#1C1917] text-[10px] font-bold px-3 py-1 rounded-lg uppercase tracking-wider shadow-sm">
-            {car.country === 'China' ? 'Китай 🇨🇳' : car.country === 'South Korea' ? 'Корея 🇰🇷' : 'Киргизия 🇰🇬'}
+        <div className="absolute top-[22px] left-[62px] flex space-x-1.5 z-10" onClick={(e) => e.stopPropagation()}>
+          <span className="bg-white/95 border border-[#EFEBE4] backdrop-blur-md text-[#1C1917] text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-wider shadow-sm">
+            {car.country === 'China' ? 'КНР 🇨🇳' : car.country === 'South Korea' ? 'Корея 🇰🇷' : 'КР 🇰🇬'}
           </span>
-          <span className={`text-[10px] font-bold px-3 py-1 rounded-lg uppercase tracking-wider border shadow-sm ${
+          <span className={`text-[8px] font-black px-2 py-0.5 rounded uppercase tracking-wider border shadow-sm ${
             car.condition === 'new' 
               ? 'bg-[#C5A880] text-white border-[#C5A880]' 
               : 'bg-[#1C1917] text-white border-[#1C1917]'
@@ -588,18 +537,19 @@ export default function VehicleDetails() {
         </div>
       </div>
 
-      {/* 6. Закрепленная кнопка заказа (CTA) */}
-      <div className="px-4 mt-6">
-        <button
+      {/* 6. Закрепленная премиальная кнопка заказа (Sticky CTA) */}
+      <div className="fixed bottom-0 left-0 right-0 max-w-[440px] mx-auto z-20 px-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] pt-4 bg-gradient-to-t from-[#F0EEEC] via-[#F0EEEC]/95 to-transparent">
+        <motion.button
+          whileTap={{ scale: 0.97 }}
           onClick={handleOpenOrderSheet}
-          className="w-full py-4 bg-[#C5A880] hover:bg-[#B0936B] active:scale-[0.98] transition-bezier text-white font-black text-xs uppercase tracking-widest rounded-2xl flex items-center justify-center space-x-2 shadow-md cursor-pointer"
+          className="w-full py-4 bg-gradient-to-r from-[#C5A880] to-[#E5C9A3] hover:from-[#B0936B] hover:to-[#C5A880] text-white font-black text-xs uppercase tracking-widest rounded-2xl flex items-center justify-center space-x-2 shadow-[0_10px_30px_rgba(197,168,128,0.35)] hover:shadow-[0_14px_35px_rgba(197,168,128,0.5)] cursor-pointer relative overflow-hidden transition-all duration-300"
         >
-          <Send className="w-4 h-4 fill-white text-white" />
-          <span>Получить бесплатную консультацию и расчет</span>
-        </button>
-        <p className="text-[9px] text-[#78716C] text-center mt-2 font-mono">
-          Нажатие открывает форму запроса. Все расчеты актуальны на {new Date().toLocaleDateString('ru-RU')}.
-        </p>
+          <Send className="w-4 h-4 fill-white text-white animate-bounce" />
+          <span>Получить расчет и консультацию</span>
+          
+          {/* Элегантный перелив света по кнопке */}
+          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2.5s_infinite]" />
+        </motion.button>
       </div>
 
       {/* 7. Выдвижной Bottom Sheet с формой заказа */}
@@ -723,9 +673,16 @@ export default function VehicleDetails() {
               Поздравляем! Ваша заявка на подбор под бюджет зарегистрирована в CRM-системе DA!CAR. Вы будете перенаправлены на экран статусов подбора, где сможете увидеть интерактивный 11-шаговый таймлайн логистики!
             </p>
 
-            <div className="mt-8 flex items-center space-x-2 text-[10px] text-[#C5A880] font-mono font-bold">
-              <span className="w-2 h-2 bg-[#C5A880] rounded-full animate-ping"></span>
-              <span>Переход на вкладку «Подбор»...</span>
+            <button
+              onClick={handleProceedToOrders}
+              className="mt-8 px-6 py-3.5 bg-[#C5A880] hover:bg-[#B0936B] text-white rounded-xl text-xs font-black uppercase tracking-wider transition active:scale-95 cursor-pointer shadow-md"
+            >
+              Посмотреть статус подбора
+            </button>
+
+            <div className="mt-4 flex items-center space-x-2 text-[9px] text-[#78716C] font-mono font-bold">
+              <span className="w-1.5 h-1.5 bg-[#C5A880] rounded-full animate-ping"></span>
+              <span>Автоматический переход...</span>
             </div>
           </motion.div>
         )}

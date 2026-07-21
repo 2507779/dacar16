@@ -161,67 +161,60 @@ export default function Profile() {
             <span className="text-[8px] text-[#78716C] mt-0.5 font-mono">Консультация онлайн</span>
           </button>
 
-          {/* Первые два контакта из панели админа, либо стандартный звонок */}
-          {managerContacts && managerContacts.length > 0 ? (
-            managerContacts.slice(0, 1).map((c) => (
-              <a
-                key={c.id}
-                href={c.type === 'telegram' ? `https://t.me/${c.value}` : `tel:${c.value}`}
-                onClick={() => triggerHaptic('light')}
-                target={c.type === 'telegram' ? '_blank' : undefined}
-                rel="noreferrer"
-                className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/45 rounded-2xl p-4 flex flex-col items-center justify-center text-center shadow-md active:scale-95 transition cursor-pointer"
-              >
-                {c.type === 'telegram' ? (
-                  <MessageSquare className="w-6 h-6 text-blue-500" />
-                ) : (
+          {/* Правая кнопка: Телефонный звонок в офис (чтобы не дублировать чаты) */}
+          {(() => {
+            const phoneContact = managerContacts?.find(c => c.type === 'phone');
+            if (phoneContact) {
+              return (
+                <a
+                  key={phoneContact.id}
+                  href={`tel:${phoneContact.value}`}
+                  onClick={() => triggerHaptic('light')}
+                  className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/45 rounded-2xl p-4 flex flex-col items-center justify-center text-center shadow-md active:scale-95 transition cursor-pointer"
+                >
                   <Phone className="w-6 h-6 text-emerald-600" />
-                )}
-                <span className="text-xs font-bold text-[#1C1917] mt-2 truncate max-w-full">{c.name}</span>
-                <span className="text-[8px] text-[#78716C] mt-0.5 font-mono truncate max-w-full">
-                  {c.type === 'telegram' ? `@${c.value}` : c.value}
-                </span>
-              </a>
-            ))
-          ) : (
-            <a
-              href="tel:+78432220099"
-              onClick={() => triggerHaptic('light')}
-              className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/45 rounded-2xl p-4 flex flex-col items-center justify-center text-center shadow-md active:scale-95 transition cursor-pointer col-span-1"
-            >
-              <Phone className="w-6 h-6 text-emerald-600" />
-              <span className="text-xs font-bold text-[#1C1917] mt-2">Позвонить в офис</span>
-              <span className="text-[8px] text-[#78716C] mt-0.5 font-mono">+7 (843) 222-00-99</span>
-            </a>
-          )}
+                  <span className="text-xs font-bold text-[#1C1917] mt-2 truncate max-w-full">{phoneContact.name}</span>
+                  <span className="text-[8px] text-[#78716C] mt-0.5 font-mono truncate max-w-full">
+                    {phoneContact.value}
+                  </span>
+                </a>
+              );
+            } else {
+              return (
+                <a
+                  href="tel:+78432220099"
+                  onClick={() => triggerHaptic('light')}
+                  className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/45 rounded-2xl p-4 flex flex-col items-center justify-center text-center shadow-md active:scale-95 transition cursor-pointer col-span-1"
+                >
+                  <Phone className="w-6 h-6 text-emerald-600" />
+                  <span className="text-xs font-bold text-[#1C1917] mt-2">Позвонить в офис</span>
+                  <span className="text-[8px] text-[#78716C] mt-0.5 font-mono">+7 (843) 222-00-99</span>
+                </a>
+              );
+            }
+          })()}
         </div>
 
         {/* Если контактов больше одного, выведем их элегантным списком */}
-        {managerContacts && managerContacts.length > 1 && (
+        {managerContacts && managerContacts.filter(c => c.type !== 'telegram').length > 1 && (
           <div className="bg-white rounded-2xl border border-[#EFEBE4] p-3 shadow-md space-y-2">
             <p className="text-[9px] font-black uppercase tracking-wider text-[#78716C] border-b border-[#EFEBE4]/55 pb-1 mb-1 font-mono">Дополнительные контакты:</p>
             <div className="grid grid-cols-1 gap-2">
-              {managerContacts.slice(1).map((c) => (
+              {managerContacts.filter(c => c.type !== 'telegram').slice(1).map((c) => (
                 <a
                   key={c.id}
-                  href={c.type === 'telegram' ? `https://t.me/${c.value}` : `tel:${c.value}`}
+                  href={`tel:${c.value}`}
                   onClick={() => triggerHaptic('light')}
-                  target={c.type === 'telegram' ? '_blank' : undefined}
-                  rel="noreferrer"
                   className="flex items-center justify-between p-2 rounded-xl bg-[#F0EEEC] border border-[#EFEBE4]/60 active:scale-[0.99] transition hover:border-[#C5A880]/30 cursor-pointer"
                 >
                   <div className="flex items-center space-x-2.5 min-w-0">
                     <div className="w-7 h-7 bg-[#C5A880]/10 rounded-full flex items-center justify-center shrink-0">
-                      {c.type === 'telegram' ? (
-                        <MessageSquare className="w-4 h-4 text-[#C5A880]" />
-                      ) : (
-                        <Phone className="w-4 h-4 text-emerald-600" />
-                      )}
+                      <Phone className="w-4 h-4 text-emerald-600" />
                     </div>
                     <div className="min-w-0">
                       <p className="text-[11px] font-bold text-[#1C1917] truncate">{c.name}</p>
                       <p className="text-[8px] text-[#78716C] font-mono truncate">
-                        {c.type === 'telegram' ? `Telegram: @${c.value}` : `Тел: ${c.value}`}
+                        Тел: {c.value}
                       </p>
                     </div>
                   </div>

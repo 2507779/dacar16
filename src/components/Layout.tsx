@@ -286,71 +286,107 @@ export default function Layout({ children }: LayoutProps) {
           {children}
         </div>
 
-        {/* 4. Навигация Bottom Navigation (Frosted Glass Light Premium) */}
-        <div className="absolute bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] sm:bottom-4 left-4 right-4 h-16 bg-white/80 backdrop-blur-xl border border-[#EFEBE4] rounded-2xl px-2 flex justify-around items-center z-30 shadow-[0_12px_32px_rgba(197,168,128,0.03)] select-none">
+        {/* 4. Навигация Bottom Navigation (Premium Obsidian Dark & Gold) */}
+        <div className="absolute bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] sm:bottom-4 left-4 right-4 h-16 bg-[#1C1917] border border-[#2D2A26] rounded-2xl px-2 flex justify-around items-center z-30 shadow-[0_16px_40px_rgba(0,0,0,0.3)] select-none">
           
           <button
             id="nav-home"
             onClick={() => handleTabChange('home')}
-            className={`flex flex-col items-center justify-center flex-1 h-full py-1 transition-bezier cursor-pointer ${
-              currentTab === 'home' ? 'text-[#C5A880] font-bold' : 'text-[#78716C] hover:text-[#1C1917]'
+            className={`flex flex-col items-center justify-center flex-1 h-full py-1 relative cursor-pointer transition-colors duration-300 ${
+              currentTab === 'home' ? 'text-[#C5A880]' : 'text-[#8C847E] hover:text-[#C5A880]'
             }`}
           >
-            <div className="relative">
-              <Home className={`w-4 h-4 transition-transform duration-250 ${currentTab === 'home' ? 'scale-115 text-[#C5A880]' : ''}`} />
+            <div className="relative flex flex-col items-center justify-center">
+              <Home className={`w-4 h-4 transition-all duration-300 ${currentTab === 'home' ? 'scale-110 text-[#C5A880]' : ''}`} />
+              <span className="text-[9px] mt-1 font-bold tracking-tight">Главная</span>
+              {currentTab === 'home' && (
+                <motion.div 
+                  layoutId="active-dot"
+                  className="absolute -bottom-1.5 w-1 h-1 bg-[#C5A880] rounded-full"
+                />
+              )}
             </div>
-            <span className="text-[9px] mt-1 font-medium tracking-tight">Главная</span>
           </button>
 
           <button
             id="nav-catalog"
             onClick={() => handleTabChange('catalog')}
-            className={`flex flex-col items-center justify-center flex-1 h-full py-1 transition-bezier cursor-pointer ${
-              currentTab === 'catalog' ? 'text-[#C5A880] font-bold' : 'text-[#78716C] hover:text-[#1C1917]'
+            className={`flex flex-col items-center justify-center flex-1 h-full py-1 relative cursor-pointer transition-colors duration-300 ${
+              currentTab === 'catalog' ? 'text-[#C5A880]' : 'text-[#8C847E] hover:text-[#C5A880]'
             }`}
           >
-            <Car className={`w-4 h-4 transition-transform duration-250 ${currentTab === 'catalog' ? 'scale-115 text-[#C5A880]' : ''}`} />
-            <span className="text-[9px] mt-1 font-medium tracking-tight">Каталог</span>
+            <div className="relative flex flex-col items-center justify-center">
+              <Car className={`w-4 h-4 transition-all duration-300 ${currentTab === 'catalog' ? 'scale-110 text-[#C5A880]' : ''}`} />
+              <span className="text-[9px] mt-1 font-bold tracking-tight">Каталог</span>
+              {currentTab === 'catalog' && (
+                <motion.div 
+                  layoutId="active-dot"
+                  className="absolute -bottom-1.5 w-1 h-1 bg-[#C5A880] rounded-full"
+                />
+              )}
+            </div>
           </button>
 
           <button
             id="nav-favorites"
             onClick={() => handleTabChange('favorites')}
-            className={`flex flex-col items-center justify-center flex-1 h-full py-1 transition-bezier cursor-pointer ${
-              currentTab === 'favorites' ? 'text-[#C5A880] font-bold' : 'text-[#78716C] hover:text-[#1C1917]'
+            className={`flex flex-col items-center justify-center flex-1 h-full py-1 relative cursor-pointer transition-colors duration-300 ${
+              currentTab === 'favorites' ? 'text-[#C5A880]' : 'text-[#8C847E] hover:text-[#C5A880]'
             }`}
           >
-            <Heart className={`w-4 h-4 transition-transform duration-250 ${currentTab === 'favorites' ? 'scale-115 text-[#C5A880]' : ''}`} />
-            <span className="text-[9px] mt-1 font-medium tracking-tight">Избранное</span>
+            <div className="relative flex flex-col items-center justify-center">
+              <Heart className={`w-4 h-4 transition-all duration-300 ${currentTab === 'favorites' ? 'scale-110 text-[#C5A880]' : ''}`} />
+              <span className="text-[9px] mt-1 font-bold tracking-tight">Избранное</span>
+              {currentTab === 'favorites' && (
+                <motion.div 
+                  layoutId="active-dot"
+                  className="absolute -bottom-1.5 w-1 h-1 bg-[#C5A880] rounded-full"
+                />
+              )}
+            </div>
           </button>
 
           <button
             id="nav-orders"
             onClick={() => handleTabChange('orders')}
-            className={`flex flex-col items-center justify-center flex-1 h-full py-1 transition-bezier cursor-pointer ${
-              currentTab === 'orders' ? 'text-[#C5A880] font-bold' : 'text-[#78716C] hover:text-[#1C1917]'
+            className={`flex flex-col items-center justify-center flex-1 h-full py-1 relative cursor-pointer transition-colors duration-300 ${
+              currentTab === 'orders' ? 'text-[#C5A880]' : 'text-[#8C847E] hover:text-[#C5A880]'
             }`}
           >
-            <div className="relative">
-              <Package className={`w-4 h-4 transition-transform duration-250 ${currentTab === 'orders' ? 'scale-115 text-[#C5A880]' : ''}`} />
+            <div className="relative flex flex-col items-center justify-center">
+              <Package className={`w-4 h-4 transition-all duration-300 ${currentTab === 'orders' ? 'scale-110 text-[#C5A880]' : ''}`} />
               {orders.length > 0 && (
-                <span className="absolute -top-1.5 -right-2 bg-[#C5A880] text-white text-[8px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center shadow-md border border-white">
+                <span className="absolute -top-2 -right-2 bg-[#C5A880] text-white text-[8px] font-black w-3.5 h-3.5 rounded-full flex items-center justify-center shadow-md border border-[#1C1917] animate-pulse">
                   {orders.length}
                 </span>
               )}
+              <span className="text-[9px] mt-1 font-bold tracking-tight">Подбор</span>
+              {currentTab === 'orders' && (
+                <motion.div 
+                  layoutId="active-dot"
+                  className="absolute -bottom-1.5 w-1 h-1 bg-[#C5A880] rounded-full"
+                />
+              )}
             </div>
-            <span className="text-[9px] mt-1 font-medium tracking-tight">Подбор</span>
           </button>
 
           <button
             id="nav-profile"
             onClick={() => handleTabChange('profile')}
-            className={`flex flex-col items-center justify-center flex-1 h-full py-1 transition-bezier cursor-pointer ${
-              currentTab === 'profile' ? 'text-[#C5A880] font-bold' : 'text-[#78716C] hover:text-[#1C1917]'
+            className={`flex flex-col items-center justify-center flex-1 h-full py-1 relative cursor-pointer transition-colors duration-300 ${
+              currentTab === 'profile' ? 'text-[#C5A880]' : 'text-[#8C847E] hover:text-[#C5A880]'
             }`}
           >
-            <User className={`w-4 h-4 transition-transform duration-250 ${currentTab === 'profile' ? 'scale-115 text-[#C5A880]' : ''}`} />
-            <span className="text-[9px] mt-1 font-medium tracking-tight">Профиль</span>
+            <div className="relative flex flex-col items-center justify-center">
+              <User className={`w-4 h-4 transition-all duration-300 ${currentTab === 'profile' ? 'scale-110 text-[#C5A880]' : ''}`} />
+              <span className="text-[9px] mt-1 font-bold tracking-tight">Профиль</span>
+              {currentTab === 'profile' && (
+                <motion.div 
+                  layoutId="active-dot"
+                  className="absolute -bottom-1.5 w-1 h-1 bg-[#C5A880] rounded-full"
+                />
+              )}
+            </div>
           </button>
 
         </div>

@@ -383,7 +383,7 @@ export default function Favorites() {
                   ) : (
                     <>
                       <Share2 className="w-4 h-4" />
-                      <span>Скопировать ссылку t.me</span>
+                      <span>Скопировать ссылку</span>
                     </>
                   )}
                 </button>

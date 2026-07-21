@@ -23,6 +23,7 @@ export default function Home() {
   // Feature 9: Onboarding Stories
   const [activeStoryIndex, setActiveStoryIndex] = useState<number | null>(null);
   const [storyProgress, setStoryProgress] = useState(0);
+  const [activeServiceStep, setActiveServiceStep] = useState(0);
   const onboardingStories = [
     {
       title: 'Договор и 100% Гарантии',
@@ -98,38 +99,17 @@ export default function Home() {
   return (
     <div className="flex flex-col text-[#1C1917] pb-12 select-none bg-[#F0EEEC]">
       
-      {/* Имиджевый баннер шапки из брошюры-флаера */}
-      <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full relative overflow-hidden border-b border-[#EFEBE4] bg-white shadow-sm"
-      >
-        <img 
-          src="/banner-header.jpg" 
-          alt="DA!CAR — Автомобильный консьерж-сервис" 
-          className="w-full h-auto object-cover select-none"
-        />
-      </motion.div>
-
       {/* Премиум Баннер */}
       <div className="relative px-4 pt-4 select-none">
         <div 
           className="h-56 rounded-3xl p-5 flex flex-col justify-between text-white overflow-hidden relative border border-[#EFEBE4] shadow-md bg-cover bg-center transition-all duration-500"
           style={{ 
-            backgroundImage: homepageBannerUrl ? `url(${homepageBannerUrl})` : undefined,
+            backgroundImage: `url(${homepageBannerUrl || '/banner-header.jpg'})`,
             backgroundColor: '#1C1917'
           }}
         >
           {/* Overlay to ensure ultra-premium look */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#1C1917] via-[#1C1917]/40 to-black/20 z-0" />
-          {/* Premium blue glow background effect if no image */}
-          {!homepageBannerUrl && (
-            <>
-              <div className="absolute inset-0 bg-gradient-to-br from-[#2D2A26] via-[#1C1917] to-[#0E0C0A] z-0" />
-              <div className="absolute -top-12 -right-12 w-60 h-60 bg-[#C5A880]/15 rounded-full blur-[80px] z-0" />
-            </>
-          )}
 
           <div className="flex justify-between items-start z-10">
             <div>
@@ -220,10 +200,10 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Интерактивный таймлайн: ПОЛНЫЙ СПЕКТР УСЛУГ */}
+      {/* Интерактивный премиум-таймлайн: ПОЛНЫЙ СПЕКТР УСЛУГ */}
       <div className="px-4 mt-6 select-none">
         <div className="bg-white border border-[#EFEBE4] rounded-3xl p-5 shadow-sm">
-          <div className="text-center pb-3 border-b border-[#EFEBE4]">
+          <div className="text-center pb-3 border-b border-[#EFEBE4]/60">
             <h3 className="font-display text-[10px] font-black uppercase tracking-widest text-[#1C1917]">
               Полный спектр услуг
             </h3>
@@ -232,32 +212,110 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-4 pt-4 text-center">
+          {/* Интерактивные шаги (Плитки-табы) */}
+          <div className="grid grid-cols-3 gap-2 pt-4">
             {[
-              { num: '1', name: 'ПОДБОР', desc: 'Подбор идеального авто под ваши пожелания.', icon: Search },
-              { num: '2', name: 'ПРОВЕРКА', desc: 'Тщательная проверка и диагностика кузова.', icon: Check },
-              { num: '3', name: 'ПОКУПКА', desc: 'Безопасная сделка, юридический договор.', icon: ShieldCheck },
-              { num: '4', name: 'ДОСТАВКА', desc: 'Бережная международная логистика.', icon: Truck },
-              { num: '5', name: 'ТАМОЖНЯ', desc: 'Беспроблемное оформление всех документов.', icon: FileText },
-              { num: '6', name: 'ВРУЧЕНИЕ', desc: 'Доставка прямо к вашему дому.', icon: Award }
+              { num: '1', name: 'ПОДБОР', icon: Search, title: 'Подбор под ключ', desc: 'Анализируем аукционы и дилерские базы КНР, Кореи и ОАЭ. Находим идеальные варианты.', bullets: ['Анализ рынков в реальном времени', 'Доступ к закрытым площадкам дилеров', 'Согласование комплектации до мелочей'], outcome: 'Точное попадание в бюджет и параметры без скрытых комиссий.' },
+              { num: '2', name: 'ПРОВЕРКА', icon: Check, title: 'Экспертная проверка', desc: 'Наш инспектор выезжает на осмотр по 150+ параметрам с видео 4K и замером ЛКП.', bullets: ['Полный замер толщины ЛКП', 'Компьютерное чтение блоков', 'Проверка батареи электрокаров'], outcome: 'Абсолютно честное понимание состояния перед оплатой.' },
+              { num: '3', name: 'ПОКУПКА', icon: ShieldCheck, title: 'Официальный договор', desc: 'Заключаем юридический договор. Оплата напрямую в банк по официальному инвойсу.', bullets: ['Юридический договор с гарантией', 'Оплата через банк по инвойсу', 'Фиксация итоговой цены под ключ'], outcome: '100% юридическая чистота сделки и защита бюджета.' },
+              { num: '4', name: 'ДОСТАВКА', icon: Truck, title: 'Премиум логистика', desc: 'Бережная доставка в закрытых автовозах. Страхование на 100% стоимости авто.', bullets: ['Страхование на всех этапах пути', 'Транспортировка в закрытых автовозах', 'GPS-мониторинг местоположения'], outcome: 'Безупречная защита кузова от дорожного мусора.' },
+              { num: '5', name: 'ТАМОЖНЯ', icon: FileText, title: 'Оформление документов', desc: 'Быстрое прохождение таможни во Владивостоке или странах ЕАЭС со списанием утильсбора.', bullets: ['Выдача легальных СБКТС и ЭПТС', 'Официальное списание утильсбора', 'Полный пакет для ГИБДД'], outcome: 'Легальный автомобиль, готовый к постановке на учет.' },
+              { num: '6', name: 'ВРУЧЕНИЕ', icon: Award, title: 'Торжественная выдача', desc: 'Проводим полный детейлинг авто. Торжественная выдача в шоуруме или доставка к дому.', bullets: ['Премиальная мойка и детейлинг', 'Вручение в шоуруме с подарками', 'Доставка эвакуатором прямо к дому'], outcome: 'Незабываемые эмоции и идеальный вид вашей новой машины.' }
             ].map((step, idx) => {
               const StepIcon = step.icon;
+              const isActive = activeServiceStep === idx;
               return (
-                <div key={idx} className="flex flex-col items-center group">
-                  <div className="w-8 h-8 rounded-full bg-[#F0EEEC] border border-[#EFEBE4] flex items-center justify-center text-[#C5A880] relative mb-1.5 shadow-sm">
+                <button
+                  key={idx}
+                  onClick={() => {
+                    triggerHaptic('light');
+                    setActiveServiceStep(idx);
+                  }}
+                  className={`relative flex flex-col items-center p-2.5 rounded-2xl border transition-all duration-300 cursor-pointer text-center ${
+                    isActive
+                      ? 'bg-gradient-to-br from-[#1C1917] to-[#2D2A26] border-[#1C1917] text-white shadow-md scale-[1.02]'
+                      : 'bg-[#F0EEEC]/45 border-[#EFEBE4] text-[#1C1917] hover:bg-[#F0EEEC]/70'
+                  }`}
+                >
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center relative mb-1.5 transition-colors ${
+                    isActive ? 'bg-[#C5A880] text-white' : 'bg-white border border-[#EFEBE4] text-[#C5A880]'
+                  }`}>
                     <StepIcon className="w-3.5 h-3.5" />
-                    <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#1C1917] border border-white text-white text-[7px] font-black flex items-center justify-center">
+                    <span className={`absolute -top-1 -right-1 w-4 h-4 rounded-full text-[7.5px] font-black flex items-center justify-center border transition-colors ${
+                      isActive ? 'bg-white text-[#1C1917] border-[#1C1917]' : 'bg-[#1C1917] text-white border-white'
+                    }`}>
                       {step.num}
                     </span>
                   </div>
-                  <h4 className="text-[9px] font-black text-[#1C1917] tracking-wider uppercase">{step.name}</h4>
-                  <p className="text-[7px] text-[#78716C] leading-tight mt-0.5 font-medium max-w-[85px]">
-                    {step.desc}
-                  </p>
-                </div>
+                  <h4 className={`text-[8.5px] font-black tracking-wider uppercase transition-colors ${
+                    isActive ? 'text-[#C5A880]' : 'text-[#1C1917]'
+                  }`}>
+                    {step.name}
+                  </h4>
+                </button>
               );
             })}
           </div>
+
+          {/* Информационный блок активного шага с плавной анимацией */}
+          <div className="mt-4 pt-4 border-t border-[#EFEBE4]/60">
+            <AnimatePresence mode="wait">
+              {[
+                { num: '1', name: 'ПОДБОР', icon: Search, title: 'Подбор под ключ', desc: 'Анализируем аукционы и дилерские базы КНР, Кореи и ОАЭ. Находим идеальные варианты.', bullets: ['Анализ рынков в реальном времени', 'Доступ к закрытым площадкам дилеров', 'Согласование комплектации до мелочей'], outcome: 'Точное попадание в бюджет и параметры без скрытых комиссий.' },
+                { num: '2', name: 'ПРОВЕРКА', icon: Check, title: 'Экспертная проверка', desc: 'Наш инспектор выезжает на осмотр по 150+ параметрам с видео 4K и замером ЛКП.', bullets: ['Полный замер толщины ЛКП', 'Компьютерное чтение блоков', 'Проверка батареи электрокаров'], outcome: 'Абсолютно честное понимание состояния перед оплатой.' },
+                { num: '3', name: 'ПОКУПКА', icon: ShieldCheck, title: 'Официальный договор', desc: 'Заключаем юридический договор. Оплата напрямую в банк по официальному инвойсу.', bullets: ['Юридический договор с гарантией', 'Оплата через банк по инвойсу', 'Фиксация итоговой цены под ключ'], outcome: '100% юридическая чистота сделки и защита бюджета.' },
+                { num: '4', name: 'ДОСТАВКА', icon: Truck, title: 'Премиум логистика', desc: 'Бережная доставка в закрытых автовозах. Страхование на 100% стоимости авто.', bullets: ['Страхование на всех этапах пути', 'Транспортировка в закрытых автовозах', 'GPS-мониторинг местоположения'], outcome: 'Безупречная защита кузова от дорожного мусора.' },
+                { num: '5', name: 'ТАМОЖНЯ', icon: FileText, title: 'Оформление документов', desc: 'Быстрое прохождение таможни во Владивостоке или странах ЕАЭС со списанием утильсбора.', bullets: ['Выдача легальных СБКТС и ЭПТС', 'Официальное списание утильсбора', 'Полный пакет для ГИБДД'], outcome: 'Легальный автомобиль, готовый к постановке на учет.' },
+                { num: '6', name: 'ВРУЧЕНИЕ', icon: Award, title: 'Торжественная выдача', desc: 'Проводим полный детейлинг авто. Торжественная выдача в шоуруме или доставка к дому.', bullets: ['Премиальная мойка и детейлинг', 'Вручение в шоуруме с подарками', 'Доставка эвакуатором прямо к дому'], outcome: 'Незабываемые эмоции и идеальный вид вашей новой машины.' }
+              ].map((step, idx) => {
+                if (activeServiceStep !== idx) return null;
+                return (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.25 }}
+                    className="space-y-3"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <span className="text-[10px] bg-[#C5A880]/15 text-[#C5A880] font-black px-2 py-0.5 rounded-md font-mono">
+                        Этап {step.num}
+                      </span>
+                      <h5 className="text-[11px] font-black text-[#1C1917] uppercase tracking-wide">
+                        {step.title}
+                      </h5>
+                    </div>
+
+                    <p className="text-[10px] text-[#57534E] leading-relaxed font-medium">
+                      {step.desc}
+                    </p>
+
+                    <div className="space-y-1.5 bg-[#F0EEEC]/30 p-3 rounded-2xl border border-[#EFEBE4]/40">
+                      <p className="text-[8px] font-black uppercase tracking-wider text-[#78716C] font-mono mb-1">Что входит в этап:</p>
+                      {step.bullets.map((b, bIdx) => (
+                        <div key={bIdx} className="flex items-start space-x-2 text-[9px] text-[#1C1917]">
+                          <Check className="w-3 h-3 text-emerald-600 shrink-0 mt-0.5" />
+                          <span className="font-bold">{b}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="bg-[#1C1917] text-white p-2.5 rounded-xl flex items-center space-x-2 shadow-sm">
+                      <div className="w-5 h-5 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+                        <Sparkles className="w-3 h-3 text-[#C5A880]" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[7px] text-stone-400 font-mono uppercase tracking-wider">Результат этапа:</p>
+                        <p className="text-[8.5px] font-black text-stone-100 truncate">{step.outcome}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          </div>
+
         </div>
       </div>
 

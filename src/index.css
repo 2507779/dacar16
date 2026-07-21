@@ -79,3 +79,10 @@ body {
   transition-duration: 350ms;
   transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+/* Перелив шиммера для привлечения внимания */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}

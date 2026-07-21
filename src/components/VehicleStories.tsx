@@ -146,11 +146,6 @@ export default function VehicleStories() {
     triggerHaptic('success');
     setIsSubmitting(true);
 
-    const tg = (window as any).Telegram?.WebApp;
-    if (tg && tg.MainButton) {
-      tg.MainButton.showProgress();
-    }
-
     addOrder(car, name, phone, selectedCity);
 
     submitStoriesTimeoutRef.current = setTimeout(() => {
@@ -158,11 +153,6 @@ export default function VehicleStories() {
       setOrderSuccess(true);
       setName('');
       setPhone('');
-
-      if (tg && tg.MainButton) {
-        tg.MainButton.hideProgress();
-        tg.MainButton.hide();
-      }
 
       closeStoriesFormTimeoutRef.current = setTimeout(() => {
         setShowOrderForm(false);
@@ -205,52 +195,6 @@ export default function VehicleStories() {
       }
     }
   }, [activeStoryCarId, car, showOrderForm]);
-
-  // Управление видимостью Telegram MainButton в сторис
-  useEffect(() => {
-    const tg = (window as any).Telegram?.WebApp;
-    if (!tg || !tg.MainButton) return;
-
-    if (car && showOrderForm && !orderSuccess) {
-      tg.MainButton.show();
-    } else {
-      tg.MainButton.hide();
-    }
-
-    return () => {
-      tg.MainButton.hide();
-    };
-  }, [car, showOrderForm, orderSuccess]);
-
-  // Настройка контента и обработчиков клика Telegram MainButton в сторис
-  useEffect(() => {
-    const tg = (window as any).Telegram?.WebApp;
-    if (!tg || !tg.MainButton || !car || !showOrderForm || orderSuccess) return;
-
-    if (isSubmitting) {
-      tg.MainButton.setText('ОТПРАВКА...');
-      tg.MainButton.disable();
-      tg.MainButton.showProgress();
-    } else if (isFormValid) {
-      tg.MainButton.setText('ОТПРАВИТЬ ЗАЯВКУ');
-      tg.MainButton.enable();
-      tg.MainButton.hideProgress();
-    } else {
-      tg.MainButton.setText('ЗАПОЛНИТЕ ИМЯ И ТЕЛЕФОН');
-      tg.MainButton.disable();
-      tg.MainButton.hideProgress();
-    }
-
-    const handleMainClick = () => {
-      if (isFormValid && !isSubmitting) {
-        executeStoriesSubmission();
-      }
-    };
-    tg.MainButton.onClick(handleMainClick);
-    return () => {
-      tg.MainButton.offClick(handleMainClick);
-    };
-  }, [car, showOrderForm, name, phone, isFormValid, isSubmitting, orderSuccess]);
 
   if (!car) return null;
 
