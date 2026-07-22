@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
-import { formatCurrency, calculateFullCarPrice, EXCHANGE_RATES, getCarImages } from '../data/cars';
+import { formatCurrency, calculateFullCarPrice, EXCHANGE_RATES, getCarImages, handleCarImageError } from '../data/cars';
 import { triggerHaptic } from '../utils/haptics';
 import { Search, SlidersHorizontal, Grid, List, ArrowUpDown, X, Heart, Sparkles, CheckCircle, Truck } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -441,6 +441,7 @@ export default function Catalog() {
                         src={getCarImages(car)[0]}
                         alt={`${car.brand} ${car.model}`}
                         referrerPolicy="no-referrer"
+                        onError={(e) => handleCarImageError(e)}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       {/* Кнопка "Сторис" */}
@@ -515,6 +516,7 @@ export default function Catalog() {
                         src={getCarImages(car)[0]}
                         alt={`${car.brand} ${car.model}`}
                         referrerPolicy="no-referrer"
+                        onError={(e) => handleCarImageError(e)}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       {/* Кнопка "Сторис" */}

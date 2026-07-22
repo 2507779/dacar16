@@ -168,76 +168,89 @@ export function getRawCarImages(car: any): string[] {
   return rawImages.map(img => img.split('?')[0]);
 }
 
-// Безопасное получение списка изображений автомобиля (строго локальные пути по умолчанию)
-export function getCarImages(car: any): string[] {
-  if (!car) return [];
+// Черная фирменная заглушка с логотипом DA!CAR
+export const BLACK_PLACEHOLDER = '/cars/placeholder.svg';
+
+// Список реально существующих локальных файлов фотографий в /public/cars/
+export const VERIFIED_LOCAL_CAR_IMAGES = [
+  '/cars/zeekr_001.jpg',
+  '/cars/geely_monjaro.jpg',
+  '/cars/li_l9.jpg',
+  '/cars/toyota_highlander_1.jpg',
+  '/cars/toyota_rav4_1.jpg',
+  '/cars/vw_tharu_1.jpg'
+];
+
+// Автоматический поиск подходящей фотографии по бренду или возврат черной заглушки с логотипом DA!CAR
+export function getBrandFallbackImage(brandName: string = '', index: number = 0): string {
+  if (index === 0) {
+    const b = (brandName || '').toLowerCase();
+    if (b.includes('toyota') || b.includes('lexus')) return '/cars/toyota_highlander_1.jpg';
+    if (b.includes('vw') || b.includes('volkswagen') || b.includes('jetta')) return '/cars/vw_tharu_1.jpg';
+    if (b.includes('geely') || b.includes('changan') || b.includes('haval') || b.includes('chery') || b.includes('gac') || b.includes('byd')) return '/cars/geely_monjaro.jpg';
+    if (b.includes('li') || b.includes('lixiang') || b.includes('voyah') || b.includes('aito')) return '/cars/li_l9.jpg';
+    if (b.includes('zeekr') || b.includes('lotus') || b.includes('nio') || b.includes('xpeng')) return '/cars/zeekr_001.jpg';
+  }
   
-  // 1. Получаем список явно заданных картинок из car.images или fallback
+  // Для любых других позиций или ненайденных брендов — черная стильная заглушка с логотипом DA!CAR
+  return BLACK_PLACEHOLDER;
+}
+
+// Безопасное получение списка изображений автомобиля (с подстановкой черной заглушки для отсутствующих файлов)
+export function getCarImages(car: any): string[] {
+  if (!car) return [BLACK_PLACEHOLDER];
+  
   let rawImages = getRawCarImages(car);
 
-  // Если список пуст, пытаемся использовать последовательные картинки по порядковому номеру машины в каталоге
+  // Если список пуст, используем ротацию проверенного основного фото бренда + черная заглушка с логотипом
   if (rawImages.length === 0) {
-    let seqImages: string[] = [];
-    let carsList: any[] = [];
-    if (typeof window !== 'undefined') {
-      const localCars = localStorage.getItem('dacar_all_cars');
-      if (localCars) {
-        try {
-          carsList = JSON.parse(localCars);
-        } catch (e) {}
-      }
-    }
-    if (carsList.length === 0) {
-      carsList = CARS_DATA_JSON as any[];
-    }
-
-    const carIndex = carsList.findIndex(c => c.id === car.id);
-    if (carIndex >= 0) {
-      const startNum = carIndex * 4 + 1;
-      seqImages = [
-        `/cars/${startNum}.jpg`,
-        `/cars/${startNum + 1}.jpg`,
-        `/cars/${startNum + 2}.jpg`,
-        `/cars/${startNum + 3}.jpg`
-      ];
-    }
-
-    if (seqImages.length > 0) {
-      rawImages = seqImages;
-    }
+    const primaryImg = getBrandFallbackImage(car.brand, 0);
+    rawImages = [primaryImg, BLACK_PLACEHOLDER];
   }
 
-  // Если и теперь список пуст, используем дефолтные заглушки
-  if (rawImages.length === 0) {
-    rawImages = [
-      '/cars/zeekr_001.jpg',
-      '/cars/geely_monjaro.jpg',
-      '/cars/li_l9.jpg'
-    ];
-  }
-
-  // Добавляем кэш-бастер при наличии в localStorage для предотвращения показа старых фото.
-  // Если кэш-бастера еще нет (первый визит), используем часовой кэш-бастер в качестве надежного фолбека.
-  // Это гарантирует, что новые фото отобразятся максимум через час у всех клиентов абсолютно автоматически!
+  // Получаем кэш-бастер
   let buster = typeof window !== 'undefined' ? localStorage.getItem('dacar_cache_buster') : null;
   if (!buster) {
     buster = Math.floor(Date.now() / (3600 * 1000)).toString();
   }
 
-  return rawImages.map(img => {
-    if (!img || img.startsWith('data:')) return img;
+  return rawImages.map((img, idx) => {
+    if (!img) return BLACK_PLACEHOLDER;
+    
+    // Если это base64, blob или черная заглушка - возвращаем как есть
+    if (img.startsWith('data:') || img.startsWith('blob:') || img.includes('placeholder.svg') || img.includes('black-placeholder')) {
+      return img;
+    }
     
     const cleanImg = img.split('?')[0];
-    
+
+    // Внешние HTTP/HTTPS ссылки
     if (cleanImg.includes('//')) {
-      // Внешние URL
       return cleanImg.includes('?') ? `${cleanImg}&cb=${buster}` : `${cleanImg}?cb=${buster}`;
-    } else {
-      // Локальные пути
-      const normalized = cleanImg.startsWith('/') ? cleanImg : `/${cleanImg}`;
+    }
+
+    // Относительный локальный путь вида /cars/...
+    const normalized = cleanImg.startsWith('/') ? cleanImg : `/${cleanImg}`;
+    
+    // Проверяем, существует ли файл в локальной папке
+    if (VERIFIED_LOCAL_CAR_IMAGES.includes(normalized)) {
       return `${normalized}?cb=${buster}`;
     }
+
+    // Если локального файла физически нет (например /cars/vw_tharu_2.jpg), заменяем его на черную заглушку с логотипом DA!CAR
+    const fallbackPath = getBrandFallbackImage(car.brand, idx);
+    return fallbackPath.endsWith('.svg') || fallbackPath.startsWith('data:') 
+      ? fallbackPath 
+      : `${fallbackPath}?cb=${buster}`;
   });
+}
+
+// Универсальный обработчик ошибок загрузки изображений для <img>: моментально переключает на черную заглушку с логотипом DA!CAR
+export function handleCarImageError(e: any, _index?: number) {
+  const target = e?.currentTarget || e?.target;
+  if (target && !target.src?.includes('placeholder.svg')) {
+    target.src = BLACK_PLACEHOLDER;
+  }
 }
 
 // Безопасное получение списка характеристик/опций

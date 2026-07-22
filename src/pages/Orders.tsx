@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { useStore, ORDER_STATUSES } from '../store/useStore';
-import { formatCurrency } from '../data/cars';
+import { formatCurrency, handleCarImageError } from '../data/cars';
 import { triggerHaptic } from '../utils/haptics';
 import { Package, Truck, Calendar, MapPin, Play, CheckCircle2, ChevronRight, ChevronDown, Sparkles, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -87,6 +87,7 @@ export default function Orders() {
                       src={order.carImage}
                       alt={`${order.carBrand} ${order.carModel}`}
                       referrerPolicy="no-referrer"
+                      onError={(e) => handleCarImageError(e)}
                       className="w-16 h-16 rounded-2xl object-cover border border-[#EFEBE4] shrink-0"
                     />
                     <div className="flex-1 min-w-0">

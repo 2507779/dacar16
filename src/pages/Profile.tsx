@@ -59,7 +59,7 @@ export default function Profile() {
 
   // Данные о пользователе Telegram WebApp
   const tgUser = (window as any).Telegram?.WebApp?.initDataUnsafe?.user;
-  const userName = tgUser ? [tgUser.first_name, tgUser.last_name].filter(Boolean).join(' ') || tgUser.username : 'Premium Клиент';
+  const userName = tgUser ? [tgUser.first_name, tgUser.last_name].filter(Boolean).join(' ') || tgUser.username : 'VIP Клиент DA!CAR';
   const userId = tgUser?.id ? `tg_user_id: ${tgUser.id}` : 'tg_user_id: 841b57fe';
   const userAvatarChar = userName.charAt(0).toUpperCase();
 
@@ -234,7 +234,7 @@ export default function Profile() {
           <div className="flex items-center justify-between">
             <div>
               <h4 className="text-xs font-bold text-[#1C1917]">Тактильная отдача (Haptic)</h4>
-              <p className="text-[10px] text-[#78716C] mt-0.5 font-medium leading-tight">Премиум-вибрация при кликах и действиях</p>
+              <p className="text-[10px] text-[#78716C] mt-0.5 font-medium leading-tight">Приятный тактильный отклик при касаниях</p>
             </div>
             <button
               onClick={() => {
@@ -508,7 +508,7 @@ export default function Profile() {
                       // SECURE TELEGRAM NOTIFICATION DISPATCH (VIA BACKEND)
                       try {
                         const tgMessage = `📞 **ЗАКАЗ ОБРАТНОГО ЗВОНКА**\n\n` +
-                          `👤 **Пользователь:** Premium Клиент\n` +
+                          `👤 **Пользователь:** ${userName}\n` +
                           `📞 **Телефон:** ${phone}\n\n` +
                           `⚡ *Срочно перезвоните клиенту!*`;
 

@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useStore } from '../store/useStore';
-import { calculateFullCarPrice, formatCurrency, DELIVERY_CITIES, getCarImages } from '../data/cars';
+import { calculateFullCarPrice, formatCurrency, DELIVERY_CITIES, getCarImages, handleCarImageError } from '../data/cars';
 import { triggerHaptic } from '../utils/haptics';
 import { 
   X, Check, ChevronLeft, ChevronRight, Truck, Info, 
@@ -202,7 +202,7 @@ export default function VehicleStories() {
 
   // Кастомные фичи в левом столбце
   const defaultFeatures = [
-    { title: 'Премиум дизайн', desc: 'и технологичный комфорт' },
+    { title: 'Скажи «Да!» своей мечте!', desc: 'и технологичный комфорт' },
     { title: 'Эксклюзивность', desc: 'бизнес-класс в каждой детали' },
     { title: 'Надёжность', desc: `безупречные стандарты ${car.brand}` },
     { title: 'Динамика', desc: 'идеальный отклик и управляемость' },
@@ -254,7 +254,7 @@ export default function VehicleStories() {
               </div>
               <div>
                 <div className="flex items-center space-x-1">
-                  <span className="font-display font-bold text-xs uppercase tracking-wider text-white">DA!CAR Premium</span>
+                  <span className="font-display font-bold text-xs uppercase tracking-wider text-white">DA!CAR — Мечта рядышком</span>
                   <BadgeCheck className="w-3.5 h-3.5 text-[#C5A880] fill-white" />
                 </div>
                 <span className="text-[9px] text-white/85">АВТО ПОД ЗАКАЗ • КОРЕЯ & КИТАЙ</span>
@@ -374,6 +374,7 @@ export default function VehicleStories() {
                   src={getCarImages(car)[currentSlideIndex] || getCarImages(car)[0]} 
                   alt={`${car.brand} ${car.model}`}
                   referrerPolicy="no-referrer"
+                  onError={(e) => handleCarImageError(e, currentSlideIndex)}
                   className="w-full h-full object-cover"
                 />
                 <span className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-[8px] font-bold text-white px-1.5 py-0.5 rounded">

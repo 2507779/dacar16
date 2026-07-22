@@ -168,7 +168,7 @@ export default function Layout({ children }: LayoutProps) {
             )}
             <div>
               <div className="font-display font-bold text-xs tracking-wide flex items-center text-[#1C1917]">
-                DA!CAR — Салон Премиум Импорта
+                DA!CAR — Скажи «Да!» своей мечте!
                 <span className="ml-1 w-3.5 h-3.5 bg-[#C5A880] rounded-full flex items-center justify-center text-[7px] text-white font-black">
                   ✓
                 </span>

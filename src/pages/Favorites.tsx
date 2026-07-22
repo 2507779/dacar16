@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { useStore } from '../store/useStore';
-import { formatCurrency, calculateFullCarPrice, getCarImages } from '../data/cars';
+import { formatCurrency, calculateFullCarPrice, getCarImages, handleCarImageError } from '../data/cars';
 import { triggerHaptic } from '../utils/haptics';
 import { Heart, Sparkles, Plus, Scale, Trash2, ArrowRight, Check, CheckCircle2, Share2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
@@ -254,6 +254,7 @@ export default function Favorites() {
                       src={getCarImages(car)[0]}
                       alt={`${car.brand} ${car.model}`}
                       referrerPolicy="no-referrer"
+                      onError={(e) => handleCarImageError(e)}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                     <button
@@ -342,7 +343,7 @@ export default function Favorites() {
                   
                   <div className="flex justify-between items-center">
                     <span className="text-[8px] font-black uppercase tracking-widest text-[#C5A880] bg-[#C5A880]/15 px-2 py-0.5 rounded font-mono">
-                      DA!CAR PREMIUM
+                      DA!CAR — СКАЖИ «ДА!» СВОЕЙ МЕЧТЕ!
                     </span>
                     <span className="text-[8.5px] text-[#78716C] font-mono">Сводка сравнения</span>
                   </div>

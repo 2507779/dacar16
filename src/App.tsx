@@ -15,7 +15,7 @@ import VehicleDetails from './pages/VehicleDetails';
 import VehicleStories from './components/VehicleStories';
 import { AnimatePresence, motion } from 'motion/react';
 import { Car, Power } from 'lucide-react';
-import { playEngineStartupSound, playStartupSound } from './utils/engineSound';
+import { playStartupSound } from './utils/engineSound';
 import { triggerHaptic } from './utils/haptics';
 import { APP_CONFIG } from './config';
 

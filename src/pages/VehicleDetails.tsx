@@ -5,10 +5,9 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '../store/useStore';
-import { calculateFullCarPrice, formatCurrency, DELIVERY_CITIES, COMPANY_COMMISSION, BROKER_FEE_RUB, BASE_DELIVERY_KAZAN_RUB, EXCHANGE_RATES, getCarImages, getCarFeatures } from '../data/cars';
+import { calculateFullCarPrice, formatCurrency, DELIVERY_CITIES, COMPANY_COMMISSION, BROKER_FEE_RUB, BASE_DELIVERY_KAZAN_RUB, EXCHANGE_RATES, getCarImages, getCarFeatures, handleCarImageError } from '../data/cars';
 import { triggerHaptic } from '../utils/haptics';
-import { playEngineStartupSound, EngineSimulator } from '../utils/engineSound';
-import { Heart, ChevronRight, MapPin, Truck, ShieldCheck, FileText, Send, X, Check, CheckCircle2, Award, Settings, Gauge, Power, Music, CircleDot, ArrowLeft } from 'lucide-react';
+import { Heart, ChevronRight, MapPin, Truck, ShieldCheck, FileText, Send, X, Check, CheckCircle2, Award, Settings, Gauge, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function VehicleDetails() {
@@ -67,15 +66,6 @@ export default function VehicleDetails() {
   ];
   const [selectedPaint, setSelectedPaint] = useState(paints[1]); // По умолчанию Liquid Chrome
 
-  // Состояния интерактивного звука и симулятора тест-драйва (Feature 1 & 2)
-  const [isSoundPlaying, setIsSoundPlaying] = useState(false);
-  const [isTestDriveOpen, setIsTestDriveOpen] = useState(false);
-  const [rpm, setRpm] = useState(800);
-  const [speed, setSpeed] = useState(0);
-  const [gear, setGear] = useState(1);
-  const [isAccelerating, setIsAccelerating] = useState(false);
-  const [simulator, setSimulator] = useState<EngineSimulator | null>(null);
-
   const car = cars.find(c => c.id === activeCarId);
 
   useEffect(() => {
@@ -84,106 +74,6 @@ export default function VehicleDetails() {
 
   // Валидация телефона
   const isFormValid = userName.trim().length >= 2 && userPhone.trim().length >= 6 && !isSubmitting;
-
-  // Определение типа звука по марке/модели
-  const getEngineSoundType = (vehicle: any): 'v12' | 'v8' | 'inline6' | 'electric' => {
-    if (!vehicle) return 'v12';
-    if (vehicle.engineType === 'electric' || vehicle.engineType === 'hybrid') return 'electric';
-    const brand = vehicle.brand.toLowerCase();
-    if (brand.includes('porsche') || brand.includes('mustang') || brand.includes('corvette') || brand.includes('chevrolet')) return 'v8';
-    if (brand.includes('mercedes') || brand.includes('lamborghini') || brand.includes('ferrari') || brand.includes('bentley')) return 'v12';
-    return 'inline6';
-  };
-
-  const handlePlaySound = () => {
-    if (!car || isSoundPlaying) return;
-    setIsSoundPlaying(true);
-    triggerHaptic('heavy');
-    const type = getEngineSoundType(car);
-    playEngineStartupSound(type);
-    setTimeout(() => {
-      setIsSoundPlaying(false);
-    }, 3200);
-  };
-
-  const startTestDrive = () => {
-    if (!car) return;
-    triggerHaptic('success');
-    const type = getEngineSoundType(car);
-    const sim = new EngineSimulator(type);
-    sim.start();
-    setSimulator(sim);
-    setIsTestDriveOpen(true);
-    setRpm(800);
-    setSpeed(0);
-    setGear(1);
-  };
-
-  const stopTestDrive = () => {
-    triggerHaptic('light');
-    if (simulator) {
-      simulator.stop();
-      setSimulator(null);
-    }
-    setIsTestDriveOpen(false);
-    setIsAccelerating(false);
-  };
-
-  // Эффект ускорения при удерживании газа
-  useEffect(() => {
-    if (!isAccelerating || !simulator) return;
-    
-    let currentRpm = rpm;
-    let currentSpeed = speed;
-    
-    const interval = setInterval(() => {
-      // Интенсивность разгона падает по мере роста оборотов
-      const accelPower = 190 - (currentRpm * 0.015);
-      currentRpm = Math.min(6800, currentRpm + accelPower);
-      currentSpeed = Math.min(270, currentSpeed + (currentRpm * 0.0028));
-      
-      setRpm(Math.round(currentRpm));
-      setSpeed(Math.round(currentSpeed));
-      simulator.setRPM(currentRpm);
-      
-      // Мелкая тактильная волна вибрации на шагах оборотов
-      if (Math.round(currentRpm) % 400 === 0) {
-        triggerHaptic('light');
-      }
-    }, 35);
-    
-    return () => clearInterval(interval);
-  }, [isAccelerating, simulator]);
-
-  // Эффект холостого сброса оборотов
-  useEffect(() => {
-    if (isAccelerating || !simulator) return;
-    
-    let currentRpm = rpm;
-    let currentSpeed = speed;
-    
-    const interval = setInterval(() => {
-      currentRpm = Math.max(800, currentRpm - 160);
-      currentSpeed = Math.max(0, currentSpeed - 1.2);
-      
-      setRpm(Math.round(currentRpm));
-      setSpeed(Math.round(currentSpeed));
-      simulator.setRPM(currentRpm);
-    }, 35);
-    
-    return () => clearInterval(interval);
-  }, [isAccelerating, simulator]);
-
-  const handleShiftGear = () => {
-    if (!simulator || gear >= 6) return;
-    triggerHaptic('heavy');
-    setGear(g => g + 1);
-    
-    // Эффект сброса оборотов при переключении передачи
-    const dropRpm = Math.max(1800, rpm - 1600);
-    setRpm(dropRpm);
-    simulator.setRPM(dropRpm);
-  };
 
   if (!car) return null;
 
@@ -240,15 +130,6 @@ export default function VehicleDetails() {
       if (redirectDetailsTimeoutRef.current) clearTimeout(redirectDetailsTimeoutRef.current);
     };
   }, []);
-
-  // Очистка и завершение симулятора тест-драйва при размонтировании
-  useEffect(() => {
-    return () => {
-      if (simulator) {
-        simulator.stop();
-      }
-    };
-  }, [simulator]);
 
   const executeOrderSubmission = () => {
     if (!isFormValid || isSubmitting) return;
@@ -314,13 +195,11 @@ export default function VehicleDetails() {
       if (!state) {
         // Мы вернулись на главную (state === null)
         setIsLightboxOpen(false);
-        setIsTestDriveOpen(false);
         setIsOrderSheetOpen(false);
         setActiveCarId(null);
       } else if (state.view === 'details') {
-        // Мы вернулись на страницу деталки из лайтбокса/тест-драйва/заказа
+        // Мы вернулись на страницу деталки из лайтбокса/заказа
         setIsLightboxOpen(false);
-        setIsTestDriveOpen(false);
         setIsOrderSheetOpen(false);
       }
     };
@@ -332,7 +211,6 @@ export default function VehicleDetails() {
         if (
           window.history.state?.view === 'details' ||
           window.history.state?.view === 'lightbox' ||
-          window.history.state?.view === 'testdrive' ||
           window.history.state?.view === 'ordersheet'
         ) {
           window.history.back();
@@ -341,18 +219,12 @@ export default function VehicleDetails() {
     };
   }, []);
 
-  // 2. Синхронизация состояний лайтбокса, тест-драйва и заказа с историей браузера
+  // 2. Синхронизация состояний лайтбокса и заказа с историей браузера
   useEffect(() => {
     if (isLightboxOpen && window.history.state?.view !== 'lightbox') {
       window.history.pushState({ view: 'lightbox' }, '');
     }
   }, [isLightboxOpen]);
-
-  useEffect(() => {
-    if (isTestDriveOpen && window.history.state?.view !== 'testdrive') {
-      window.history.pushState({ view: 'testdrive' }, '');
-    }
-  }, [isTestDriveOpen]);
 
   useEffect(() => {
     if (isOrderSheetOpen && window.history.state?.view !== 'ordersheet') {
@@ -401,6 +273,7 @@ export default function VehicleDetails() {
           src={getCarImages(car)[activeImageIndex] || getCarImages(car)[0]}
           alt={`${car.brand} ${car.model}`}
           referrerPolicy="no-referrer"
+          onError={(e) => handleCarImageError(e, activeImageIndex)}
           className="w-full h-full object-cover select-none"
         />
 
@@ -504,7 +377,7 @@ export default function VehicleDetails() {
 
       {/* 4. Оснащение и Преимущества */}
       <div className="px-4 mt-6">
-        <h3 className="font-display text-[10px] font-bold uppercase tracking-widest text-[#78716C] mb-2.5 font-mono">Оснащение премиум-класса</h3>
+        <h3 className="font-display text-[10px] font-bold uppercase tracking-widest text-[#78716C] mb-2.5 font-mono">Скажи «Да!» своей мечте — Оснащение</h3>
         <div className="flex flex-wrap gap-2">
           {getCarFeatures(car).map((feat, index) => (
             <span
@@ -706,6 +579,7 @@ export default function VehicleDetails() {
                   src={getCarImages(car)[0]}
                   alt={`${car.brand} ${car.model}`}
                   referrerPolicy="no-referrer"
+                  onError={(e) => handleCarImageError(e)}
                   className="w-12 h-12 rounded-xl object-cover shrink-0 border border-[#EFEBE4]/40"
                 />
                 <div>
@@ -841,6 +715,7 @@ export default function VehicleDetails() {
                 src={getCarImages(car)[activeImageIndex]}
                 alt={`${car.brand} ${car.model} Fullscreen`}
                 referrerPolicy="no-referrer"
+                onError={(e) => handleCarImageError(e, activeImageIndex)}
                 className="max-w-full max-h-[80vh] object-contain rounded-2xl select-none shadow-2xl border border-white/5"
                 onClick={(e) => e.stopPropagation()}
               />
