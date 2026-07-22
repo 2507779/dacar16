@@ -60,7 +60,7 @@ export default function VehicleDetails() {
   // Выбор эксклюзивного цвета кузова (Feature 3)
   const paints = [
     { name: 'Cosmic Black', hex: '#1C1917', border: 'border-stone-800', bgClass: 'from-[#1C1917] to-[#292524]', desc: 'Глубокий черный металлик' },
-    { name: 'Liquid Chrome', hex: '#94A3B8', border: 'border-slate-400', bgClass: 'from-[#64748B] to-[#94A3B8]', desc: 'Жидкое серебро (Шоу-кар)' },
+    { name: 'Liquid Chrome', hex: '#94A3B8', border: 'border-slate-400', bgClass: 'from-[#64748B] to-[#94A3B8]', desc: 'Жидкое серебро (Выставочный глянец)' },
     { name: 'Monza Red', hex: '#DC2626', border: 'border-red-600', bgClass: 'from-[#991B1B] to-[#DC2626]', desc: 'Гоночный красный глянец' },
     { name: 'British Racing Green', hex: '#14532D', border: 'border-green-800', bgClass: 'from-[#064E3B] to-[#14532D]', desc: 'Аристократический зеленый' },
     { name: 'Champagne Gold', hex: '#C5A880', border: 'border-[#C5A880]', bgClass: 'from-[#A18256] to-[#C5A880]', desc: 'Шампань матовый шелк' },
@@ -592,6 +592,23 @@ export default function VehicleDetails() {
                 <span className="font-mono font-bold text-[#1C1917]">
                   {formatCurrency(calculated.customsDutyRUB)}
                 </span>
+              </div>
+
+              {/* Пояснительная плашка о таможенной пошлине РФ */}
+              <div className="bg-[#F0EEEC]/80 border border-[#EFEBE4] rounded-2xl p-3 text-[10px] space-y-1.5 text-[#78716C] my-1">
+                <div className="flex items-center space-x-1.5 font-bold text-[#1C1917]">
+                  <FileText className="w-3.5 h-3.5 text-[#C5A880] shrink-0" />
+                  <span>Оплата таможни: в рублях по курсу Евро</span>
+                </div>
+                <p className="leading-relaxed">
+                  Оплата таможенной пошлины происходит <strong className="text-[#1C1917]">в рублях РФ</strong> по официальному курсу ЦБ РФ на день подачи таможенной декларации.
+                </p>
+                <div className="pt-1.5 border-t border-[#EFEBE4]">
+                  <p className="font-semibold text-[#1C1917]">Почему таможня РФ считает пошлины по курсу Евро?</p>
+                  <p className="leading-relaxed mt-0.5">
+                    Согласно Единому таможенному тарифу ЕАЭС и Таможенному кодексу, государственные ставки таможенных пошлин законодательно зафиксированы в <strong className="text-[#1C1917]">ЕВРО</strong> (€ за 1 куб. см объема двигателя или в % от стоимости). ФТС России пересчитывает сумму в рубли по курсу ЦБ РФ в момент таможенного оформления.
+                  </p>
+                </div>
               </div>
 
               <div className="flex justify-between text-[#78716C] font-medium">

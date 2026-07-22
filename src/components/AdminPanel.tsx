@@ -3224,7 +3224,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
 
                             <div className="grid grid-cols-2 gap-2">
                               <div>
-                                <label className="block text-[8px] text-[#64748B] font-bold font-mono mb-1">Адрес Шоурума</label>
+                                <label className="block text-[8px] text-[#64748B] font-bold font-mono mb-1">Адрес Офиса</label>
                                 <input
                                   type="text"
                                   value={appTexts?.showroomAddress || ''}
@@ -4049,7 +4049,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                             <span className="bg-blue-500 text-white text-[8px] font-extrabold px-1.5 py-0.5 rounded uppercase font-mono">CRM</span>
                           </div>
                           <p className="text-[9px] text-[#64748B] leading-normal font-medium">
-                            Просматривайте лиды, настраивайте оценочный бюджет сделки в USD, вносите закрытые комментарии брокера и переводите лиды по статусам.
+                            Просматривайте лиды, настраивайте оценочный бюджет сделки в ₽, вносите закрытые комментарии брокера и переводите лиды по статусам.
                           </p>
 
                           {/* Список заказов в CRM */}
@@ -4080,7 +4080,7 @@ export const CARS_DATA: Car[] = ${formattedCars};
                                   <div className="bg-[#F5F7FA] p-2 rounded-lg space-y-1.5 border border-dashed border-[#E5E7EB] text-left">
                                     <div className="grid grid-cols-2 gap-2">
                                       <div>
-                                        <label className="block text-[7.5px] text-[#64748B] uppercase font-bold font-mono">Бюджет сделки ($)</label>
+                                        <label className="block text-[7.5px] text-[#64748B] uppercase font-bold font-mono">Бюджет сделки (₽)</label>
                                         <input
                                           type="number"
                                           placeholder="Напр. 35000"
@@ -4213,8 +4213,8 @@ export const CARS_DATA: Car[] = ${formattedCars};
                               <div className="bg-white p-3 rounded-xl border border-[#E5E7EB] space-y-1.5 text-[9.5px] text-left">
                                 <span className="font-extrabold text-[#111827]">Тестовый расчет для: {cars[0].brand} {cars[0].model}</span>
                                 <div className="flex justify-between border-b pb-1">
-                                  <span className="text-gray-500">Цена FOB в Китае/Корее:</span>
-                                  <span className="font-bold font-mono">${cars[0].priceUSD.toLocaleString()} (~ {Math.round(cars[0].priceUSD * calcExchangeUSD).toLocaleString()} ₽)</span>
+                                  <span className="text-gray-500">Базовая стоимость за рубежом:</span>
+                                  <span className="font-bold font-mono">{Math.round(cars[0].priceUSD * calcExchangeUSD).toLocaleString()} ₽</span>
                                 </div>
                                 <div className="flex justify-between border-b pb-1">
                                   <span className="text-gray-500">Таможенная пошлина (€{cars[0].customsDutyEUR}):</span>
