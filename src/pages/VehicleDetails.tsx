@@ -18,6 +18,7 @@ export default function VehicleDetails() {
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const hasPushedStateRef = useRef(false);
 
   const minSwipeDistance = 50;
 
@@ -305,6 +306,7 @@ export default function VehicleDetails() {
   useEffect(() => {
     if (window.history.state?.view !== 'details') {
       window.history.pushState({ view: 'details' }, '');
+      hasPushedStateRef.current = true;
     }
 
     const handlePopState = (e: PopStateEvent) => {
@@ -326,13 +328,15 @@ export default function VehicleDetails() {
     window.addEventListener('popstate', handlePopState);
     return () => {
       window.removeEventListener('popstate', handlePopState);
-      if (
-        window.history.state?.view === 'details' ||
-        window.history.state?.view === 'lightbox' ||
-        window.history.state?.view === 'testdrive' ||
-        window.history.state?.view === 'ordersheet'
-      ) {
-        window.history.back();
+      if (hasPushedStateRef.current) {
+        if (
+          window.history.state?.view === 'details' ||
+          window.history.state?.view === 'lightbox' ||
+          window.history.state?.view === 'testdrive' ||
+          window.history.state?.view === 'ordersheet'
+        ) {
+          window.history.back();
+        }
       }
     };
   }, []);
