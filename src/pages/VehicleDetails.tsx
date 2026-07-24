@@ -7,7 +7,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useStore } from '../store/useStore';
 import { calculateFullCarPrice, formatCurrency, DELIVERY_CITIES, COMPANY_COMMISSION, BROKER_FEE_RUB, BASE_DELIVERY_KAZAN_RUB, EXCHANGE_RATES, getCarImages, getCarFeatures, handleCarImageError } from '../data/cars';
 import { triggerHaptic } from '../utils/haptics';
-import { Heart, ChevronRight, MapPin, Truck, ShieldCheck, FileText, Send, X, Check, CheckCircle2, Award, Settings, Gauge, ArrowLeft } from 'lucide-react';
+import { Heart, ChevronRight, MapPin, Truck, ShieldCheck, FileText, Send, X, Check, CheckCircle2, Award, Settings, Gauge, ArrowLeft, Lock, Building2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function VehicleDetails() {
@@ -31,7 +31,7 @@ export default function VehicleDetails() {
   };
 
   const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
+    if (!car || !touchStart || !touchEnd) return;
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
@@ -75,12 +75,8 @@ export default function VehicleDetails() {
   // Валидация телефона
   const isFormValid = userName.trim().length >= 2 && userPhone.trim().length >= 6 && !isSubmitting;
 
-  if (!car) return null;
-
-  const calculated = calculateFullCarPrice(car, selectedCity);
-  const isFav = favorites.includes(car.id);
-
   const handleToggleFav = () => {
+    if (!car) return;
     triggerHaptic('medium');
     toggleFavorite(car.id);
   };
@@ -132,13 +128,13 @@ export default function VehicleDetails() {
   }, []);
 
   const executeOrderSubmission = () => {
-    if (!isFormValid || isSubmitting) return;
+    if (!car || !isFormValid || isSubmitting) return;
 
     triggerHaptic('success');
     setIsSubmitting(true);
 
-    // Передаем базовую стоимость под ключ
-    const finalAdjustedPrice = calculated.finalPriceRUB;
+    const calculatedPrice = calculateFullCarPrice(car, selectedCity);
+    const finalAdjustedPrice = calculatedPrice.finalPriceRUB;
     
     // Создаем заказ в сторе
     const ord = addOrder(car, userName, userPhone, selectedCity);
@@ -254,6 +250,11 @@ export default function VehicleDetails() {
       tg.BackButton.hide();
     }
   }, [activeCarId, car]);
+
+  if (!car) return null;
+
+  const calculated = calculateFullCarPrice(car, selectedCity);
+  const isFav = favorites.includes(car.id);
 
   return (
     <div className="flex flex-col text-[#1C1917] pb-36 select-none relative bg-[#F0EEEC]">
@@ -522,6 +523,51 @@ export default function VehicleDetails() {
             </div>
           )}
         </div>
+
+        {/* 🛡️ Триггеры безопасности «Безупречная сделка» */}
+        <div className="bg-[#1C1917] text-white rounded-2xl p-4 border border-[#2D2A26] shadow-md my-4">
+          <div className="flex items-center space-x-2 mb-3">
+            <div className="w-6 h-6 rounded-lg bg-[#C5A880]/20 flex items-center justify-center text-[#C5A880]">
+              <ShieldCheck className="w-3.5 h-3.5" />
+            </div>
+            <div>
+              <h4 className="text-[11px] font-black uppercase tracking-wider text-white">Безупречная сделка</h4>
+              <p className="text-[9px] text-[#A8A29E]">Защита от главных рисков премиум-покупателя</p>
+            </div>
+          </div>
+
+          <div className="space-y-2 text-[10px]">
+            <div className="flex items-start space-x-2.5 bg-white/5 p-2.5 rounded-xl border border-white/10">
+              <div className="p-1.5 rounded-lg bg-[#C5A880]/20 text-[#C5A880] shrink-0 mt-0.5">
+                <FileText className="w-3.5 h-3.5" />
+              </div>
+              <div>
+                <span className="font-bold text-white block">Фиксация цены в договоре</span>
+                <span className="text-[#A8A29E] text-[9px]">Без скрытых комиссий, неожиданных доплат и изменение условий</span>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-2.5 bg-white/5 p-2.5 rounded-xl border border-white/10">
+              <div className="p-1.5 rounded-lg bg-[#C5A880]/20 text-[#C5A880] shrink-0 mt-0.5">
+                <Lock className="w-3.5 h-3.5" />
+              </div>
+              <div>
+                <span className="font-bold text-white block">100% страхование авто</span>
+                <span className="text-[#A8A29E] text-[9px]">Полное страховое покрытие стоимости авто на всех этапах логистики</span>
+              </div>
+            </div>
+
+            <div className="flex items-start space-x-2.5 bg-white/5 p-2.5 rounded-xl border border-white/10">
+              <div className="p-1.5 rounded-lg bg-[#C5A880]/20 text-[#C5A880] shrink-0 mt-0.5">
+                <Building2 className="w-3.5 h-3.5" />
+              </div>
+              <div>
+                <span className="font-bold text-white block">Оплата по безналу</span>
+                <span className="text-[#A8A29E] text-[9px]">Расчеты напрямую через официальный юридический счет в банке РФ</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 6. Закрепленная премиальная кнопка заказа (Sticky CTA) */}
@@ -529,13 +575,10 @@ export default function VehicleDetails() {
         <motion.button
           whileTap={{ scale: 0.97 }}
           onClick={handleOpenOrderSheet}
-          className="w-full py-4 bg-gradient-to-r from-[#C5A880] to-[#E5C9A3] hover:from-[#B0936B] hover:to-[#C5A880] text-white font-black text-xs uppercase tracking-widest rounded-2xl flex items-center justify-center space-x-2 shadow-[0_10px_30px_rgba(197,168,128,0.35)] hover:shadow-[0_14px_35px_rgba(197,168,128,0.5)] cursor-pointer relative overflow-hidden transition-all duration-300"
+          className="w-full py-4 bg-gradient-to-r from-[#C5A880] to-[#E5C9A3] hover:from-[#B0936B] hover:to-[#C5A880] text-white font-black text-xs uppercase tracking-widest rounded-2xl flex items-center justify-center space-x-2 gold-glow-button btn-shine-gold cursor-pointer relative overflow-hidden transition-all duration-300"
         >
           <Send className="w-4 h-4 fill-white text-white animate-bounce" />
           <span>Получить расчет и консультацию</span>
-          
-          {/* Элегантный перелив света по кнопке */}
-          <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-[shimmer_2.5s_infinite]" />
         </motion.button>
       </div>
 
@@ -625,12 +668,34 @@ export default function VehicleDetails() {
                   />
                 </div>
 
+                {/* Гарантии "Безупречная сделка" в форме */}
+                <div className="bg-[#1C1917]/95 text-white rounded-2xl p-3 border border-[#2D2A26] space-y-2 mt-3">
+                  <div className="flex items-center space-x-1.5 text-[#C5A880] text-[10px] font-bold uppercase tracking-wider">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>Безупречная сделка:</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-1.5 text-[8.5px] font-medium text-stone-300">
+                    <div className="bg-white/5 p-1.5 rounded-lg border border-white/10 flex flex-col items-center text-center">
+                      <FileText className="w-3 h-3 text-[#C5A880] mb-1" />
+                      <span className="leading-tight font-bold text-white">Цена в договоре</span>
+                    </div>
+                    <div className="bg-white/5 p-1.5 rounded-lg border border-white/10 flex flex-col items-center text-center">
+                      <Lock className="w-3 h-3 text-[#C5A880] mb-1" />
+                      <span className="leading-tight font-bold text-white">100% Страховка</span>
+                    </div>
+                    <div className="bg-white/5 p-1.5 rounded-lg border border-white/10 flex flex-col items-center text-center">
+                      <Building2 className="w-3 h-3 text-[#C5A880] mb-1" />
+                      <span className="leading-tight font-bold text-white">Безнал в РФ</span>
+                    </div>
+                  </div>
+                </div>
+
                 <button
                   type="submit"
                   disabled={!isFormValid || isSubmitting}
-                  className={`w-full py-4 rounded-xl text-xs font-black uppercase tracking-wider transition-bezier mt-6 cursor-pointer shadow-md ${
+                  className={`w-full py-4 rounded-xl text-xs font-black uppercase tracking-wider transition-bezier mt-4 cursor-pointer shadow-md ${
                     isFormValid && !isSubmitting
-                      ? 'bg-[#C5A880] text-white hover:bg-[#B0936B] active:scale-95'
+                      ? 'bg-[#C5A880] text-white hover:bg-[#B0936B] active:scale-95 btn-shine-gold gold-glow-button'
                       : 'bg-[#EFEBE4]/40 text-[#78716C]/50 border border-[#EFEBE4]/50 cursor-not-allowed'
                   }`}
                 >

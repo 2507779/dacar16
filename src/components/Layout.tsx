@@ -10,6 +10,7 @@ import { DELIVERY_CITIES } from '../data/cars';
 import { triggerHaptic } from '../utils/haptics';
 import { playInterfaceClickSound } from '../utils/engineSound';
 import { AnimatePresence, motion } from 'motion/react';
+import FloatingContactButton from './FloatingContactButton';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -285,6 +286,9 @@ export default function Layout({ children }: LayoutProps) {
         <div id="applet-content" className="flex-1 overflow-y-auto bg-[#F0EEEC] flex flex-col pb-24 relative scrollbar-none">
           {children}
         </div>
+
+        {/* Плавающая FAB кнопка вызова / чата */}
+        <FloatingContactButton />
 
         {/* 4. Навигация Bottom Navigation (Premium Obsidian Dark & Gold) */}
         <div className="absolute bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] sm:bottom-4 left-4 right-4 h-16 bg-[#1C1917] border border-[#2D2A26] rounded-2xl px-2 flex justify-around items-center z-30 shadow-[0_16px_40px_rgba(0,0,0,0.3)] select-none">

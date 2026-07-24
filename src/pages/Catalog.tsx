@@ -426,7 +426,7 @@ export default function Catalog() {
                       triggerHaptic('light');
                       setActiveCarId(car.id);
                     }}
-                    className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/25 rounded-3xl overflow-hidden flex flex-col shadow-md cursor-pointer group relative"
+                    className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/30 rounded-3xl overflow-hidden flex flex-col gold-glow-card cursor-pointer group relative"
                   >
                     <div 
                       onClick={(e) => {
@@ -501,7 +501,7 @@ export default function Catalog() {
                       triggerHaptic('light');
                       setActiveCarId(car.id);
                     }}
-                    className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/25 rounded-3xl overflow-hidden flex shadow-md cursor-pointer group relative"
+                    className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/30 rounded-3xl overflow-hidden flex gold-glow-card cursor-pointer group relative"
                   >
                     <div 
                       onClick={(e) => {

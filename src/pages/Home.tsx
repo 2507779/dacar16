@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useStore } from '../store/useStore';
 import { formatCurrency, calculateFullCarPrice, EXCHANGE_RATES, getCarImages, handleCarImageError } from '../data/cars';
 import { triggerHaptic } from '../utils/haptics';
-import { ShieldCheck, Truck, Percent, Coins, MessageSquare, ArrowRight, Zap, Flame, Award, Sparkles, Globe, Crown, Shield, FileText, Check, HelpCircle, MapPin, Search, Play, HelpCircle as HelpIcon, TrendingUp, TrendingDown, RefreshCw, Heart, ChevronRight } from 'lucide-react';
+import { ShieldCheck, Truck, Percent, Coins, MessageSquare, ArrowRight, Zap, Flame, Award, Sparkles, Globe, Crown, Shield, FileText, Check, HelpCircle, MapPin, Search, Play, HelpCircle as HelpIcon, TrendingUp, TrendingDown, RefreshCw, Heart, ChevronRight, Lock, Building2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 export default function Home() {
@@ -41,13 +41,13 @@ export default function Home() {
       title: 'Скажи «Да!» своей мечте',
       image: '/cars/st3.jpg', // Путь к вашему изображению в папке public/cars/
       tag: '🚛 Доставка',
-      desc: 'Транспортировка осуществляется на автовозах партнерами по логистике.'
+      desc: 'Транспортировка осуществляется в закрытых брендированных автовозах VIP-класса. Полная защита от дорожного мусора и камней.'
     },
     {
       title: 'Офис',
       image: '/cars/st4.jpg', // Путь к вашему изображению в папке public/cars/
       tag: '🏢 Офис',
-      desc: `Приглашаем вас в наш главный офис по адресу: ${appTexts.showroomAddress}.`
+      desc: `Приглашаем вас в наш главный офис по адресу: ${appTexts.showroomAddress}. Проведем полную предпродажную подготовку и выдадим авто!`
     }
   ];
 
@@ -138,7 +138,7 @@ export default function Home() {
                 triggerHaptic('medium');
                 setCurrentTab('catalog');
               }}
-              className="bg-white hover:bg-[#F0EEEC] text-[#1C1917] px-4 py-2 rounded-xl text-[10px] font-black flex items-center space-x-1.5 cursor-pointer active:scale-95 transition-bezier shadow-md"
+              className="bg-white hover:bg-[#F0EEEC] text-[#1C1917] px-4 py-2 rounded-xl text-[10px] font-black flex items-center space-x-1.5 cursor-pointer active:scale-95 transition-bezier shadow-md btn-shine"
             >
               <span>Подобрать</span>
               <ArrowRight className="w-3 h-3 text-[#1C1917]" />
@@ -189,9 +189,9 @@ export default function Home() {
         </h3>
         <div className="grid grid-cols-3 gap-2 mt-2">
           {[
-            { id: 'China', label: 'Китай 🇨🇳', desc: 'Бензин / Гибриды' },
-            { id: 'South Korea', label: 'Корея 🇰🇷', desc: 'Дизель / Бензин' },
-            { id: 'Kyrgyzstan', label: 'Киргизия 🇰🇬', desc: 'Быстрый транзит' }
+            { id: 'China', label: 'Китай 🇨🇳', desc: 'Электро / Гибриды' },
+            { id: 'South Korea', label: 'Корея 🇰🇷', desc: 'Дизель / Benz' },
+            { id: 'Kyrgyzstan', label: 'Киргизия 🇰🇬', desc: 'Мгновенный транзит' }
           ].map((c, idx) => (
             <motion.button
               key={c.id}
@@ -225,10 +225,10 @@ export default function Home() {
           {/* Интерактивные шаги (Плитки-табы) */}
           <div className="grid grid-cols-3 gap-2 pt-4">
             {[
-              { num: '1', name: 'ПОДБОР', icon: Search, title: 'Подбор под ключ', desc: 'Анализируем аукционы и дилерские базы КНР, Кореи . Находим идеальные варианты.', bullets: ['Анализ рынков в реальном времени', 'Доступ к закрытым площадкам дилеров', 'Согласование комплектации до мелочей'], outcome: 'Точное попадание в бюджет и параметры без скрытых комиссий.' },
-              { num: '2', name: 'ПРОВЕРКА', icon: Check, title: 'Экспертная проверка', desc: 'Наш инспектор выезжает на осмотр по 150+ параметрам с видео и замером ЛКП.', bullets: ['Полный замер толщины ЛКП', 'Компьютерное чтение блоков', 'Проверка батареи электрокаров'], outcome: 'Абсолютно честное понимание состояния перед оплатой.' },
+              { num: '1', name: 'ПОДБОР', icon: Search, title: 'Подбор под ключ', desc: 'Анализируем аукционы и дилерские базы КНР, Кореи и ОАЭ. Находим идеальные варианты.', bullets: ['Анализ рынков в реальном времени', 'Доступ к закрытым площадкам дилеров', 'Согласование комплектации до мелочей'], outcome: 'Точное попадание в бюджет и параметры без скрытых комиссий.' },
+              { num: '2', name: 'ПРОВЕРКА', icon: Check, title: 'Экспертная проверка', desc: 'Наш инспектор выезжает на осмотр по 150+ параметрам с видео 4K и замером ЛКП.', bullets: ['Полный замер толщины ЛКП', 'Компьютерное чтение блоков', 'Проверка батареи электрокаров'], outcome: 'Абсолютно честное понимание состояния перед оплатой.' },
               { num: '3', name: 'ПОКУПКА', icon: ShieldCheck, title: 'Официальный договор', desc: 'Заключаем юридический договор. Оплата напрямую в банк по официальному инвойсу.', bullets: ['Юридический договор с гарантией', 'Оплата через банк по инвойсу', 'Фиксация итоговой цены под ключ'], outcome: '100% юридическая чистота сделки и защита бюджета.' },
-              { num: '4', name: 'ДОСТАВКА', icon: Truck, title: 'Скажи «Да!» своей мечте', desc: 'Бережная доставка в закрытых автовозах. Страхование на 100% стоимости авто.', bullets: ['Страхование на всех этапах пути', 'Транспортировка в автовозах', 'GPS-мониторинг местоположения'], outcome: 'Безупречная защита кузова от дорожного мусора.' },
+              { num: '4', name: 'ДОСТАВКА', icon: Truck, title: 'Скажи «Да!» своей мечте', desc: 'Бережная доставка в закрытых автовозах. Страхование на 100% стоимости авто.', bullets: ['Страхование на всех этапах пути', 'Транспортировка в закрытых автовозах', 'GPS-мониторинг местоположения'], outcome: 'Безупречная защита кузова от дорожного мусора.' },
               { num: '5', name: 'ТАМОЖНЯ', icon: FileText, title: 'Оформление документов', desc: 'Быстрое прохождение таможни во Владивостоке или странах ЕАЭС со списанием утильсбора.', bullets: ['Выдача легальных СБКТС и ЭПТС', 'Официальное списание утильсбора', 'Полный пакет для ГИБДД'], outcome: 'Легальный автомобиль, готовый к постановке на учет.' },
               { num: '6', name: 'ВРУЧЕНИЕ', icon: Award, title: 'Торжественная выдача', desc: 'Проводим полный детейлинг авто. Торжественная выдача в офисе или доставка к дому.', bullets: ['Премиальная мойка и детейлинг', 'Вручение в офисе с подарками', 'Доставка эвакуатором прямо к дому'], outcome: 'Незабываемые эмоции и идеальный вид вашей новой машины.' }
             ].map((step, idx) => {
@@ -279,9 +279,9 @@ export default function Home() {
                 { num: '1', name: 'ПОДБОР', icon: Search, title: 'Подбор под ключ', desc: 'Анализируем аукционы и дилерские базы КНР, Кореи и ОАЭ. Находим идеальные варианты.', bullets: ['Анализ рынков в реальном времени', 'Доступ к закрытым площадкам дилеров', 'Согласование комплектации до мелочей'], outcome: 'Точное попадание в бюджет и параметры без скрытых комиссий.' },
                 { num: '2', name: 'ПРОВЕРКА', icon: Check, title: 'Экспертная проверка', desc: 'Наш инспектор выезжает на осмотр по 150+ параметрам с видео 4K и замером ЛКП.', bullets: ['Полный замер толщины ЛКП', 'Компьютерное чтение блоков', 'Проверка батареи электрокаров'], outcome: 'Абсолютно честное понимание состояния перед оплатой.' },
                 { num: '3', name: 'ПОКУПКА', icon: ShieldCheck, title: 'Официальный договор', desc: 'Заключаем юридический договор. Оплата напрямую в банк по официальному инвойсу.', bullets: ['Юридический договор с гарантией', 'Оплата через банк по инвойсу', 'Фиксация итоговой цены под ключ'], outcome: '100% юридическая чистота сделки и защита бюджета.' },
-                { num: '4', name: 'ДОСТАВКА', icon: Truck, title: 'Скажи «Да!» своей мечте', desc: 'Бережная доставка в автовозах. Страхование на 100% стоимости авто.', bullets: ['Страхование на всех этапах пути', 'Транспортировка в автовозах', 'GPS-мониторинг местоположения'], outcome: 'Безупречная защита кузова от дорожного мусора.' },
+                { num: '4', name: 'ДОСТАВКА', icon: Truck, title: 'Скажи «Да!» своей мечте', desc: 'Бережная доставка в закрытых автовозах. Страхование на 100% стоимости авто.', bullets: ['Страхование на всех этапах пути', 'Транспортировка в закрытых автовозах', 'GPS-мониторинг местоположения'], outcome: 'Безупречная защита кузова от дорожного мусора.' },
                 { num: '5', name: 'ТАМОЖНЯ', icon: FileText, title: 'Оформление документов', desc: 'Быстрое прохождение таможни во Владивостоке или странах ЕАЭС со списанием утильсбора.', bullets: ['Выдача легальных СБКТС и ЭПТС', 'Официальное списание утильсбора', 'Полный пакет для ГИБДД'], outcome: 'Легальный автомобиль, готовый к постановке на учет.' },
-                { num: '6', name: 'ВРУЧЕНИЕ', icon: Award, title: 'Торжественная выдача', desc: 'Проводим полный детейлинг авто. Торжественная выдача в офисе или доставка к дому.', bullets: ['Премиальная мойка и детейлинг', 'Вручение в офисе с подарками', 'Доставка прямо к дому'], outcome: 'Незабываемые эмоции и идеальный вид вашей новой машины.' }
+                { num: '6', name: 'ВРУЧЕНИЕ', icon: Award, title: 'Торжественная выдача', desc: 'Проводим полный детейлинг авто. Торжественная выдача в офисе или доставка к дому.', bullets: ['Премиальная мойка и детейлинг', 'Вручение в офисе с подарками', 'Доставка эвакуатором прямо к дому'], outcome: 'Незабываемые эмоции и идеальный вид вашей новой машины.' }
               ].map((step, idx) => {
                 if (activeServiceStep !== idx) return null;
                 return (
@@ -331,6 +331,8 @@ export default function Home() {
             </AnimatePresence>
           </div>
 
+
+
         </div>
       </div>
 
@@ -365,7 +367,7 @@ export default function Home() {
         <div className="flex justify-between items-center mb-2.5">
           <h3 className="font-display text-[9px] font-black uppercase tracking-widest text-[#78716C] flex items-center space-x-1">
             <Flame className="w-3 h-3 text-[#C5A880] fill-[#C5A880]" />
-            <span>Популярные модели </span>
+            <span>Горячие предложения каталога</span>
           </h3>
           <button
             onClick={() => {
@@ -390,7 +392,7 @@ export default function Home() {
                 viewport={{ once: true, margin: '-10px' }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
                 onClick={() => handleOpenCar(car.id)}
-                className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/25 rounded-3xl overflow-hidden flex flex-col shadow-sm cursor-pointer group animate-fade-in"
+                className="bg-white border border-[#EFEBE4] hover:border-[#C5A880]/30 rounded-3xl overflow-hidden flex flex-col gold-glow-card cursor-pointer group animate-fade-in"
               >
                 <div 
                   onClick={(e) => {
@@ -461,7 +463,7 @@ export default function Home() {
                     </button>
                     <button
                       onClick={() => handleOpenCar(car.id)}
-                      className="flex-1 py-2 bg-[#1C1917] hover:bg-black text-white rounded-xl text-[10px] font-bold uppercase tracking-wider transition active:scale-95 cursor-pointer flex items-center justify-center space-x-1"
+                      className="flex-1 py-2 bg-[#1C1917] hover:bg-black text-white rounded-xl text-[10px] font-bold uppercase tracking-wider transition active:scale-95 cursor-pointer flex items-center justify-center space-x-1 btn-shine"
                     >
                       <span>Подробнее об авто</span>
                       <ChevronRight className="w-3 h-3" />
@@ -502,7 +504,7 @@ export default function Home() {
           </div>
 
           <p className="text-[7.5px] text-[#78716C] font-black uppercase tracking-wider">
-            Опыт с 2022 года • Местное доверие • Индивидуальный подход
+            Мировой опыт • Местное доверие • Индивидуальный подход
           </p>
         </div>
       </div>
@@ -516,7 +518,7 @@ export default function Home() {
               Индивидуальный консьерж-подбор
             </h4>
             <p className="text-[10px] text-slate-300 font-bold mt-1 leading-tight">
-              Оставьте заявку — свяжемся с Вами для детального обсуждения
+              Оставьте заявку — куратор свяжется с вами для детального согласования
             </p>
           </div>
           <button
